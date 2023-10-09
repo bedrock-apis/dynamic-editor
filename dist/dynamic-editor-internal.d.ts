@@ -36,7 +36,7 @@ declare interface ExtensionOptionalParameters {description?: string, notes?: str
 /**@beta */
 export declare class Josh {
     get name(): number;
-    /**@internal */
+    /**@internal @readonly */
     get suss(): MinecraftEditor;
 }
 

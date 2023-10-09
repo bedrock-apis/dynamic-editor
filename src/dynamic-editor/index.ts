@@ -4,7 +4,7 @@ export const sus: string = ";  ";
 /**@beta */
 export class Josh{
     get name(){return 5;}
-    /**@internal */
+    /**@internal @readonly */
     get suss(){return editor}
 }
 export {Extension as SuperSus} from "@minecraft/server-editor-bindings";

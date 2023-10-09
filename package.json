@@ -1,0 +1,23 @@
+{
+  "name": "dynamic-editor",
+  "version": "0.1.0",
+  "description": "Dynamic Editor Module",
+  "typings":"./dist/dynamic-editor.d.ts",
+  "scripts": {
+    "build": "npx tsc -p configs/tsconfig.json & npx api-extractor run --config=configs/api-extractor.json --local & powershell Remove-Item -Recurse -Force \".bin\"",
+    "watch": "powershell ./scripts/watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Bedrock-APIs/based-editor.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Bedrock-APIs/based-editor/issues"
+  },
+  "homepage": "https://github.com/Bedrock-APIs/based-editor#readme",
+  "dependencies": {
+    "@microsoft/api-extractor": "^7.38.0",
+    "@minecraft/server": "beta"
+  }
+}

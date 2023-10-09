@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+        "module": "es2022",
+        "target": "ESNext",
+        "moduleResolution": "node",
+        "downlevelIteration": true,
+        "allowJs": true,
+        "checkJs": false,
+        "declaration": true,
+        "emitDeclarationOnly": true,
+        "allowSyntheticDefaultImports": true,
+        "outDir": "../.bin",
+        "baseUrl": "../src",
+        "resolveJsonModule": true,
+        "strict": true,
+        "typeRoots": ["../node_modules"],
+        "types": [
+            "@minecraft/server"
+        ],
+        "skipLibCheck": true
+    },
+    "exclude": ["../node_modules"],
+    "include": ["../src/"]
+}

@@ -7,7 +7,6 @@
         "allowJs": true,
         "checkJs": false,
         "declaration": true,
-        "emitDeclarationOnly": true,
         "allowSyntheticDefaultImports": true,
         "outDir": "../.bin",
         "baseUrl": "../src",
@@ -15,7 +14,8 @@
         "strict": true,
         "typeRoots": ["../node_modules"],
         "types": [
-            "@minecraft/server"
+            "@minecraft/server",
+            "@minecraft/server-editor"
         ],
         "skipLibCheck": true
     },

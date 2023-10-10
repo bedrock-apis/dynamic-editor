@@ -18,15 +18,13 @@ import * as _00 from '@minecraft/server';
 
 /* Excluded from this release type: CursorTargetMode */
 
+/* Excluded from this release type: editor */
+
+/* Excluded from this release type: Extension */
+
 /* Excluded from this release type: ExtensionContext */
 
 /* Excluded from this release type: ExtensionOptionalParameters */
-
-/**@beta */
-export declare class Josh {
-    get name(): number;
-    /* Excluded from this release type: suss */
-}
 
 /* Excluded from this release type: Logger */
 
@@ -37,10 +35,6 @@ export declare class Josh {
 /* Excluded from this release type: Selection_2 */
 
 /* Excluded from this release type: SelectionManager */
-
-/* Excluded from this release type: SuperSus */
-
-export declare const sus: string;
 
 /* Excluded from this release type: TransactionManager */
 

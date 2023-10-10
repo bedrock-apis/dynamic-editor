@@ -13,7 +13,8 @@
         "strict": true,
         "typeRoots": ["./node_modules"],
         "types": [
-            "@minecraft/server"
+            "@minecraft/server",
+            "@minecraft/server-editor"
         ],
         "skipLibCheck": true
     },

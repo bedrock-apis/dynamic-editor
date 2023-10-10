@@ -29,7 +29,8 @@
     ],
     "dependencies": [
         {"module_name": "@minecraft/server","version": "1.7.0-beta"},
-        {"module_name": "@minecraft/server-editor-bindings","version": "0.1.0-beta"}
+        {"module_name": "@minecraft/server-editor-bindings","version": "0.1.0-beta"},
+        {"module_name": "@minecraft/server-editor","version": "0.1.0-beta"}
     ],
     "capabilities":["editorExtension","script_eval"]
 }

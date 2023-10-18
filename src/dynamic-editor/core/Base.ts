@@ -4,7 +4,12 @@
 const TypeError = globalThis.TypeError;
 const ReferenceError = globalThis.ReferenceError;
 const random = Math.random;
-const floor = Math.floor;/*
+const floor = Math.floor;
+export const NewKeyword = "must be called with new";
+export const ObjectBoundNotExist ="Native object bound to prototype does not exist.";
+export const NoConstructor = `No constructor for native class `;
+export const NoPrivileges = `Native function [$] does not have required privileges.`;
+/*
 export const NewKeyword = ()=>new TypeError("must be called with new");
 export const ObjectBoundNotExist = ()=>new ReferenceError("Native object bound to prototype does not exist.");
 export const NoConstructor = (name)=>new ReferenceError(`No constructor for native class '${name}'`);

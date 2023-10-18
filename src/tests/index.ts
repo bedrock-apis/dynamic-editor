@@ -1,8 +1,15 @@
-import { editor } from "dynamic-editor";
-import { TriggerEvent } from "dynamic-editor/core/index";
+import { EditorExtension } from "dynamic-editor";
 
-editor.events.clientReady.subscribe((a)=>{
-    console.warn("test: " + a.client);
-});
-TriggerEvent(editor.events.clientReady,{client:"TEST PARAM"});
-console.warn("Lol");
+class MyExtension extends EditorExtension{
+    Initialiaze(){
+        console.warn("Initialize");
+        this.onShutdown.subscribe((e)=>console.warn("Event On Shutdown"));
+    }
+    Ready(){
+        console.warn("Ready!");
+    }
+    Shutdown(){
+        console.warn("Shutdown");
+    }
+}
+MyExtension.registry();

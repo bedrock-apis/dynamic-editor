@@ -1,7 +1,14 @@
-import "./core/index";
-import "./private/index";
+/*
+import { Editor } from "./public_bin/Editor";
 
-
-export { editor, Editor } from "./public/Editor";
-export { ClientReadyEvent, ClientReadyEventData, EditorEvents} from "./public/Events";
-export { BuildInPane, RedirectDestination as Destination, PublicEvent } from "./core/index";
+export { Editor, EditorEvents } from "./public_bin/Editor";
+export { ClientReadyEvent } from "./public_bin/PublicEvents";*/
+export { BuildInPane, RedirectDestination as Destination } from "./core/index";
+export { EditorExtension } from "./native/Editor/index";
+export { 
+    ExtensionInitializeEvent, ExtensionInitializeEventData,
+    ExtensionReadyEvent, ExtensionReadyEventData,
+    ExtensionShutdownEvent, ExtensionShutdownEventData
+} from "./native/Events";
+/*
+export const editor: Editor = CreateInstance(Editor,e);*/

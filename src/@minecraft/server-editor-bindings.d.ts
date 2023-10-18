@@ -31,7 +31,7 @@ export class TransactionManager { private constructor(); commitOpenTransaction()
 export interface ClipboardWriteOptions {anchor?: _00.Vector3, mirror?: ClipboardMirrorAxis, offset?: _00.Vector3, rotation?: ClipboardRotation}
 /**@alpha */
 export interface CursorProperties {controlMode?: CursorControlMode, fixedModeDistance?: number, outlineColor?: _00.RGBA, targetMode?: CursorTargetMode, visible?: number}
-/**@alpha */
+/**@public */
 export interface ExtensionOptionalParameters {description?: string, notes?: string}
 /**@alpha */
 export interface LogProperties {player?: _00.Player, tags?: string[]}

@@ -1,0 +1,1 @@
+- Editor class and its instance with Client class is not intented to be available, becuase its not useful, is onClientReadyEvent useful?

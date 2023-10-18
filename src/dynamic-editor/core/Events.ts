@@ -1,11 +1,7 @@
-import { core } from "./Base";
-import { NoConstructor } from "./Errors";
-
 /**
  * Represents an event signal.
- * @template - The types of the arguments passed to the event handlers.
+ * - The types of the arguments passed to the event handlers.
  */
-type EventType<R extends any[]> = NativeEvent<R> | PublicEvent<R>;
 const sessions = new WeakMap<NativeEvent<any> | PublicEvent<any>,Set<(...params: any)=>void>>();
 export class NativeEvent<args extends any[]>{
     constructor(){sessions.set(this,new Set());}
@@ -62,12 +58,8 @@ export async function TriggerEvent<R extends any[]>(event: NativeEvent<R> | Publ
     }
 }
 /**@public */
-export class PublicEvent<args extends any[]>{
-    protected constructor(){
-        if(!core.isNativeCall) throw new TypeError(NoConstructor + new.target.name);
-        sessions.set(this,new Set());
-    }
-
+export class PublicEvent<args extends any[]> {
+    constructor(){sessions.set(this,new Set());}
     /**
      * Subscribes to the event signal.
      * @template  k - The type of the event handler function.

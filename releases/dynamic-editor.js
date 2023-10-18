@@ -1,3 +1,4 @@
+/*! This file was automatically generated. */
 import * as __WEBPACK_EXTERNAL_MODULE__minecraft_server_editor_bindings_e2bf1028__ from "@minecraft/server-editor-bindings";
 import * as __WEBPACK_EXTERNAL_MODULE__minecraft_server_fb7572af__ from "@minecraft/server";
 /******/ // The require scope
@@ -27,7 +28,7 @@ var __webpack_exports__ = {};
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
   uf: () => (/* reexport */ Definitions_BuildInPane),
-  o6: () => (/* reexport */ Definitions_RedirectDestination),
+  o6: () => (/* reexport */ Destination),
   MC: () => (/* reexport */ EditorExtension),
   et: () => (/* reexport */ ExtensionInitializeEvent),
   V2: () => (/* reexport */ ExtensionInitializeEventData),
@@ -37,7 +38,7 @@ __webpack_require__.d(__webpack_exports__, {
   _4: () => (/* reexport */ ExtensionShutdownEventData)
 });
 
-;// CONCATENATED MODULE: ./.bin/dynamic-editor/core/Events.js
+;// CONCATENATED MODULE: ./src/dynamic-editor/core/Events.ts
 /**
  * Represents an event signal.
  * - The types of the arguments passed to the event handlers.
@@ -136,7 +137,7 @@ class PublicEvent {
     }
 }
 
-;// CONCATENATED MODULE: ./.bin/dynamic-editor/core/Base.js
+;// CONCATENATED MODULE: ./src/dynamic-editor/core/Base.ts
 /////////////////////////////////////
 ///// Errors
 /////////////////////////////////////
@@ -168,7 +169,7 @@ class Core {
 }
 const Base_core = new Core();
 
-;// CONCATENATED MODULE: ./.bin/dynamic-editor/core/Definitions.js
+;// CONCATENATED MODULE: ./src/dynamic-editor/core/Definitions.ts
 /**@public */
 var Definitions_RedirectDestination;
 (function (RedirectDestination) {
@@ -300,126 +301,107 @@ const ReceiveEventEnum = {
     [ReceiveEventId["Editor::ClientUXEvents"]]: ReceiveUXEventType,
 };
 
-;// CONCATENATED MODULE: ./.bin/dynamic-editor/core/APIBuilder.js
+;// CONCATENATED MODULE: ./src/dynamic-editor/core/APIBuilder.js
+
 
 const $native_functions = new WeakSet();
 const APIBuilder_toString = Function.prototype.toString;
 const call = Function.prototype.call.bind(Function.prototype.call);
 const FuncProto = Function.prototype;
 const ObjProto = Object.prototype;
-$native_functions.add(Function.prototype.toString = function () {
-    if ($native_functions.has(this))
-        return `function ${this.name}() {\n    [native code]\n}`;
-    return call(APIBuilder_toString, this);
+$native_functions.add(Function.prototype.toString = function(){
+    if($native_functions.has(this)) return `function ${this.name}() {\n    [native code]\n}`;
+    return call(APIBuilder_toString,this);
 });
+
 const constructors = new WeakMap();
 const PUBLIC_CACHES = new WeakMap();
-function ReleaseCache(constructor, cache) {
+function ReleaseCache(constructor,cache){
     const k = PUBLIC_CACHES.get(cache);
     PUBLIC_CACHES.delete(cache);
-    return constructors.get(constructor)?.cache?.delete?.(k) ?? false;
+    return constructors.get(constructor)?.cache?.delete?.(k)??false;
 }
-function GetPublicInstance(cache) { return PUBLIC_CACHES.get(cache); }
-function IsRegistered(func) { return constructors.has(func) || func === FuncProto; }
-function CreateMethodFunction(name, func, manager) {
-    const f = function () {
+function GetPublicInstance(cache){ return PUBLIC_CACHES.get(cache); }
+function IsRegistered(func){return constructors.has(func) || func === FuncProto;}
+function CreateMethodFunction(name,func,manager){
+    const f = function (){
         try {
             const cache = manager.getCache(this);
-            if (!cache)
-                throw new ReferenceError(ObjectBoundNotExist);
-            return call(func, this, cache, ...arguments);
-        }
-        catch (error) {
-            throw new error.constructor(error.message);
-        }
+            if(!cache) throw new ReferenceError(ObjectBoundNotExist);
+            return call(func,this,cache,...arguments);
+        } catch (error) {throw new error.constructor(error.message);}
     };
     $native_functions.add(f);
-    if (typeof name === "string")
-        Object.defineProperty(f, "name", { value: name, configurable: true, enumerable: true, writable: false });
+    if(typeof name === "string")  Object.defineProperty(f,"name",{value:name,configurable:true,enumerable:true,writable:false});
     return f;
 }
-function CreateGetterFunction(name, func, manager) {
-    const f = function () {
+function CreateGetterFunction(name,func,manager){
+    const f = function (){
         try {
             const cache = manager.getCache(this);
-            if (!cache)
-                return undefined;
-            return call(func, this, cache, ...arguments);
-        }
-        catch (error) {
-            throw new error.constructor(error.message);
-        }
+            if(!cache) return undefined;
+            return call(func,this,cache,...arguments);
+        } catch (error) {throw new error.constructor(error.message);}
     };
     $native_functions.add(f);
-    if (typeof name === "string")
-        Object.defineProperty(f, "name", { value: name, configurable: true, enumerable: true, writable: false });
+    if(typeof name === "string") Object.defineProperty(f,"name",{value:name,configurable:true,enumerable:true,writable:false});
     return f;
 }
-class Manager {
-    constructor() {
+class Manager{
+    constructor(){
         this.cache = new WeakMap();
-        this.getCache = (that) => this.cache.get(that);
-        this.hasCache = (that) => this.cache.has(that);
-        this.setCache = (that, it) => this.cache.set(that, it);
+        this.getCache = (that)=>this.cache.get(that);
+        this.hasCache = (that)=>this.cache.has(that);
+        this.setCache = (that,it)=>this.cache.set(that,it);
     }
 }
-function RegisterClass(classConstructor) {
-    if (IsRegistered(classConstructor))
-        return constructors.get(classConstructor);
-    if (!IsRegistered(Object.getPrototypeOf(classConstructor)))
-        throw new ReferenceError("Parent class is not registred.");
+function RegisterClass(classConstructor){
+    if(IsRegistered(classConstructor)) return constructors.get(classConstructor);
+    if(!IsRegistered(Object.getPrototypeOf(classConstructor))) throw new ReferenceError("Parent class is not registred.");
     const m = new Manager();
-    constructors.set(classConstructor, m);
+    constructors.set(classConstructor,m);
     return m;
 }
-function CreateInstance(constructor, cache, proto = constructor.prototype) {
-    if (!IsRegistered(constructor))
-        throw new ReferenceError("Constructor is not registered.");
+function CreateInstance(constructor,cache, proto = constructor.prototype){
+    if(!IsRegistered(constructor)) throw new ReferenceError("Constructor is not registered.");
     let con = constructor;
     const instance = Object.create(proto);
-    while (con != FuncProto & con != null & con != ObjProto) {
+    while(con != FuncProto & con != null & con!= ObjProto){
         const m = constructors.get(con);
-        m.setCache(instance, cache);
+        m.setCache(instance,cache);
         con = Object.getPrototypeOf(con);
     }
-    PUBLIC_CACHES.set(cache, instance);
+    PUBLIC_CACHES.set(cache,instance);
     return instance;
 }
-function CreateClass(name, properties, func, extending = FuncProto) {
-    properties = properties ?? {};
-    func = func ??= function () {
-        if (!new.target)
-            throw new TypeError(NewKeyword);
-        if (!core.isNativeCall)
-            throw new ReferenceError(NoConstructor + name);
-    };
-    Object.defineProperty(func, "name", { value: name, configurable: true, enumerable: true, writable: false });
-    Object.setPrototypeOf(func, extending);
-    Object.setPrototypeOf(func.prototype, extending.prototype ?? ObjProto);
+function CreateClass(name,properties,func, extending = FuncProto){
+    properties = properties??{};
+    func = func??=function (){
+        if(!new.target) throw new TypeError(NewKeyword);
+        if(!core.isNativeCall) throw new ReferenceError(NoConstructor + name);
+    }
+    Object.defineProperty(func,"name",{value:name,configurable:true,enumerable:true,writable:false});
+    Object.setPrototypeOf(func,extending);
+    Object.setPrototypeOf(func.prototype,extending.prototype??ObjProto);
     $native_functions.add(func);
     const manager = RegisterClass(func);
     const proto = func.prototype;
-    Object.setPrototypeOf(properties, manager);
+    Object.setPrototypeOf(properties,manager);
     for (const key of Object.getOwnPropertyNames(properties)) {
-        const { value, get, set, enumerable, configurable, writable } = Object.getOwnPropertyDescriptor(properties, key);
-        if (typeof value === "function") {
-            Object.defineProperty(proto, key, { value: CreateMethodFunction(key, value, manager), enumerable, configurable, writable });
-        }
-        else if (get || set)
-            Object.defineProperty(proto, key, { get: typeof get === "function" ? CreateGetterFunction(key, get, manager) : undefined, set: typeof set === "function" ? CreateMethodFunction(key, set, manager) : undefined, enumerable, configurable });
+        const {value,get,set,enumerable,configurable,writable} = Object.getOwnPropertyDescriptor(properties,key);
+        if(typeof value === "function"){
+            Object.defineProperty(proto,key,{value:CreateMethodFunction(key,value,manager),enumerable,configurable,writable});
+        } else if(get || set) Object.defineProperty(proto,key,{get:typeof get === "function"?CreateGetterFunction(key,get,manager):undefined,set:typeof set === "function"?CreateMethodFunction(key,set,manager):undefined,enumerable,configurable});
     }
     for (const key of Object.getOwnPropertySymbols(properties)) {
-        const { value, get, set, enumerable, configurable, writable } = Object.getOwnPropertyDescriptor(properties, key);
-        if (typeof value === "function") {
-            Object.defineProperty(proto, key, { value: CreateMethodFunction(key, value, manager), enumerable, configurable, writable });
-        }
-        else if (get || set)
-            Object.defineProperty(proto, key, { get: typeof get === "function" ? CreateGetterFunction(key, get, manager) : undefined, set: typeof set === "function" ? CreateMethodFunction(key, set, manager) : undefined, enumerable, configurable });
+        const {value,get,set,enumerable,configurable,writable} = Object.getOwnPropertyDescriptor(properties,key);
+        if(typeof value === "function"){
+            Object.defineProperty(proto,key,{value:CreateMethodFunction(key,value,manager),enumerable,configurable,writable});
+        } else if(get || set) Object.defineProperty(proto,key,{get:typeof get === "function"?CreateGetterFunction(key,get,manager):undefined,set:typeof set === "function"?CreateMethodFunction(key,set,manager):undefined,enumerable,configurable});
     }
-    return { constructor: func, manager };
+    return {constructor: func, manager};
 }
-
-;// CONCATENATED MODULE: ./.bin/dynamic-editor/core/Packets.js
+;// CONCATENATED MODULE: ./src/dynamic-editor/core/Packets.ts
 
 class PacketManager {
     static GetRedirectToDestinationPacket(destination) {
@@ -466,14 +448,14 @@ class UpdateBuildInPanePacket extends (/* unused pure expression or super */ nul
     constructor(panelId, visible) { super({ type: ServerUXEventType.UpdateBuildInPanes, panel: panelId, visible }); }
 }
 
-;// CONCATENATED MODULE: ./.bin/dynamic-editor/core/index.js
+;// CONCATENATED MODULE: ./src/dynamic-editor/core/index.ts
 
 
 
 
 
 
-;// CONCATENATED MODULE: ./.bin/dynamic-editor/native/Editor/Editor.js
+;// CONCATENATED MODULE: ./src/dynamic-editor/native/Editor/Editor.ts
 class Editor {
     events;
     constructor() {
@@ -485,7 +467,7 @@ class EditorEvents {
 }
 const editor = new Editor();
 
-;// CONCATENATED MODULE: ./.bin/dynamic-editor/native/Events.js
+;// CONCATENATED MODULE: ./src/dynamic-editor/native/Events.ts
 
 /**@beta */
 class EventData {
@@ -533,54 +515,42 @@ class ExtensionShutdownEvent extends PublicEvent {
 }
 ;
 
-;// CONCATENATED MODULE: ./.bin/dynamic-editor/native/Editor/EditorExtension.js
+;// CONCATENATED MODULE: ./src/dynamic-editor/native/Editor/EditorExtension.js
+
 
 
 /**@public */
-class EditorExtension {
-    Shutdown() { }
-    ;
-    Ready() { }
-    ;
-    Initialize() { }
-    ;
+class EditorExtension{   
+    Shutdown(){};
+    Ready(){};
+    Initialize(){};
     onInitialize = new ExtensionInitializeEvent();
     onReady = new ExtensionReadyEvent();
     onShutdown = new ExtensionShutdownEvent();
     /**@param {import("./EditorContext").EditorContextManager} context  */
-    constructor(context, that = EditorExtension) {
-        if (!Base_core.isNativeCall)
-            throw new TypeError(Base_NoConstructor + EditorExtension.name);
+    constructor(context, that = EditorExtension){
+        if(!Base_core.isNativeCall) throw new TypeError(Base_NoConstructor + EditorExtension.name);
         this.player = context.player;
         this.client = context.client;
-        context.onInitialiazeEvent.subscribe(() => {
+        context.onInitialiazeEvent.subscribe(()=>{
             try {
                 this.Initialiaze?.(this.public);
-            }
-            catch (error) {
-                console.error(error, error.stack);
-            }
-            TriggerEvent(this.onInitialize, new ExtensionInitializeEventData(this));
+            } catch (error) {console.error(error,error.stack);}
+            TriggerEvent(this.onInitialize,new ExtensionInitializeEventData(this));
         });
-        context.onReadyEvent.subscribe(() => {
+        context.onReadyEvent.subscribe(()=>{
             try {
                 this.Ready?.(this.public);
-            }
-            catch (error) {
-                console.error(error, error.stack);
-            }
-            TriggerEvent(this.onReady, new ExtensionReadyEventData(this));
+            } catch (error) {console.error(error,error.stack);}
+            TriggerEvent(this.onReady,new ExtensionReadyEventData(this));
         });
-        context.onShutdownEvent.subscribe(() => {
-            TriggerEvent(this.onShutdown, new ExtensionShutdownEventData(this));
+        context.onShutdownEvent.subscribe(()=>{
+            TriggerEvent(this.onShutdown,new ExtensionShutdownEventData(this));
             try {
                 this.Shutdown?.(this.public);
-            }
-            catch (error) {
-                console.error(error, error.stack);
-            }
+            } catch (error) {console.error(error,error.stack);}
         });
-        Object.setPrototypeOf(this, that.prototype ?? EditorExtension.prototype);
+        Object.setPrototypeOf(this,that.prototype??EditorExtension.prototype);
     }
 }
 /*
@@ -590,8 +560,7 @@ export const PublicEditorExtension = CreateClass("EditorExtension",{
     Initialize(){},
     get player(): Player{return super.getCache(this).player;},
     get client(){return GetPublicInstance(super.getCache(this).context.client);}
-}).constructor as unknown as typeof EX;*/ 
-
+}).constructor as unknown as typeof EX;*/
 ;// CONCATENATED MODULE: external "@minecraft/server-editor-bindings"
 var x = y => { var x = {}; __webpack_require__.d(x, y); return x; }
 var y = x => () => x
@@ -599,8 +568,8 @@ const server_editor_bindings_namespaceObject = x({ ["editor"]: () => __WEBPACK_E
 ;// CONCATENATED MODULE: external "@minecraft/server"
 var server_x = y => { var x = {}; __webpack_require__.d(x, y); return x; }
 var server_y = x => () => x
-const server_namespaceObject = server_x({ ["world"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_fb7572af__.world });
-;// CONCATENATED MODULE: ./.bin/dynamic-editor/native/Editor/EditorEventManager.js
+const server_namespaceObject = server_x({ ["Player"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_fb7572af__.Player, ["world"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_fb7572af__.world });
+;// CONCATENATED MODULE: ./src/dynamic-editor/native/Editor/EditorEventManager.ts
 
 
 class EditorEventManager {
@@ -629,12 +598,14 @@ class EditorEventManager {
 }
 const editorEventManager = new EditorEventManager();
 
-;// CONCATENATED MODULE: ./.bin/dynamic-editor/native/Editor/EditorContext.js
+;// CONCATENATED MODULE: ./src/dynamic-editor/native/Editor/EditorContext.ts
+
 
 
 
 
 const CONTEXT_MANAGERS = new WeakMap();
+const POST = server_namespaceObject.Player.prototype.postClientMessage;
 class EditorContextManager {
     context;
     player;
@@ -648,8 +619,7 @@ class EditorContextManager {
     onActionExecuted = new NativeEvent();
     onPanePropertyChanged = new NativeEvent();
     onPaneVisibilityChanged = new NativeEvent();
-    isValid = true;
-    isReady = false;
+    isReady = true;
     /**@param {ExtensionContext} context  */
     constructor(context, that) {
         if (CONTEXT_MANAGERS.has(context))
@@ -660,8 +630,10 @@ class EditorContextManager {
         this.selectionManager = context.selectionManager;
         this.player = context.player;
         editorEventManager.onClientReady.subscribe(({ player }) => {
-            if (player === this.player)
+            if (player === this.player) {
+                this.isReady = true;
                 this.onReadyEvent.trigger(this);
+            }
         });
         Base_core.isNativeCall = true;
         //@ts-ignore
@@ -671,16 +643,18 @@ class EditorContextManager {
     }
     shutdown() {
         this.onShutdownEvent.trigger(this);
-        this.isValid = false;
+        this.isReady = false;
     }
     static Shutdown(context) {
         const that = CONTEXT_MANAGERS.get(context);
         that?.shutdown();
     }
+    post(packet) { POST.call(this.player, packet.id, packet.getMessage()); }
 }
 EditorExtension.registry = function (extensionName) {
     if (typeof this !== 'function')
         throw new TypeError("Bound to 'this' is not a function.");
+    //@ts-ignore
     this.extensionName = (extensionName ?? this.extensionName) ?? this.name;
     if (typeof this.extensionName !== 'string')
         throw new ReferenceError("Extension name required.");
@@ -691,13 +665,13 @@ function registerExtension_Internal(extensionName, that, metadata) {
     server_editor_bindings_namespaceObject.editor.registerExtension_Internal(extensionName, (context) => { new EditorContextManager(context, that); }, (context) => { EditorContextManager.Shutdown(context); }, metadata ?? {});
 }
 
-;// CONCATENATED MODULE: ./.bin/dynamic-editor/native/Editor/index.js
+;// CONCATENATED MODULE: ./src/dynamic-editor/native/Editor/index.ts
 
 
 
 
 
-;// CONCATENATED MODULE: ./.bin/dynamic-editor/index.js
+;// CONCATENATED MODULE: ./src/dynamic-editor/index.ts
 /*
 import { Editor } from "./public_bin/Editor";
 
@@ -705,11 +679,13 @@ export { Editor, EditorEvents } from "./public_bin/Editor";
 export { ClientReadyEvent } from "./public_bin/PublicEvents";*/
 
 
+const Destination = Definitions_RedirectDestination;
+
 
 /*
 export const editor: Editor = CreateInstance(Editor,e);*/ 
 
-;// CONCATENATED MODULE: ./.bin/dynamic-editor.js
+;// CONCATENATED MODULE: ./src/dynamic-editor.ts
 
 
 var __webpack_exports__BuildInPane = __webpack_exports__.uf;

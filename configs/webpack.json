@@ -1,6 +1,6 @@
 {
     "outDir":"../releases/",
     "entries":{
-        "dynamic-editor":"../.bin/dynamic-editor.js"
+        "dynamic-editor":"../src/dynamic-editor.ts"
     }
 }

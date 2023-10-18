@@ -2,9 +2,9 @@
   "name": "dynamic-editor",
   "version": "0.1.0",
   "description": "Dynamic Editor Module",
-  "typings":"./dist/dynamic-editor.d.ts",
+  "typings": "./dist/dynamic-editor.d.ts",
   "scripts": {
-    "build": "npx tsc -p configs/tsconfig.json & node ./scripts/webpack.js configs/webpack.json & npx api-extractor run --config=configs/api-extractor.json --local & powershell Remove-Item -Recurse -Force \".bin\"",
+    "build": "node ./scripts/webpack.js configs/webpack.json",
     "watch": "powershell -ExecutionPolicy ByPass -File ./scripts/watch.ps1",
     "init": "npm i & npx tsc & powershell Start-Process -FilePath \"regolith\" -ArgumentList \"run\" -PassThru -NoNewWindow -WorkingDirectory ./configs & npm run build"
   },
@@ -18,9 +18,12 @@
   },
   "homepage": "https://github.com/Bedrock-APIs/based-editor#readme",
   "dependencies": {
-    "@microsoft/api-extractor": "^7.38.0",
     "@minecraft/server": "beta",
     "@minecraft/server-editor": "beta",
-    "webpack":"^5.88.1"
+    "dts-bundle-generator": "^8.1.0",
+    "ts-loader": "^9.5.0",
+    "tsconfig-paths-webpack-plugin": "^4.1.0",
+    "typescript": "^5.2.2",
+    "webpack": "^5.88.1"
   }
 }

@@ -1,7 +1,10 @@
 const webpack = require("webpack");
+const TesterPlugin = require("terser-webpack-plugin");
+const { TsconfigPathsPlugin } = require("tsconfig-paths-webpack-plugin");
 const path = require("path");
 const fs = require("fs");
 const { argv } = require("process");
+const { generateDtsBundle } = require("dts-bundle-generator");
 
 function BuildConfig(config,baseDir){
     if(typeof config !== "object") throw new TypeError("Config is not type of object");
@@ -12,14 +15,33 @@ function BuildConfig(config,baseDir){
         mode: "production",
         target: ["es2020"],
         // ------ ^
-        module: {rules: []},
+        module: {
+            rules: [
+              {
+                test: /\.tsx?$/,
+                use: "ts-loader",
+                exclude: /node_modules/,
+              },
+            ]
+        },
         resolve: {
-            plugins: [],
-            extensions: [".js"]
+            plugins: [new TsconfigPathsPlugin()],
+            extensions: [".ts", ".js"]
         },
         optimization: {
             minimize: true,
-            minimizer: []  
+            minimizer: [
+              new TesterPlugin({
+                include: /\.min\.js$/,
+                terserOptions: {
+                  format: {
+                    comments: 'some',
+                  }
+                },
+                extractComments: false
+              }),
+              new webpack.BannerPlugin(`This file was automatically generated.`),    
+            ]  
         },
         output: {
             filename: '[name].js',
@@ -59,12 +81,33 @@ async function BundleModules(webpack_config){
     });
     await promise;
 }
+async function DeclarationCompile(config){
+    const options = {preferredConfigPath:"./configs/tsconfig.json"};
+    let data = "";
+    
+    const module_names = Object.getOwnPropertyNames(config.entry);
+    const outputPath = config.output.path;
+    for(const module_name of module_names)
+    {
+        console.log("[D.TS]","Generating declaration file for '" + module_name + ".js' . . .");
+        const [types] = generateDtsBundle([{filePath:config.entry[module_name],
+            failOnClass: false,
+            output: {
+              noBanner: true,
+              exportReferencedTypes: true,
+              inlineDeclareExternals: true,
+            }}], options);
+        fs.writeFileSync(outputPath +`/${module_name}.d.ts`, types + "\n" + data);
+    }
+}
 const config = argv[2];
 if(config){
     if(!fs.existsSync(config)) return console.error("File not found: " + config);
     if(!config.endsWith(".json")) console.warn("'" + config + "' should end with '.json'");
     const dirname = path.dirname(config);
     const a = JSON.parse(fs.readFileSync(config));
-    BundleModules(BuildConfig(a,dirname)).catch(er=>console.error(er,er.stack));
+    const cf = BuildConfig(a,dirname)
+    BundleModules(cf).catch(er=>console.error(er,er.stack));
+    DeclarationCompile(cf).catch(er=>console.error(er,er.stack));
 }
 else console.error("No config specified.");

@@ -6,7 +6,6 @@
         "downlevelIteration": true,
         "allowJs": true,
         "checkJs": false,
-        "declaration": true,
         "allowSyntheticDefaultImports": true,
         "outDir": "../.bin",
         "baseUrl": "../src",

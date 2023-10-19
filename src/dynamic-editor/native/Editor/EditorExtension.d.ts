@@ -1,11 +1,13 @@
 import { ExtensionOptionalParameters } from "@minecraft/server-editor-bindings";
 import { ExtensionInitializeEvent, ExtensionReadyEvent, ExtensionShutdownEvent } from "../Events";
+import { StatusBarControl } from "../Controls";
 /**@public */
 export abstract class EditorExtension{
     readonly player: Player;
     readonly onInitialize: ExtensionInitializeEvent<this>;
     readonly onReady: ExtensionReadyEvent<this>;
     readonly onShutdown: ExtensionShutdownEvent<this>;
+    readonly statusBar: StatusBarControl
     protected constructor();
     static readonly extensionName?: string;
     static readonly metadata?: ExtensionOptionalParameters;

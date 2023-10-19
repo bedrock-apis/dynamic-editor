@@ -2,4 +2,4 @@
 import "./debug/index";
 
 import "dynamic-editor.js";
-import "tests/index.js";
+import "tests/index.js"; 

@@ -1,7 +1,7 @@
 {
 	"$schema": "https://raw.githubusercontent.com/Bedrock-OSS/regolith-schemas/main/config/v1.1.json",
-	"author": "Dynamic Editor Testing",
-	"name": "Dynamic Editor Testing",
+	"author": "Dynamic_Editor_Testing",
+	"name": "Dynamic_Editor_Testing",
 	"packs": {
 		"behaviorPack": "../packs/BP",
 		"resourcePack": "../packs/RP"

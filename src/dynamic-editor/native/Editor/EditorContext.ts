@@ -3,6 +3,7 @@ import { NativeEvent, Packet, core } from "../../core/index";
 import { EditorExtension } from "./EditorExtension";
 import { editorEventManager } from "./EditorEventManager";
 import { Player } from "@minecraft/server";
+import { EditorControlManager } from "./EditorControlManager";
 
 const CONTEXT_MANAGERS = new WeakMap();
 const POST = Player.prototype.postClientMessage;
@@ -11,6 +12,7 @@ export class EditorContextManager{
     readonly player;
     readonly transactionManager;
     readonly selectionManager;
+    readonly controlManager;
     readonly extension;
     readonly onInitialiazeEvent = new NativeEvent<[this]>();
     readonly onReadyEvent = new NativeEvent<[this]>();
@@ -19,7 +21,7 @@ export class EditorContextManager{
     readonly onActionExecuted = new NativeEvent();
     readonly onPanePropertyChanged = new NativeEvent();
     readonly onPaneVisibilityChanged = new NativeEvent();
-    isReady = true;
+    isReady = false;
     /**@param {ExtensionContext} context  */
     constructor(context: ExtensionContext,that: new () => any){
         if(CONTEXT_MANAGERS.has(context)) return CONTEXT_MANAGERS.get(context);
@@ -35,6 +37,7 @@ export class EditorContextManager{
             }
         });
         core.isNativeCall = true;
+        this.controlManager = new EditorControlManager(this);
         //@ts-ignore
         this.extension = (new EditorExtension(this,that)) as EditorExtension;
         core.isNativeCall = false;

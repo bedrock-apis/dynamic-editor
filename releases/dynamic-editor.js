@@ -27,6 +27,8 @@ var __webpack_exports__ = {};
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
+  sj: () => (/* reexport */ BindedProperty),
+  xv: () => (/* reexport */ BooleanProperty),
   uf: () => (/* reexport */ Definitions_BuildInPane),
   o6: () => (/* reexport */ Destination),
   MC: () => (/* reexport */ EditorExtension),
@@ -35,7 +37,12 @@ __webpack_require__.d(__webpack_exports__, {
   hV: () => (/* reexport */ ExtensionReadyEvent),
   CS: () => (/* reexport */ ExtensionReadyEventData),
   CG: () => (/* reexport */ ExtensionShutdownEvent),
-  _4: () => (/* reexport */ ExtensionShutdownEventData)
+  _4: () => (/* reexport */ ExtensionShutdownEventData),
+  Y6: () => (/* reexport */ NumberProperty),
+  V7: () => (/* reexport */ StatusBarAlignmentProperty),
+  wl: () => (/* reexport */ StatusBarItem),
+  se: () => (/* reexport */ StatusBarItemAlignment),
+  h_: () => (/* reexport */ StringProperty)
 });
 
 ;// CONCATENATED MODULE: ./src/dynamic-editor/core/Events.ts
@@ -102,7 +109,7 @@ async function TriggerEvent(event, ...params) {
     }
 }
 /**@public */
-class PublicEvent {
+class Events_PublicEvent {
     constructor() { sessions.set(this, new Set()); }
     /**
      * Subscribes to the event signal.
@@ -211,6 +218,11 @@ var InputModifier;
     InputModifier[InputModifier["Shift"] = 8] = "Shift";
     InputModifier[InputModifier["Any"] = 15] = "Any";
 })(InputModifier || (InputModifier = {}));
+var StatusBarItemAlignment;
+(function (StatusBarItemAlignment) {
+    StatusBarItemAlignment[StatusBarItemAlignment["Right"] = 0] = "Right";
+    StatusBarItemAlignment[StatusBarItemAlignment["Left"] = 1] = "Left";
+})(StatusBarItemAlignment || (StatusBarItemAlignment = {}));
 ////////////////////////////////////////////////////////////
 /////////////////////////////////// POST
 ////////////////////////////////////////////////////////////
@@ -432,8 +444,8 @@ class Packet {
         return this;
     }
 }
-class ServerUXEventPacket extends (/* unused pure expression or super */ null && (Packet)) {
-    constructor(data) { super(PostEventId["Editor::ServerUXEvents"], data); }
+class ServerUXEventPacket extends Packet {
+    constructor(data) { super(Definitions_PostEventId["Editor::ServerUXEvents"], data); }
 }
 class ServerActionEventPacket extends (/* unused pure expression or super */ null && (Packet)) {
     constructor(data) { super(PostEventId["Editor::ServerActionEvents"], data); }
@@ -503,15 +515,15 @@ class ExtensionShutdownEventData extends ExtensionEventData {
 }
 ;
 /**@beta */
-class ExtensionInitializeEvent extends PublicEvent {
+class ExtensionInitializeEvent extends Events_PublicEvent {
 }
 ;
 /**@beta */
-class ExtensionReadyEvent extends PublicEvent {
+class ExtensionReadyEvent extends Events_PublicEvent {
 }
 ;
 /**@beta */
-class ExtensionShutdownEvent extends PublicEvent {
+class ExtensionShutdownEvent extends Events_PublicEvent {
 }
 ;
 
@@ -532,6 +544,7 @@ class EditorExtension{
         if(!Base_core.isNativeCall) throw new TypeError(Base_NoConstructor + EditorExtension.name);
         this.player = context.player;
         this.client = context.client;
+        this.statusBar = context.controlManager.statusBar;
         context.onInitialiazeEvent.subscribe(()=>{
             try {
                 this.Initialiaze?.(this.public);
@@ -568,7 +581,7 @@ const server_editor_bindings_namespaceObject = x({ ["editor"]: () => __WEBPACK_E
 ;// CONCATENATED MODULE: external "@minecraft/server"
 var server_x = y => { var x = {}; __webpack_require__.d(x, y); return x; }
 var server_y = x => () => x
-const server_namespaceObject = server_x({ ["Player"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_fb7572af__.Player, ["world"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_fb7572af__.world });
+const server_namespaceObject = server_x({ ["Player"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_fb7572af__.Player, ["system"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_fb7572af__.system, ["world"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_fb7572af__.world });
 ;// CONCATENATED MODULE: ./src/dynamic-editor/native/Editor/EditorEventManager.ts
 
 
@@ -598,7 +611,344 @@ class EditorEventManager {
 }
 const editorEventManager = new EditorEventManager();
 
+;// CONCATENATED MODULE: ./src/dynamic-editor/native/Controls/GeneralUI.ts
+
+const UPDATE_FLAG = 1;
+const REMOVE_FLAG = 2;
+const NULL_TYPE = Symbol("NULL");
+class Postable {
+    REMOVE_TYPE = null;
+    UPDATE_TYPE = null;
+    getData(flags = 0) { return { type: ((flags & REMOVE_FLAG) === REMOVE_FLAG ? this.REMOVE_TYPE : this.UPDATE_TYPE) }; }
+    *getPackets(flags) { yield new ServerUXEventPacket(this.getData(flags)); }
+}
+class UniquePostable extends Postable {
+    id = UUID.generate();
+    getData(flags) {
+        const data = super.getData(flags);
+        data.id = this.id;
+        return data;
+    }
+}
+class Changeable {
+    onChange = new PublicEvent;
+    constructor() { }
+    ;
+}
+class Property {
+    static UNIQUE_TYPE = NULL_TYPE;
+    static EXPECTED_VALUE_TYPE = undefined;
+    _type;
+    _expectedType;
+    onValueChange = new Events_PublicEvent;
+    constructor() { this._type = new.target.UNIQUE_TYPE; this._expectedType = new.target.EXPECTED_VALUE_TYPE; }
+    ;
+}
+class ElemenentProperty extends Property {
+    value;
+    defualtValue;
+    typeOf;
+    constructor(defaultValue) {
+        super();
+        this.typeOf = typeof defaultValue;
+        this.value = defaultValue;
+        this.defualtValue = defaultValue;
+    }
+    isValidType(v) { return typeof v === this.typeOf; }
+    getType(v) { return v; }
+    setValue(value) {
+        if (!this.isValidType(value))
+            throw new TypeError("Invalid value type: '" + value + "' expected " + (this._expectedType ?? this.typeOf));
+        //@ts-ignore
+        this.value = this.getType(value);
+        TriggerEvent(this.onValueChange, { oldValue: this.value ?? this.defualtValue, newValue: value });
+        return this;
+    }
+    getValue() { return this.value ?? this.defualtValue; }
+    toJSON() { return this.getValue(); }
+    valueOf() { return this.getValue(); }
+}
+class StringProperty extends ElemenentProperty {
+    static UNIQUE_TYPE = Symbol("StringProperty");
+    constructor(value) { super(value ?? ""); }
+}
+class NumberProperty extends ElemenentProperty {
+    static UNIQUE_TYPE = Symbol("NumberProperty");
+    constructor(value) { super(value ?? 0); }
+}
+class BooleanProperty extends ElemenentProperty {
+    static UNIQUE_TYPE = Symbol("BooleanProperty");
+    constructor(value) { super(value ?? false); }
+}
+class CustomProperty extends ElemenentProperty {
+    constructor(value) { super(value ?? false); }
+}
+class BindedProperty extends ElemenentProperty {
+    type;
+    bindProperty;
+    constructor(property, ongoingConverter, as_unique_type) {
+        //@ts-ignore
+        super(ongoingConverter(property.value, property));
+        this.type = as_unique_type;
+        this.bindProperty = property;
+        property.onValueChange.subscribe((e) => {
+            const newValue = ongoingConverter(e.newValue, property);
+            TriggerEvent(this.onValueChange, { oldValue: this.value ?? this.defualtValue, newValue: newValue });
+            //@ts-ignore
+            this.value = newValue;
+        });
+    }
+    setValue() {
+        throw new TypeError("Binded property cann't be modified.");
+    }
+}
+class Element extends UniquePostable {
+    //@ts-ignore
+    onPropertyValueChange = new Events_PublicEvent;
+    propertyBag;
+    _methods;
+    constructor(properties) {
+        super();
+        this._methods = new WeakMap();
+        const bag = {};
+        for (const propertyName of Object.getOwnPropertyNames(properties)) {
+            const prop = properties[propertyName];
+            bag[propertyName] = prop;
+            const method = prop.onValueChange.subscribe(e => {
+                //@ts-ignore
+                TriggerEvent(this.onPropertyValueChange, {
+                    element: this,
+                    newValue: e.newValue,
+                    propertyName: propertyName,
+                    oldValue: e.oldValue,
+                    property: prop
+                });
+            });
+            this._methods.set(prop, method);
+        }
+        this.propertyBag = bag;
+    }
+    getPropertyNames() {
+        return [...Object.getOwnPropertyNames(this.propertyBag)];
+    }
+    hasProperty(propertyName) { return propertyName in this.propertyBag; }
+    getProperty(propertyName) { return this.propertyBag[propertyName]; }
+    //@ts-ignore
+    getPropertyValue(propertyName) { return this.propertyBag[propertyName].getValue(); }
+    setProperty(propertyName, property) {
+        if (!this.hasProperty(propertyName))
+            throw new ReferenceError("Unknow property: " + propertyName);
+        const prop = this.propertyBag[propertyName];
+        //@ts-ignore
+        if (property._type != prop._type)
+            throw new TypeError("Can't assign '" + property._type.description + "' type to type of '" + prop._type?.description + "'");
+        prop.onValueChange.unsubscribe(this._methods.get(prop));
+        this._methods.delete(prop);
+        const method = property.onValueChange.subscribe(e => {
+            //@ts-ignore
+            TriggerEvent(this.onPropertyValueChange, {
+                element: this,
+                newValue: e.newValue,
+                propertyName: propertyName,
+                oldValue: e.oldValue,
+                property: property
+            });
+        });
+        this._methods.set(property, method);
+        this.propertyBag[propertyName] = property;
+        return this;
+    }
+    //@ts-ignore
+    setPropertyValue(propertyName, value) {
+        this.propertyBag[propertyName].setValue(value);
+        return this;
+    }
+    getData(flags) {
+        const data = super.getData(flags);
+        for (const key of this.getPropertyNames())
+            data[key] = this.propertyBag[key];
+        return data;
+    }
+}
+class Control extends Postable {
+    onControlUpdate;
+    _additions;
+    _deletions;
+    _manager;
+    _eventHandler;
+    _instanceConstructor;
+    _isDisposed = false;
+    //@ts-ignore
+    get isDisposed() { return this._isDisposed; }
+    //@ts-ignore
+    get elementsLength() { return this._eventHandler.size; }
+    constructor(manager, instanceOf) {
+        if (!Base_core.isNativeCall)
+            throw new ReferenceError(Base_NoConstructor + Control.name);
+        super();
+        this._instanceConstructor = instanceOf;
+        this.onControlUpdate = new NativeEvent;
+        this._manager = manager;
+        this._eventHandler = new Map;
+        this._additions = new Set;
+        this._deletions = new Set;
+    }
+    _onChange(element) {
+        if (!this._deletions.has(element)) {
+            this._additions.add(element);
+            this.onControlUpdate.trigger(this, element, UPDATE_FLAG);
+            this._pushChanges();
+        }
+    }
+    addItem(item) {
+        if (this._isDisposed)
+            throw new ReferenceError("You can't manipulate with disposed elements.");
+        if (!(item instanceof this._instanceConstructor))
+            return false;
+        if (this._eventHandler.has(item))
+            return true;
+        const method = item.onPropertyValueChange.subscribe(() => this._onChange(item));
+        this._eventHandler.set(item, method);
+        this._additions.add(item);
+        this._deletions.delete(item);
+        this.onControlUpdate.trigger(this, item, UPDATE_FLAG);
+        this._pushChanges();
+        return true;
+    }
+    removeItem(item) {
+        if (this._isDisposed)
+            throw new ReferenceError("You can't manipulate with disposed elements.");
+        if (!(item instanceof this._instanceConstructor))
+            return false;
+        if (this._eventHandler.has(item)) {
+            const method = this._eventHandler.get(item);
+            item.onPropertyValueChange.unsubscribe(method);
+            this._additions.delete(item);
+            this._deletions.add(item);
+            this.onControlUpdate.trigger(this, item, REMOVE_FLAG);
+            this._pushChanges();
+            return true;
+        }
+        ;
+        return false;
+    }
+    *getItems() { if (this._isDisposed)
+        throw new ReferenceError("You can't manipulate with disposed elements."); for (const item of this._eventHandler.keys())
+        yield item; }
+    hasItem(item) { if (this._isDisposed)
+        throw new ReferenceError("You can't manipulate with disposed elements."); return this._eventHandler.has(item); }
+    *getPackets() {
+        if (this._isDisposed)
+            throw new ReferenceError("You can't manipulate with disposed elements.");
+        for (const control of this._additions)
+            yield* control.getPackets(UPDATE_FLAG);
+        for (const control of this._deletions)
+            yield* control.getPackets(REMOVE_FLAG);
+    }
+    dispose() {
+        this._isDisposed = true;
+        for (const key of this._eventHandler.keys())
+            key.onPropertyValueChange.unsubscribe(this._eventHandler.get(key));
+        this._deletions.clear();
+        this._additions.clear();
+        this._eventHandler.clear();
+    }
+    _pushChanges() {
+        this._manager.changes.add(this);
+        this._manager.setUpdate();
+    }
+}
+
+;// CONCATENATED MODULE: ./src/dynamic-editor/core.ts
+
+
+;// CONCATENATED MODULE: ./src/dynamic-editor/native/Controls/Properties.ts
+
+
+class StatusBarAlignmentProperty extends CustomProperty {
+    static UNIQUE_TYPE = Symbol("StatusBarAlignmentProperty");
+    static EXPECTED_VALUE_TYPE = "StatusBarItemAlignment";
+    constructor(alignment = StatusBarItemAlignment.Right) { super(alignment); }
+    isValidType(v) { return v in StatusBarItemAlignment; }
+    getType(v) { return (typeof v === "string" ? StatusBarItemAlignment[v] : v); }
+}
+
+;// CONCATENATED MODULE: ./src/dynamic-editor/native/Controls/Elements.ts
+
+
+
+class StatusBarItem extends Element {
+    constructor() {
+        super({
+            alignment: new StatusBarAlignmentProperty(0),
+            enabled: new BooleanProperty(true),
+            visible: new BooleanProperty(true),
+            text: new StringProperty(""),
+            size: new NumberProperty(0)
+        });
+    }
+    REMOVE_TYPE = Definitions_ServerUXEventType.ReleaseStatusBarItem;
+    UPDATE_TYPE = Definitions_ServerUXEventType.UpdateStatusBarItem;
+}
+
+;// CONCATENATED MODULE: ./src/dynamic-editor/native/Controls/Controls.ts
+
+
+class StatusBarControl extends Control {
+    constructor(manager) { super(manager, StatusBarItem); }
+}
+
+;// CONCATENATED MODULE: ./src/dynamic-editor/native/Controls/index.ts
+
+
+
+
+
+;// CONCATENATED MODULE: ./src/dynamic-editor/native/Editor/EditorControlManager.ts
+
+
+
+class EditorControlManager {
+    context;
+    changes;
+    statusBar;
+    get isReady() { return this._ready ?? this.context.isReady; }
+    set isReady(v) { this._ready = v; }
+    constructor(context) {
+        if (!Base_core.isNativeCall)
+            throw new ReferenceError(Base_NoConstructor + EditorControlManager.name);
+        this.context = context;
+        this.changes = new Set();
+        this.context.onReadyEvent.subscribe(() => this.build());
+        this.context.onShutdownEvent.subscribe(() => {
+            this.isReady = false;
+            if (typeof this.task === "number")
+                server_namespaceObject.system.clearRun(this.task);
+            this.task = null;
+            //Dispose all controls on when shutdown
+            this.statusBar.dispose();
+            //@ts-ignore
+            this.statusBar = null;
+        });
+        this.task = null;
+        this.statusBar = new StatusBarControl(this);
+    }
+    setUpdate() { if (this.isReady && this.task === null)
+        return (this.task = server_namespaceObject.system.run(() => this.build())) || true; }
+    _ready;
+    task;
+    build() {
+        this.task = null;
+        const context = this.context;
+        for (const control of this.changes) {
+            for (const packet of control.getPackets())
+                context.post(packet);
+        }
+    }
+}
+
 ;// CONCATENATED MODULE: ./src/dynamic-editor/native/Editor/EditorContext.ts
+
 
 
 
@@ -611,6 +961,7 @@ class EditorContextManager {
     player;
     transactionManager;
     selectionManager;
+    controlManager;
     extension;
     onInitialiazeEvent = new NativeEvent();
     onReadyEvent = new NativeEvent();
@@ -619,7 +970,7 @@ class EditorContextManager {
     onActionExecuted = new NativeEvent();
     onPanePropertyChanged = new NativeEvent();
     onPaneVisibilityChanged = new NativeEvent();
-    isReady = true;
+    isReady = false;
     /**@param {ExtensionContext} context  */
     constructor(context, that) {
         if (CONTEXT_MANAGERS.has(context))
@@ -636,6 +987,7 @@ class EditorContextManager {
             }
         });
         Base_core.isNativeCall = true;
+        this.controlManager = new EditorControlManager(this);
         //@ts-ignore
         this.extension = (new EditorExtension(this, that));
         Base_core.isNativeCall = false;
@@ -682,12 +1034,15 @@ export { ClientReadyEvent } from "./public_bin/PublicEvents";*/
 const Destination = Definitions_RedirectDestination;
 
 
+
 /*
 export const editor: Editor = CreateInstance(Editor,e);*/ 
 
 ;// CONCATENATED MODULE: ./src/dynamic-editor.ts
 
 
+var __webpack_exports__BindedProperty = __webpack_exports__.sj;
+var __webpack_exports__BooleanProperty = __webpack_exports__.xv;
 var __webpack_exports__BuildInPane = __webpack_exports__.uf;
 var __webpack_exports__Destination = __webpack_exports__.o6;
 var __webpack_exports__EditorExtension = __webpack_exports__.MC;
@@ -697,4 +1052,9 @@ var __webpack_exports__ExtensionReadyEvent = __webpack_exports__.hV;
 var __webpack_exports__ExtensionReadyEventData = __webpack_exports__.CS;
 var __webpack_exports__ExtensionShutdownEvent = __webpack_exports__.CG;
 var __webpack_exports__ExtensionShutdownEventData = __webpack_exports__._4;
-export { __webpack_exports__BuildInPane as BuildInPane, __webpack_exports__Destination as Destination, __webpack_exports__EditorExtension as EditorExtension, __webpack_exports__ExtensionInitializeEvent as ExtensionInitializeEvent, __webpack_exports__ExtensionInitializeEventData as ExtensionInitializeEventData, __webpack_exports__ExtensionReadyEvent as ExtensionReadyEvent, __webpack_exports__ExtensionReadyEventData as ExtensionReadyEventData, __webpack_exports__ExtensionShutdownEvent as ExtensionShutdownEvent, __webpack_exports__ExtensionShutdownEventData as ExtensionShutdownEventData };
+var __webpack_exports__NumberProperty = __webpack_exports__.Y6;
+var __webpack_exports__StatusBarAlignmentProperty = __webpack_exports__.V7;
+var __webpack_exports__StatusBarItem = __webpack_exports__.wl;
+var __webpack_exports__StatusBarItemAlignment = __webpack_exports__.se;
+var __webpack_exports__StringProperty = __webpack_exports__.h_;
+export { __webpack_exports__BindedProperty as BindedProperty, __webpack_exports__BooleanProperty as BooleanProperty, __webpack_exports__BuildInPane as BuildInPane, __webpack_exports__Destination as Destination, __webpack_exports__EditorExtension as EditorExtension, __webpack_exports__ExtensionInitializeEvent as ExtensionInitializeEvent, __webpack_exports__ExtensionInitializeEventData as ExtensionInitializeEventData, __webpack_exports__ExtensionReadyEvent as ExtensionReadyEvent, __webpack_exports__ExtensionReadyEventData as ExtensionReadyEventData, __webpack_exports__ExtensionShutdownEvent as ExtensionShutdownEvent, __webpack_exports__ExtensionShutdownEventData as ExtensionShutdownEventData, __webpack_exports__NumberProperty as NumberProperty, __webpack_exports__StatusBarAlignmentProperty as StatusBarAlignmentProperty, __webpack_exports__StatusBarItem as StatusBarItem, __webpack_exports__StatusBarItemAlignment as StatusBarItemAlignment, __webpack_exports__StringProperty as StringProperty };

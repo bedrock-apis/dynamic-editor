@@ -17,6 +17,7 @@ export class EditorExtension{
         if(!core.isNativeCall) throw new TypeError(NoConstructor + EditorExtension.name);
         this.player = context.player;
         this.client = context.client;
+        this.statusBar = context.controlManager.statusBar;
         context.onInitialiazeEvent.subscribe(()=>{
             try {
                 this.Initialiaze?.(this.public);

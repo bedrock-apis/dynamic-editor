@@ -4,6 +4,11 @@ export enum RedirectDestination {
     Feedback = 2,
     PauseScreen = 3
 }
+export declare enum EditorInputContext {
+    GlobalEditor = 'global.editor',
+    GlobalToolMode = 'global.toolMode',
+    Viewport = 'local.toolMode.viewport',
+}
 /**@public */
 export enum BuildInPane {
     UISettings = 1,
@@ -14,6 +19,20 @@ export enum ActionType {
     NoArgsAction = "NoArgsAction",
     MouseRayCastAction = "MouseRayCastAction"
 };
+export enum InternalInputTypes {
+    ButtonDown = 1,
+    ButtonUp = 2,
+    WheelDown = 3,
+    WheelUo = 4,
+    DragStart = 5,
+    Draging = 6,
+    DragStop = 7,
+}
+export enum InternalInteractionTypes {
+    LeftButton = 1,
+    MiddleButton = 2,
+    Scroll = 4 
+}
 export enum MouseAction {
     Button = 1,
     Wheel = 2,

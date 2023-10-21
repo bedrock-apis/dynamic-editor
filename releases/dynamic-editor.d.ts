@@ -72,6 +72,10 @@ declare enum ServerUXEventType {
 	RedirectToDestination = 15,
 	UpdateBuildInPanes = 18
 }
+declare enum ServerActionEventType {
+	CreateAction = 1,
+	ReleaseAction = 2
+}
 declare enum PostEventId {
 	"Editor::ServerUXEvents" = "Editor::ServerUXEvents",
 	"Editor::ServerInputBindingEvents" = "Editor::ServerInputBindingEvents",
@@ -250,36 +254,9 @@ export declare class ExtensionShutdownEvent<T extends EditorExtension> extends P
 	ExtensionShutdownEventData<T>
 ]> {
 }
-declare class EditorContextManager {
-	readonly context: ExtensionContext | undefined;
-	readonly player: Player | undefined;
-	readonly transactionManager: TransactionManager | undefined;
-	readonly selectionManager: SelectionManager | undefined;
-	readonly controlManager: EditorControlManager | undefined;
-	readonly extension: EditorExtension | undefined;
-	readonly onInitialiazeEvent: NativeEvent<[
-		this
-	]>;
-	readonly onReadyEvent: NativeEvent<[
-		this
-	]>;
-	readonly onShutdownEvent: NativeEvent<[
-		this
-	]>;
-	readonly onToolSelected: NativeEvent<any[]>;
-	readonly onActionExecuted: NativeEvent<any[]>;
-	readonly onPanePropertyChanged: NativeEvent<any[]>;
-	readonly onPaneVisibilityChanged: NativeEvent<any[]>;
-	isReady: boolean;
-	/**@param {ExtensionContext} context  */
-	constructor(context: ExtensionContext, that: new () => any);
-	shutdown(): void;
-	static Shutdown(context: ExtensionContext): void;
-	post(packet: Packet): void;
-}
 declare class EditorControlManager {
 	readonly context: EditorContextManager;
-	readonly changes: Set<Control<any>>;
+	readonly changes: Set<BaseControl<any>>;
 	readonly statusBar: StatusBarControl;
 	get isReady(): boolean;
 	set isReady(v: boolean);
@@ -307,7 +284,7 @@ declare class Property<EventType extends any[]> {
 	readonly onValueChange: PublicEvent<EventType>;
 	protected constructor();
 }
-declare class ElemenentProperty<T> extends Property<[
+declare class ElementProperty<T> extends Property<[
 	{
 		oldValue: T;
 		newValue: T;
@@ -315,7 +292,7 @@ declare class ElemenentProperty<T> extends Property<[
 ]> {
 	protected readonly value: T | null;
 	protected readonly defualtValue?: T;
-	protected readonly typeOf: string;
+	protected readonly _typeOf: string;
 	protected constructor(defaultValue: T);
 	protected isValidType(v: any): boolean;
 	protected getType(v: T): T;
@@ -324,30 +301,39 @@ declare class ElemenentProperty<T> extends Property<[
 	toJSON(): T;
 	valueOf(): T;
 }
-export declare class StringProperty extends ElemenentProperty<string> {
+export declare class StringProperty extends ElementProperty<string> {
 	static readonly UNIQUE_TYPE: symbol;
 	constructor(value?: string);
 }
-export declare class NumberProperty extends ElemenentProperty<number> {
+export declare class NumberProperty extends ElementProperty<number> {
 	static readonly UNIQUE_TYPE: symbol;
 	constructor(value?: number);
 }
-export declare class BooleanProperty extends ElemenentProperty<boolean> {
+export declare class BooleanProperty extends ElementProperty<boolean> {
 	static readonly UNIQUE_TYPE: symbol;
 	constructor(value?: boolean);
 }
-declare class CustomProperty<validValues extends any[]> extends ElemenentProperty<validValues[number]> {
+declare class CustomProperty<validValues extends any[]> extends ElementProperty<validValues[number]> {
 	protected constructor(value?: validValues[number]);
 }
-export declare class BindedProperty<T, Control extends ElemenentProperty<any>> extends ElemenentProperty<T> {
-	readonly type: symbol;
-	readonly bindProperty: Control;
-	constructor(property: Control, ongoingConverter: (data: Control extends ElemenentProperty<infer A> ? A : never, property: Control) => T, as_unique_type: symbol);
-	setValue(): never;
+export declare class ConvertingProperty<T, J> extends ElementProperty<J> {
+	constructor(sourceProperty: ElementProperty<T>, convenrter: (value: T) => J, UNIQUE_TYPE?: symbol);
+	setValue(value: J | null): never;
 }
-declare class Element<PropertyRecord extends {
-	[key: string]: ElemenentProperty<any>;
-} = {}> extends UniquePostable {
+export type ElementExtendable = {
+	[key: string]: ElementProperty<any>;
+};
+export declare class BindedSource<S extends ElementExtendable, T extends ElementExtendable> {
+	readonly targetElement: Element<T>;
+	readonly targetPropertyName: keyof T;
+	readonly sourceElement: Element<S>;
+	readonly sourcePropertyName: keyof S;
+	readonly method: (value: any) => any;
+	private constructor();
+}
+export declare class Element<PropertyRecord extends ElementExtendable = {}> extends UniquePostable {
+	static BindProperty<L extends ElementExtendable, P extends ElementExtendable, K extends keyof L, K2 extends keyof P>(sourceElement: Element<P>, sourcePropertyName: K2, targetElement: Element<L>, targetPropertyName: K, convertor?: (value: P[K2]["value"]) => L[K]["value"]): any;
+	static UnbindProperty<L extends ElementExtendable, P extends ElementExtendable>(bindedSource: BindedSource<L, P>): null;
 	readonly onPropertyValueChange: PublicEvent<[
 		{
 			element: Element<PropertyRecord>;
@@ -368,22 +354,45 @@ declare class Element<PropertyRecord extends {
 	setPropertyValue<T extends keyof PropertyRecord>(propertyName: T, value: PropertyRecord[T]["value"]): this;
 	getData(flags?: number): PacketData;
 }
-declare class Control<T extends Element<any>> extends Postable {
+declare class VisualElement<PropertyRecord extends ElementExtendable = {}> extends Element<PropertyRecord & {
+	visible: BooleanProperty;
+	enabled: BooleanProperty;
+}> {
+	protected constructor(properties: PropertyRecord);
+	get isVisible(): false | NonNullable<(PropertyRecord & {
+		visible: BooleanProperty;
+		enabled: BooleanProperty;
+	})["visible"]["value"]>;
+	set isVisible(v: boolean | NonNullable<(PropertyRecord & {
+		visible: BooleanProperty;
+		enabled: BooleanProperty;
+	})["visible"]["value"]>);
+	get isEnabled(): false | NonNullable<(PropertyRecord & {
+		visible: BooleanProperty;
+		enabled: BooleanProperty;
+	})["enabled"]["value"]>;
+	set isEnabled(v: boolean | NonNullable<(PropertyRecord & {
+		visible: BooleanProperty;
+		enabled: BooleanProperty;
+	})["enabled"]["value"]>);
+	setVisibility(visible: boolean): this;
+	setEnable(enable: boolean): this;
+}
+declare class BaseControl<T extends Postable> extends Postable {
 	protected readonly onControlUpdate: NativeEvent<[
-		Control<T>,
+		BaseControl<T>,
 		T,
 		number
 	]>;
 	protected readonly _additions: Set<T>;
 	protected readonly _deletions: Set<T>;
 	protected readonly _manager: EditorControlManager;
-	protected readonly _eventHandler: Map<T, any>;
 	protected readonly _instanceConstructor: (new () => T) | (() => T);
 	protected _isDisposed: boolean;
+	protected readonly _elements: Set<T>;
 	readonly get isDisposed(): boolean;
 	readonly get elementsLength(): number;
 	protected constructor(manager: EditorControlManager, instanceOf: (new () => T) | (() => T));
-	private _onChange;
 	addItem(item: T): boolean;
 	removeItem(item: T): boolean;
 	getItems(): Generator<T, void, unknown>;
@@ -391,6 +400,14 @@ declare class Control<T extends Element<any>> extends Postable {
 	getPackets(): Generator<ServerUXEventPacket, void, unknown>;
 	dispose(): void;
 	protected _pushChanges(): void;
+}
+declare class Control<T extends Element<any>> extends BaseControl<T> {
+	protected readonly _eventHandler: WeakMap<T, any>;
+	protected constructor(manager: EditorControlManager, instanceOf: (new () => T) | (() => T));
+	addItem(item: T): boolean;
+	removeItem(item: T): boolean;
+	dispose(): void;
+	private _onChange;
 }
 export declare class StatusBarAlignmentProperty extends CustomProperty<[
 	StatusBarItemAlignment
@@ -401,14 +418,21 @@ export declare class StatusBarAlignmentProperty extends CustomProperty<[
 	protected isValidType(v: any): boolean;
 	protected getType(v: StatusBarItemAlignment): StatusBarItemAlignment;
 }
-export declare class StatusBarItem extends Element<{
-	visible: BooleanProperty;
+export declare class StatusBarItem extends VisualElement<{
 	size: NumberProperty;
-	enabled: BooleanProperty;
 	text: StringProperty;
 	alignment: StatusBarAlignmentProperty;
 }> {
 	constructor();
+	get alignment(): StatusBarItemAlignment;
+	set alignment(v: StatusBarItemAlignment);
+	get text(): string;
+	set text(v: string);
+	get size(): number;
+	set size(v: number);
+	setText(text: string): this;
+	setSize(size: number): this;
+	setAlignmentt(alignment: StatusBarItemAlignment): this;
 	protected readonly REMOVE_TYPE = ServerUXEventType.ReleaseStatusBarItem;
 	protected readonly UPDATE_TYPE = ServerUXEventType.UpdateStatusBarItem;
 }
@@ -416,6 +440,11 @@ declare class StatusBarControl extends Control<StatusBarItem> {
 	constructor(manager: EditorControlManager);
 }
 /**@public */
+export interface EditorExtension {
+	Initialiaze(extension: this): void;
+	Ready(extension: this): void;
+	Shutdown(extension: this): void;
+}
 export abstract class EditorExtension {
 	readonly player: Player;
 	readonly onInitialize: ExtensionInitializeEvent<this>;
@@ -426,12 +455,43 @@ export abstract class EditorExtension {
 	static readonly extensionName?: string;
 	static readonly metadata?: ExtensionOptionalParameters;
 	static registry<T extends typeof EditorExtension>(this: T, extensionName?: string): T;
-	abstract Initialiaze?(extension: this): void;
-	abstract Ready?(extension: this): void;
-	abstract Shutdown?(extension: this): void;
-	abstract Initialiaze?(this: this, extension: this): void;
-	abstract Ready?(this: this, extension: this): void;
-	abstract Shutdown?(this: this, extension: this): void;
+	redirectTo(destination: Destination): void;
+	setBuildInPaneVisibility(pane: BuildInPane, visible?: boolean): void;
+}
+declare class Action extends UniquePostable {
+	protected readonly REMOVE_TYPE = ServerActionEventType.ReleaseAction;
+	protected readonly UPDATE_TYPE = ServerActionEventType.CreateAction;
+}
+declare class EditorContextManager {
+	readonly context: ExtensionContext | undefined;
+	readonly player: Player | undefined;
+	readonly transactionManager: TransactionManager | undefined;
+	readonly selectionManager: SelectionManager | undefined;
+	readonly controlManager: EditorControlManager | undefined;
+	readonly extension: EditorExtension | undefined;
+	readonly onInitialiazeEvent: NativeEvent<[
+		this
+	]>;
+	readonly onReadyEvent: NativeEvent<[
+		this
+	]>;
+	readonly onShutdownEvent: NativeEvent<[
+		this
+	]>;
+	readonly onToolSelected: NativeEvent<any[]>;
+	readonly onActionExecuted: NativeEvent<any[]>;
+	readonly onPanePropertyChanged: NativeEvent<any[]>;
+	readonly onPaneVisibilityChanged: NativeEvent<any[]>;
+	readonly actionManager: Map<string, Action>;
+	isReady: boolean;
+	/**@param {ExtensionContext} context  */
+	constructor(context: ExtensionContext, that: new () => any);
+	shutdown(): void;
+	static Shutdown(context: ExtensionContext): void;
+	post(packet: Packet): void;
+	_onReady(): void;
+	_onAction(id: string, data: any): void;
+	_onPropertyChange(): void;
 }
 export declare const Destination: typeof RedirectDestination;
 

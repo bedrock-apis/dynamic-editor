@@ -1,11 +1,11 @@
 import { system } from "@minecraft/server";
 import { EditorContextManager } from "./EditorContext";
-import { Control, StatusBarControl } from "../Controls/index";
+import { BaseControl, Control, StatusBarControl } from "../Controls/index";
 import { NoConstructor, core } from "dynamic-editor/core";
 
 export class EditorControlManager{
     readonly context;
-    readonly changes: Set<Control<any>>;
+    readonly changes: Set<BaseControl<any>>;
     readonly statusBar;
     get isReady(){return this._ready??this.context.isReady;}
     set isReady(v){this._ready = v;}

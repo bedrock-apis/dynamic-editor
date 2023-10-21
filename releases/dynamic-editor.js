@@ -27,11 +27,13 @@ var __webpack_exports__ = {};
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  sj: () => (/* reexport */ BindedProperty),
+  mj: () => (/* reexport */ BindedSource),
   xv: () => (/* reexport */ BooleanProperty),
   uf: () => (/* reexport */ Definitions_BuildInPane),
+  Os: () => (/* reexport */ ConvertingProperty),
   o6: () => (/* reexport */ Destination),
   MC: () => (/* reexport */ EditorExtension),
+  W_: () => (/* reexport */ Element),
   et: () => (/* reexport */ ExtensionInitializeEvent),
   V2: () => (/* reexport */ ExtensionInitializeEventData),
   hV: () => (/* reexport */ ExtensionReadyEvent),
@@ -197,6 +199,22 @@ var ActionType;
     ActionType["MouseRayCastAction"] = "MouseRayCastAction";
 })(ActionType || (ActionType = {}));
 ;
+var InternalInputTypes;
+(function (InternalInputTypes) {
+    InternalInputTypes[InternalInputTypes["ButtonDown"] = 1] = "ButtonDown";
+    InternalInputTypes[InternalInputTypes["ButtonUp"] = 2] = "ButtonUp";
+    InternalInputTypes[InternalInputTypes["WheelDown"] = 3] = "WheelDown";
+    InternalInputTypes[InternalInputTypes["WheelUo"] = 4] = "WheelUo";
+    InternalInputTypes[InternalInputTypes["DragStart"] = 5] = "DragStart";
+    InternalInputTypes[InternalInputTypes["Draging"] = 6] = "Draging";
+    InternalInputTypes[InternalInputTypes["DragStop"] = 7] = "DragStop";
+})(InternalInputTypes || (InternalInputTypes = {}));
+var InternalInteractionTypes;
+(function (InternalInteractionTypes) {
+    InternalInteractionTypes[InternalInteractionTypes["LeftButton"] = 1] = "LeftButton";
+    InternalInteractionTypes[InternalInteractionTypes["MiddleButton"] = 2] = "MiddleButton";
+    InternalInteractionTypes[InternalInteractionTypes["Scroll"] = 4] = "Scroll";
+})(InternalInteractionTypes || (InternalInteractionTypes = {}));
 var MouseAction;
 (function (MouseAction) {
     MouseAction[MouseAction["Button"] = 1] = "Button";
@@ -226,7 +244,7 @@ var StatusBarItemAlignment;
 ////////////////////////////////////////////////////////////
 /////////////////////////////////// POST
 ////////////////////////////////////////////////////////////
-var Definitions_ServerUXEventType;
+var ServerUXEventType;
 (function (ServerUXEventType) {
     ServerUXEventType[ServerUXEventType["UpdatePropertyPane"] = 1] = "UpdatePropertyPane";
     ServerUXEventType[ServerUXEventType["ReleasePropertyPane"] = 2] = "ReleasePropertyPane";
@@ -242,12 +260,12 @@ var Definitions_ServerUXEventType;
     ServerUXEventType[ServerUXEventType["UnbindUIEvent"] = 12] = "UnbindUIEvent";
     ServerUXEventType[ServerUXEventType["RedirectToDestination"] = 15] = "RedirectToDestination";
     ServerUXEventType[ServerUXEventType["UpdateBuildInPanes"] = 18] = "UpdateBuildInPanes";
-})(Definitions_ServerUXEventType || (Definitions_ServerUXEventType = {}));
-var ServerActionEventType;
+})(ServerUXEventType || (ServerUXEventType = {}));
+var Definitions_ServerActionEventType;
 (function (ServerActionEventType) {
     ServerActionEventType[ServerActionEventType["CreateAction"] = 1] = "CreateAction";
     ServerActionEventType[ServerActionEventType["ReleaseAction"] = 2] = "ReleaseAction";
-})(ServerActionEventType || (ServerActionEventType = {}));
+})(Definitions_ServerActionEventType || (Definitions_ServerActionEventType = {}));
 var ServerInputBindingEventType;
 (function (ServerInputBindingEventType) {
     ServerInputBindingEventType[ServerInputBindingEventType["KeyActionBinding"] = 1] = "KeyActionBinding";
@@ -268,9 +286,9 @@ var PostEventName;
     PostEventName["ServerInputBindingEvents"] = "Editor::ServerInputBindingEvents";
 })(PostEventName || (PostEventName = {}));
 const PostEventEnum = {
-    [Definitions_PostEventId["Editor::ServerUXEvents"]]: Definitions_ServerUXEventType,
+    [Definitions_PostEventId["Editor::ServerUXEvents"]]: ServerUXEventType,
     [Definitions_PostEventId["Editor::ServerInputBindingEvents"]]: ServerInputBindingEventType,
-    [Definitions_PostEventId["Editor::ServerActionEvents"]]: ServerActionEventType,
+    [Definitions_PostEventId["Editor::ServerActionEvents"]]: Definitions_ServerActionEventType,
 };
 ////////////////////////////////////////////////////////////
 /////////////////////////////////// RECEIVE
@@ -453,10 +471,10 @@ class ServerActionEventPacket extends (/* unused pure expression or super */ nul
 class ServerInputBindingEventPacket extends (/* unused pure expression or super */ null && (Packet)) {
     constructor(data) { super(PostEventId["Editor::ServerInputBindingEvents"], data); }
 }
-class RedirectToDestinationPacket extends (/* unused pure expression or super */ null && (ServerUXEventPacket)) {
+class RedirectToDestinationPacket extends ServerUXEventPacket {
     constructor(destination) { super({ type: ServerUXEventType.RedirectToDestination, destination: destination }); }
 }
-class UpdateBuildInPanePacket extends (/* unused pure expression or super */ null && (ServerUXEventPacket)) {
+class UpdateBuildInPanePacket extends ServerUXEventPacket {
     constructor(panelId, visible) { super({ type: ServerUXEventType.UpdateBuildInPanes, panel: panelId, visible }); }
 }
 
@@ -479,6 +497,10 @@ class EditorEvents {
 }
 const editor = new Editor();
 
+;// CONCATENATED MODULE: external "@minecraft/server-editor-bindings"
+var x = y => { var x = {}; __webpack_require__.d(x, y); return x; }
+var y = x => () => x
+const server_editor_bindings_namespaceObject = x({ ["editor"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_editor_bindings_e2bf1028__.editor });
 ;// CONCATENATED MODULE: ./src/dynamic-editor/native/Events.ts
 
 /**@beta */
@@ -531,8 +553,9 @@ class ExtensionShutdownEvent extends Events_PublicEvent {
 
 
 
+
 /**@public */
-class EditorExtension{   
+class EditorExtension{
     Shutdown(){};
     Ready(){};
     Initialize(){};
@@ -565,51 +588,25 @@ class EditorExtension{
         });
         Object.setPrototypeOf(this,that.prototype??EditorExtension.prototype);
     }
+    redirectTo(destination){
+        if(!CONTEXT_BY_EXTENSION.has(this)) throw new ReferenceError(Base_ObjectBoundNotExist);
+        if(!(destination in Definitions_RedirectDestination)) throw new TypeError("Unknow Destination: " + destination);
+        if(typeof destination === "string") destination = Definitions_RedirectDestination[destination];
+        CONTEXT_BY_EXTENSION.get(this).post(new RedirectToDestinationPacket(destination));
+    }
+    setBuildInPaneVisibility(pane, visible = true){
+        if(!CONTEXT_BY_EXTENSION.has(this)) throw new ReferenceError(Base_ObjectBoundNotExist);
+        if(!(pane in Definitions_BuildInPane)) throw new TypeError("Unknow pane: " + pane);
+        if(typeof pane === "string") destination = Definitions_BuildInPane[pane];
+        CONTEXT_BY_EXTENSION.get(this).post(new UpdateBuildInPanePacket(pane,!!visible));
+    }
 }
-/*
-export const PublicEditorExtension = CreateClass("EditorExtension",{
-    Shutdown(){},
-    Ready(){},
-    Initialize(){},
-    get player(): Player{return super.getCache(this).player;},
-    get client(){return GetPublicInstance(super.getCache(this).context.client);}
-}).constructor as unknown as typeof EX;*/
-;// CONCATENATED MODULE: external "@minecraft/server-editor-bindings"
-var x = y => { var x = {}; __webpack_require__.d(x, y); return x; }
-var y = x => () => x
-const server_editor_bindings_namespaceObject = x({ ["editor"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_editor_bindings_e2bf1028__.editor });
 ;// CONCATENATED MODULE: external "@minecraft/server"
 var server_x = y => { var x = {}; __webpack_require__.d(x, y); return x; }
 var server_y = x => () => x
 const server_namespaceObject = server_x({ ["Player"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_fb7572af__.Player, ["system"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_fb7572af__.system, ["world"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_fb7572af__.world });
-;// CONCATENATED MODULE: ./src/dynamic-editor/native/Editor/EditorEventManager.ts
+;// CONCATENATED MODULE: ./src/dynamic-editor/core.ts
 
-
-class EditorEventManager {
-    onClientReady = new NativeEvent();
-    constructor() {
-        server_namespaceObject.world.afterEvents.messageReceive.subscribe(({ id, message, player }) => {
-            if (!(id in ReceiveEventId))
-                return;
-            this.resolver(id, JSON.parse(message), player);
-        });
-    }
-    resolver(id, message, player) {
-        //@ts-ignore
-        this[id](id, message, player);
-    }
-    [ReceiveEventId["Editor::ClientLifecycle"]](id, message, player) {
-        if (message?.type === ReceiveLifecycleEventType.PlayerReady)
-            this.onClientReady.trigger({ player });
-    }
-    [ReceiveEventId["Editor::ClientActionEvents"]](id, message, player) {
-        console.warn(`§8No handler implementation for §r§l${id}§r§7  -->  §r§l${message.type} §r§8[${ReceiveEventEnum[id][message.type]}]`);
-    }
-    [ReceiveEventId["Editor::ClientUXEvents"]](id, message, player) {
-        console.warn(`§8No handler implementation for §r§l${id}§r§7  -->  §r§l${message.type} §r§8[${ReceiveEventEnum[id][message.type]}]`);
-    }
-}
-const editorEventManager = new EditorEventManager();
 
 ;// CONCATENATED MODULE: ./src/dynamic-editor/native/Controls/GeneralUI.ts
 
@@ -622,7 +619,7 @@ class Postable {
     getData(flags = 0) { return { type: ((flags & REMOVE_FLAG) === REMOVE_FLAG ? this.REMOVE_TYPE : this.UPDATE_TYPE) }; }
     *getPackets(flags) { yield new ServerUXEventPacket(this.getData(flags)); }
 }
-class UniquePostable extends Postable {
+class GeneralUI_UniquePostable extends Postable {
     id = UUID.generate();
     getData(flags) {
         const data = super.getData(flags);
@@ -644,21 +641,21 @@ class Property {
     constructor() { this._type = new.target.UNIQUE_TYPE; this._expectedType = new.target.EXPECTED_VALUE_TYPE; }
     ;
 }
-class ElemenentProperty extends Property {
+class ElementProperty extends Property {
     value;
     defualtValue;
-    typeOf;
+    _typeOf;
     constructor(defaultValue) {
         super();
-        this.typeOf = typeof defaultValue;
+        this._typeOf = typeof defaultValue;
         this.value = defaultValue;
         this.defualtValue = defaultValue;
     }
-    isValidType(v) { return typeof v === this.typeOf; }
+    isValidType(v) { return typeof v === this._typeOf; }
     getType(v) { return v; }
     setValue(value) {
         if (!this.isValidType(value))
-            throw new TypeError("Invalid value type: '" + value + "' expected " + (this._expectedType ?? this.typeOf));
+            throw new TypeError("Invalid value type: '" + value + "' expected " + (this._expectedType ?? this._typeOf));
         //@ts-ignore
         this.value = this.getType(value);
         TriggerEvent(this.onValueChange, { oldValue: this.value ?? this.defualtValue, newValue: value });
@@ -668,41 +665,61 @@ class ElemenentProperty extends Property {
     toJSON() { return this.getValue(); }
     valueOf() { return this.getValue(); }
 }
-class StringProperty extends ElemenentProperty {
+class StringProperty extends ElementProperty {
     static UNIQUE_TYPE = Symbol("StringProperty");
     constructor(value) { super(value ?? ""); }
 }
-class NumberProperty extends ElemenentProperty {
+class NumberProperty extends ElementProperty {
     static UNIQUE_TYPE = Symbol("NumberProperty");
     constructor(value) { super(value ?? 0); }
 }
-class BooleanProperty extends ElemenentProperty {
+class BooleanProperty extends ElementProperty {
     static UNIQUE_TYPE = Symbol("BooleanProperty");
     constructor(value) { super(value ?? false); }
 }
-class CustomProperty extends ElemenentProperty {
+class CustomProperty extends ElementProperty {
     constructor(value) { super(value ?? false); }
 }
-class BindedProperty extends ElemenentProperty {
-    type;
-    bindProperty;
-    constructor(property, ongoingConverter, as_unique_type) {
+class ConvertingProperty extends ElementProperty {
+    constructor(sourceProperty, convenrter, UNIQUE_TYPE) {
+        super(convenrter(sourceProperty.getValue()));
+        sourceProperty.onValueChange.subscribe(({ newValue }) => { super.setValue(convenrter(newValue)); });
         //@ts-ignore
-        super(ongoingConverter(property.value, property));
-        this.type = as_unique_type;
-        this.bindProperty = property;
-        property.onValueChange.subscribe((e) => {
-            const newValue = ongoingConverter(e.newValue, property);
-            TriggerEvent(this.onValueChange, { oldValue: this.value ?? this.defualtValue, newValue: newValue });
-            //@ts-ignore
-            this.value = newValue;
-        });
+        this._type = UNIQUE_TYPE;
     }
-    setValue() {
-        throw new TypeError("Binded property cann't be modified.");
+    setValue(value) {
+        throw new ReferenceError("You can not set binded property.");
     }
 }
-class Element extends UniquePostable {
+class BindedSource {
+    targetElement;
+    targetPropertyName;
+    sourceElement;
+    sourcePropertyName;
+    //@ts-ignore
+    method;
+    constructor(targetElement, targetPropertyName, sourceElement, sourcePropertyName, method) {
+        this.method = method;
+        this.targetElement = targetElement;
+        this.targetPropertyName = targetPropertyName;
+        this.sourceElement = sourceElement;
+        this.sourcePropertyName = sourcePropertyName;
+    }
+}
+class Element extends GeneralUI_UniquePostable {
+    //@ts-ignore
+    static BindProperty(sourceElement, sourcePropertyName, targetElement, targetPropertyName, convertor) {
+        const method = sourceElement.onPropertyValueChange.subscribe(({ newValue, propertyName }) => {
+            if (propertyName === sourcePropertyName)
+                targetElement.setPropertyValue(targetPropertyName, convertor?.(newValue) ?? newValue);
+        });
+        //@ts-ignore
+        return new BindedSource(targetElement, targetPropertyName, sourceElement, sourcePropertyName, method);
+    }
+    static UnbindProperty(bindedSource) {
+        bindedSource.sourceElement.onPropertyValueChange.unsubscribe(bindedSource.method);
+        return null;
+    }
     //@ts-ignore
     onPropertyValueChange = new Events_PublicEvent;
     propertyBag;
@@ -756,6 +773,18 @@ class Element extends UniquePostable {
         });
         this._methods.set(property, method);
         this.propertyBag[propertyName] = property;
+        //@ts-ignore
+        if (prop.value !== property.value) {
+            TriggerEvent(this.onPropertyValueChange, {
+                element: this,
+                //@ts-ignore
+                newValue: property.value,
+                propertyName: propertyName,
+                //@ts-ignore
+                oldValue: prop.value,
+                property: property
+            });
+        }
         return this;
     }
     //@ts-ignore
@@ -770,45 +799,51 @@ class Element extends UniquePostable {
         return data;
     }
 }
-class Control extends Postable {
+class VisualElement extends Element {
+    constructor(properties) { super({ enabled: new BooleanProperty(true), visible: new BooleanProperty(true), ...properties }); }
+    get isVisible() { return this.getPropertyValue("visible") ?? false; }
+    set isVisible(v) { this.setPropertyValue("visible", v); }
+    get isEnabled() { return this.getPropertyValue("enabled") ?? false; }
+    set isEnabled(v) { this.setPropertyValue("enabled", v); }
+    setVisibility(visible) {
+        this.setPropertyValue("visible", visible);
+        return this;
+    }
+    setEnable(enable) {
+        this.setPropertyValue("enabled", enable);
+        return this;
+    }
+}
+class BaseControl extends Postable {
     onControlUpdate;
     _additions;
     _deletions;
     _manager;
-    _eventHandler;
     _instanceConstructor;
     _isDisposed = false;
+    _elements;
     //@ts-ignore
     get isDisposed() { return this._isDisposed; }
     //@ts-ignore
-    get elementsLength() { return this._eventHandler.size; }
+    get elementsLength() { return this._elements.size; }
     constructor(manager, instanceOf) {
         if (!Base_core.isNativeCall)
-            throw new ReferenceError(Base_NoConstructor + Control.name);
+            throw new ReferenceError(Base_NoConstructor + BaseControl.name);
         super();
         this._instanceConstructor = instanceOf;
         this.onControlUpdate = new NativeEvent;
         this._manager = manager;
-        this._eventHandler = new Map;
+        this._elements = new Set;
         this._additions = new Set;
         this._deletions = new Set;
-    }
-    _onChange(element) {
-        if (!this._deletions.has(element)) {
-            this._additions.add(element);
-            this.onControlUpdate.trigger(this, element, UPDATE_FLAG);
-            this._pushChanges();
-        }
     }
     addItem(item) {
         if (this._isDisposed)
             throw new ReferenceError("You can't manipulate with disposed elements.");
         if (!(item instanceof this._instanceConstructor))
             return false;
-        if (this._eventHandler.has(item))
+        if (this._elements.has(item))
             return true;
-        const method = item.onPropertyValueChange.subscribe(() => this._onChange(item));
-        this._eventHandler.set(item, method);
         this._additions.add(item);
         this._deletions.delete(item);
         this.onControlUpdate.trigger(this, item, UPDATE_FLAG);
@@ -820,9 +855,7 @@ class Control extends Postable {
             throw new ReferenceError("You can't manipulate with disposed elements.");
         if (!(item instanceof this._instanceConstructor))
             return false;
-        if (this._eventHandler.has(item)) {
-            const method = this._eventHandler.get(item);
-            item.onPropertyValueChange.unsubscribe(method);
+        if (this._elements.has(item)) {
             this._additions.delete(item);
             this._deletions.add(item);
             this.onControlUpdate.trigger(this, item, REMOVE_FLAG);
@@ -833,10 +866,10 @@ class Control extends Postable {
         return false;
     }
     *getItems() { if (this._isDisposed)
-        throw new ReferenceError("You can't manipulate with disposed elements."); for (const item of this._eventHandler.keys())
+        throw new ReferenceError("You can't manipulate with disposed elements."); for (const item of this._elements)
         yield item; }
     hasItem(item) { if (this._isDisposed)
-        throw new ReferenceError("You can't manipulate with disposed elements."); return this._eventHandler.has(item); }
+        throw new ReferenceError("You can't manipulate with disposed elements."); return this._elements.has(item); }
     *getPackets() {
         if (this._isDisposed)
             throw new ReferenceError("You can't manipulate with disposed elements.");
@@ -847,20 +880,49 @@ class Control extends Postable {
     }
     dispose() {
         this._isDisposed = true;
-        for (const key of this._eventHandler.keys())
-            key.onPropertyValueChange.unsubscribe(this._eventHandler.get(key));
         this._deletions.clear();
         this._additions.clear();
-        this._eventHandler.clear();
     }
     _pushChanges() {
         this._manager.changes.add(this);
         this._manager.setUpdate();
     }
 }
-
-;// CONCATENATED MODULE: ./src/dynamic-editor/core.ts
-
+class Control extends BaseControl {
+    _eventHandler;
+    constructor(manager, instanceOf) {
+        super(manager, instanceOf);
+        this._eventHandler = new WeakMap;
+        /*BaseControl*/
+    }
+    addItem(item) {
+        if (super.addItem(item)) {
+            const method = item.onPropertyValueChange.subscribe(() => this._onChange(item));
+            this._eventHandler.set(item, method);
+            return true;
+        }
+        return false;
+    }
+    removeItem(item) {
+        if (super.removeItem(item)) {
+            item.onPropertyValueChange.unsubscribe(this._eventHandler.get(item));
+            return true;
+        }
+        return false;
+    }
+    dispose() {
+        for (const key of this._elements)
+            key.onPropertyValueChange.unsubscribe(this._eventHandler.get(key));
+        return super.dispose();
+    }
+    _onChange(element) {
+        if (!this._deletions.has(element)) {
+            this._additions.add(element);
+            this.onControlUpdate.trigger(this, element, UPDATE_FLAG);
+            this._pushChanges();
+        }
+    }
+}
 
 ;// CONCATENATED MODULE: ./src/dynamic-editor/native/Controls/Properties.ts
 
@@ -877,18 +939,34 @@ class StatusBarAlignmentProperty extends CustomProperty {
 
 
 
-class StatusBarItem extends Element {
+class StatusBarItem extends VisualElement {
     constructor() {
         super({
             alignment: new StatusBarAlignmentProperty(0),
-            enabled: new BooleanProperty(true),
-            visible: new BooleanProperty(true),
             text: new StringProperty(""),
             size: new NumberProperty(0)
         });
     }
-    REMOVE_TYPE = Definitions_ServerUXEventType.ReleaseStatusBarItem;
-    UPDATE_TYPE = Definitions_ServerUXEventType.UpdateStatusBarItem;
+    get alignment() { return this.getPropertyValue("alignment") ?? StatusBarItemAlignment.Right; }
+    set alignment(v) { this.setPropertyValue("alignment", v); }
+    get text() { return this.getPropertyValue("text") ?? ""; }
+    set text(v) { this.setPropertyValue("text", v); }
+    get size() { return this.getPropertyValue("size") ?? 0; }
+    set size(v) { this.setPropertyValue("size", v); }
+    setText(text) {
+        this.setPropertyValue("text", text);
+        return this;
+    }
+    setSize(size) {
+        this.setPropertyValue("size", size);
+        return this;
+    }
+    setAlignmentt(alignment) {
+        this.setPropertyValue("alignment", alignment);
+        return this;
+    }
+    REMOVE_TYPE = ServerUXEventType.ReleaseStatusBarItem;
+    UPDATE_TYPE = ServerUXEventType.UpdateStatusBarItem;
 }
 
 ;// CONCATENATED MODULE: ./src/dynamic-editor/native/Controls/Controls.ts
@@ -903,6 +981,100 @@ class StatusBarControl extends Control {
 
 
 
+
+;// CONCATENATED MODULE: ./src/dynamic-editor/native/Editor/EditorActionManager.ts
+
+
+const PayloadLoaders = new Map();
+class Action extends (/* unused pure expression or super */ null && (UniquePostable)) {
+    REMOVE_TYPE = ServerActionEventType.ReleaseAction;
+    UPDATE_TYPE = ServerActionEventType.CreateAction;
+}
+class PayloadLoader {
+    type;
+    player;
+    dimension;
+    constructor(player, data) {
+        this.player = player;
+        this.dimension = player.dimension;
+        this.type = data.type;
+    }
+}
+class NoArgsPayload extends PayloadLoader {
+}
+class MouseRayCastPayload extends PayloadLoader {
+    location;
+    direction;
+    blockLocation;
+    rayHit;
+    actionType;
+    hasCtrlModifier;
+    hasAltModifier;
+    hasShiftModifier;
+    inputType;
+    //@ts-ignore
+    get block() { return this.dimension.getBlock(this.blockLocation); }
+    constructor(player, data) {
+        super(player, data);
+        const { location, direction, cursorBlockLocation, rayHit } = data.mouseRay;
+        const { mouseAction, modifiers: { alt, ctrl, shift }, inputType } = data.mouseProps;
+        this.location = location;
+        this.direction = direction;
+        this.blockLocation = cursorBlockLocation;
+        this.rayHit = rayHit;
+        this.hasCtrlModifier = ctrl;
+        this.hasAltModifier = alt;
+        this.hasShiftModifier = shift;
+        this.actionType = mouseAction;
+        this.inputType = inputType;
+    }
+}
+PayloadLoaders.set(ActionType.NoArgsAction, NoArgsPayload);
+PayloadLoaders.set(ActionType.MouseRayCastAction, MouseRayCastPayload);
+
+;// CONCATENATED MODULE: ./src/dynamic-editor/native/Editor/EditorEventManager.ts
+
+
+
+class EditorEventManager {
+    onClientReady = new NativeEvent();
+    activeExtensions = new WeakMap();
+    constructor() {
+        server_namespaceObject.world.afterEvents.messageReceive.subscribe(({ id, message, player }) => {
+            if (!(id in ReceiveEventId))
+                return;
+            this.resolver(id, JSON.parse(message), player);
+        });
+    }
+    resolver(id, message, player) {
+        //@ts-ignore
+        this[id](id, message, player);
+    }
+    [ReceiveEventId["Editor::ClientLifecycle"]](id, message, player) {
+        if (message?.type === ReceiveLifecycleEventType.PlayerReady) {
+            this.getContextManagers(player).forEach(e => e._onReady());
+            this.onClientReady.trigger({ player });
+        }
+    }
+    [ReceiveEventId["Editor::ClientActionEvents"]](id, message, player) {
+        if (message?.type === ReceiveActionEventType.ActionExecuted) {
+            this.getContextManagers(player).forEach(e => e._onAction(message.id, new (PayloadLoaders.get(message.payload.type))(player, message.payload)));
+        }
+    }
+    [ReceiveEventId["Editor::ClientUXEvents"]](id, message, player) {
+        console.warn(`§8No handler implementation for §r§l${id}§r§7  -->  §r§l${message.type} §r§8[${ReceiveEventEnum[id][message.type]}]`);
+    }
+    getContextManagers(player) {
+        return this.activeExtensions.get(player) ?? new Set();
+    }
+    registerContextManager(player, context) {
+        if (!this.activeExtensions.has(player))
+            this.activeExtensions.set(player, new Set());
+        const set = this.activeExtensions.get(player);
+        set.add(context);
+    }
+}
+const editorEventManager = new EditorEventManager();
 
 ;// CONCATENATED MODULE: ./src/dynamic-editor/native/Editor/EditorControlManager.ts
 
@@ -955,6 +1127,7 @@ class EditorControlManager {
 
 
 const CONTEXT_MANAGERS = new WeakMap();
+const CONTEXT_BY_EXTENSION = new WeakMap();
 const POST = server_namespaceObject.Player.prototype.postClientMessage;
 class EditorContextManager {
     context;
@@ -970,6 +1143,7 @@ class EditorContextManager {
     onActionExecuted = new NativeEvent();
     onPanePropertyChanged = new NativeEvent();
     onPaneVisibilityChanged = new NativeEvent();
+    actionManager = new Map();
     isReady = false;
     /**@param {ExtensionContext} context  */
     constructor(context, that) {
@@ -980,17 +1154,13 @@ class EditorContextManager {
         this.transactionManager = context.transactionManager;
         this.selectionManager = context.selectionManager;
         this.player = context.player;
-        editorEventManager.onClientReady.subscribe(({ player }) => {
-            if (player === this.player) {
-                this.isReady = true;
-                this.onReadyEvent.trigger(this);
-            }
-        });
         Base_core.isNativeCall = true;
         this.controlManager = new EditorControlManager(this);
+        editorEventManager.registerContextManager(context.player, this);
         //@ts-ignore
         this.extension = (new EditorExtension(this, that));
         Base_core.isNativeCall = false;
+        CONTEXT_BY_EXTENSION.set(this.extension, this);
         this.onInitialiazeEvent.trigger(this);
     }
     shutdown() {
@@ -1002,6 +1172,14 @@ class EditorContextManager {
         that?.shutdown();
     }
     post(packet) { POST.call(this.player, packet.id, packet.getMessage()); }
+    _onReady() {
+        this.isReady = true;
+        this.onReadyEvent.trigger(this);
+    }
+    _onAction(id, data) {
+    }
+    _onPropertyChange() {
+    }
 }
 EditorExtension.registry = function (extensionName) {
     if (typeof this !== 'function')
@@ -1041,11 +1219,13 @@ export const editor: Editor = CreateInstance(Editor,e);*/
 ;// CONCATENATED MODULE: ./src/dynamic-editor.ts
 
 
-var __webpack_exports__BindedProperty = __webpack_exports__.sj;
+var __webpack_exports__BindedSource = __webpack_exports__.mj;
 var __webpack_exports__BooleanProperty = __webpack_exports__.xv;
 var __webpack_exports__BuildInPane = __webpack_exports__.uf;
+var __webpack_exports__ConvertingProperty = __webpack_exports__.Os;
 var __webpack_exports__Destination = __webpack_exports__.o6;
 var __webpack_exports__EditorExtension = __webpack_exports__.MC;
+var __webpack_exports__Element = __webpack_exports__.W_;
 var __webpack_exports__ExtensionInitializeEvent = __webpack_exports__.et;
 var __webpack_exports__ExtensionInitializeEventData = __webpack_exports__.V2;
 var __webpack_exports__ExtensionReadyEvent = __webpack_exports__.hV;
@@ -1057,4 +1237,4 @@ var __webpack_exports__StatusBarAlignmentProperty = __webpack_exports__.V7;
 var __webpack_exports__StatusBarItem = __webpack_exports__.wl;
 var __webpack_exports__StatusBarItemAlignment = __webpack_exports__.se;
 var __webpack_exports__StringProperty = __webpack_exports__.h_;
-export { __webpack_exports__BindedProperty as BindedProperty, __webpack_exports__BooleanProperty as BooleanProperty, __webpack_exports__BuildInPane as BuildInPane, __webpack_exports__Destination as Destination, __webpack_exports__EditorExtension as EditorExtension, __webpack_exports__ExtensionInitializeEvent as ExtensionInitializeEvent, __webpack_exports__ExtensionInitializeEventData as ExtensionInitializeEventData, __webpack_exports__ExtensionReadyEvent as ExtensionReadyEvent, __webpack_exports__ExtensionReadyEventData as ExtensionReadyEventData, __webpack_exports__ExtensionShutdownEvent as ExtensionShutdownEvent, __webpack_exports__ExtensionShutdownEventData as ExtensionShutdownEventData, __webpack_exports__NumberProperty as NumberProperty, __webpack_exports__StatusBarAlignmentProperty as StatusBarAlignmentProperty, __webpack_exports__StatusBarItem as StatusBarItem, __webpack_exports__StatusBarItemAlignment as StatusBarItemAlignment, __webpack_exports__StringProperty as StringProperty };
+export { __webpack_exports__BindedSource as BindedSource, __webpack_exports__BooleanProperty as BooleanProperty, __webpack_exports__BuildInPane as BuildInPane, __webpack_exports__ConvertingProperty as ConvertingProperty, __webpack_exports__Destination as Destination, __webpack_exports__EditorExtension as EditorExtension, __webpack_exports__Element as Element, __webpack_exports__ExtensionInitializeEvent as ExtensionInitializeEvent, __webpack_exports__ExtensionInitializeEventData as ExtensionInitializeEventData, __webpack_exports__ExtensionReadyEvent as ExtensionReadyEvent, __webpack_exports__ExtensionReadyEventData as ExtensionReadyEventData, __webpack_exports__ExtensionShutdownEvent as ExtensionShutdownEvent, __webpack_exports__ExtensionShutdownEventData as ExtensionShutdownEventData, __webpack_exports__NumberProperty as NumberProperty, __webpack_exports__StatusBarAlignmentProperty as StatusBarAlignmentProperty, __webpack_exports__StatusBarItem as StatusBarItem, __webpack_exports__StatusBarItemAlignment as StatusBarItemAlignment, __webpack_exports__StringProperty as StringProperty };

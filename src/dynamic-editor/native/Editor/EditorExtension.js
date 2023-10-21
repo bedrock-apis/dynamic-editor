@@ -1,11 +1,12 @@
-import { core, NoConstructor, TriggerEvent } from "../../core/index";
+import { BuildInPane, core, NoConstructor, ObjectBoundNotExist, RedirectDestination, RedirectToDestinationPacket, TriggerEvent, UpdateBuildInPanePacket } from "../../core/index";
 import { 
     ExtensionInitializeEvent, ExtensionInitializeEventData, 
     ExtensionReadyEvent, ExtensionReadyEventData, 
     ExtensionShutdownEvent, ExtensionShutdownEventData } from "../Events";
+import { CONTEXT_BY_EXTENSION } from "./EditorContext";
 
 /**@public */
-export class EditorExtension{   
+export class EditorExtension{
     Shutdown(){};
     Ready(){};
     Initialize(){};
@@ -38,12 +39,16 @@ export class EditorExtension{
         });
         Object.setPrototypeOf(this,that.prototype??EditorExtension.prototype);
     }
+    redirectTo(destination){
+        if(!CONTEXT_BY_EXTENSION.has(this)) throw new ReferenceError(ObjectBoundNotExist);
+        if(!(destination in RedirectDestination)) throw new TypeError("Unknow Destination: " + destination);
+        if(typeof destination === "string") destination = RedirectDestination[destination];
+        CONTEXT_BY_EXTENSION.get(this).post(new RedirectToDestinationPacket(destination));
+    }
+    setBuildInPaneVisibility(pane, visible = true){
+        if(!CONTEXT_BY_EXTENSION.has(this)) throw new ReferenceError(ObjectBoundNotExist);
+        if(!(pane in BuildInPane)) throw new TypeError("Unknow pane: " + pane);
+        if(typeof pane === "string") destination = BuildInPane[pane];
+        CONTEXT_BY_EXTENSION.get(this).post(new UpdateBuildInPanePacket(pane,!!visible));
+    }
 }
-/*
-export const PublicEditorExtension = CreateClass("EditorExtension",{
-    Shutdown(){},
-    Ready(){},
-    Initialize(){},
-    get player(): Player{return super.getCache(this).player;},
-    get client(){return GetPublicInstance(super.getCache(this).context.client);}
-}).constructor as unknown as typeof EX;*/

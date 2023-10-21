@@ -4,8 +4,10 @@ import { EditorExtension } from "./EditorExtension";
 import { editorEventManager } from "./EditorEventManager";
 import { Player } from "@minecraft/server";
 import { EditorControlManager } from "./EditorControlManager";
+import { Action } from "./EditorActionManager";
 
 const CONTEXT_MANAGERS = new WeakMap();
+export const CONTEXT_BY_EXTENSION = new WeakMap<any,EditorContextManager>();
 const POST = Player.prototype.postClientMessage;
 export class EditorContextManager{
     readonly context;
@@ -21,6 +23,7 @@ export class EditorContextManager{
     readonly onActionExecuted = new NativeEvent();
     readonly onPanePropertyChanged = new NativeEvent();
     readonly onPaneVisibilityChanged = new NativeEvent();
+    readonly actionManager = new Map<string,Action>();
     isReady = false;
     /**@param {ExtensionContext} context  */
     constructor(context: ExtensionContext,that: new () => any){
@@ -30,17 +33,13 @@ export class EditorContextManager{
         this.transactionManager = context.transactionManager;
         this.selectionManager = context.selectionManager;
         this.player = context.player;
-        editorEventManager.onClientReady.subscribe(({player})=>{
-            if(player === this.player) {
-                this.isReady = true;
-                this.onReadyEvent.trigger(this);
-            }
-        });
         core.isNativeCall = true;
         this.controlManager = new EditorControlManager(this);
+        editorEventManager.registerContextManager(context.player,this);
         //@ts-ignore
         this.extension = (new EditorExtension(this,that)) as EditorExtension;
         core.isNativeCall = false;
+        CONTEXT_BY_EXTENSION.set(this.extension,this);
         this.onInitialiazeEvent.trigger(this);
     }
     shutdown(){
@@ -52,6 +51,16 @@ export class EditorContextManager{
         that?.shutdown();
     }
     post(packet: Packet){POST.call(this.player,packet.id,packet.getMessage());}
+    _onReady(){
+        this.isReady = true;
+        this.onReadyEvent.trigger(this);
+    }
+    _onAction(id: string, data: any){
+        
+    }
+    _onPropertyChange(){
+
+    }
 }
 
 EditorExtension.registry = function (extensionName: string){

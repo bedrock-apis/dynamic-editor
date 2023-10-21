@@ -1,25 +1,35 @@
 import { system } from "@minecraft/server";
-import { EditorExtension, StatusBarItem, StatusBarItemAlignment } from "dynamic-editor";
+import { BuildInPane, ConvertingProperty, Destination, EditorExtension, ExtensionReadyEvent, NumberProperty, StatusBarItem, StatusBarItemAlignment } from "dynamic-editor";
 
-const myStatusBar = new StatusBarItem();
-myStatusBar.setPropertyValue("text", "My Text");
-myStatusBar.setPropertyValue("size", 15);
 class MyExtension extends EditorExtension{
     Initialiaze(){
-        console.warn("Initialize");
-        this.onShutdown.subscribe((e)=>console.warn("Event On Shutdown"));
+        const myStatusBar = new StatusBarItem()
+        .setAlignmentt(StatusBarItemAlignment.Left)
+        .setText("Some text")
+        .setSize("Some Text".length * 1.25);
+
+
+        //basic type by type binding
+        myStatusBar.setProperty("enabled",myStatusBar.getProperty("visible"));
+        //bind size property depending on current text property and its length
+        myStatusBar.setProperty("size", new ConvertingProperty(myStatusBar.getProperty("text"),(value)=>value.length * 1.25));
+        //bind size element value to another text element value
+        StatusBarItem.BindProperty(myStatusBar, "size",myStatusBar,"text",(text)=>text?.length??0);
+
+        system.runTimeout(()=>myStatusBar.text = "Other Text",60);
         this.statusBar.addItem(myStatusBar);
     }
-    Ready(){
-        console.warn("Ready! " + this.statusBar.elementsLength);
-        system.runTimeout(()=>{
-            for (const i of this.statusBar.getItems()) {
-                this.statusBar.removeItem(i);
-            }
-        },60);
-    }
-    Shutdown(){
-        console.warn("Shutdown");
+    Ready(extension: this): void {
+        this.redirectTo(Destination.PauseScreen);
+        this.setBuildInPaneVisibility(BuildInPane.UISettings);
     }
 }
 MyExtension.registry();
+
+class AutoSizeStatusBarItem extends StatusBarItem{
+    constructor(){
+        super();
+        //bind size property depending on current text property and its length
+        this.setProperty("size", new ConvertingProperty(this.getProperty("text"),(value)=>value.length * 1.25));
+    }
+}

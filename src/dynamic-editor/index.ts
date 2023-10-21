@@ -1,11 +1,6 @@
-/*
-import { Editor } from "./public_bin/Editor";
-
-export { Editor, EditorEvents } from "./public_bin/Editor";
-export { ClientReadyEvent } from "./public_bin/PublicEvents";*/
 import { RedirectDestination } from "./core/index";
 export {BuildInPane, StatusBarItemAlignment} from "./core/index";
-export const Destination: typeof RedirectDestination = RedirectDestination;
+export const Destination = RedirectDestination;
 export { EditorExtension } from "./native/Editor/index";
 export { 
     ExtensionInitializeEvent, ExtensionInitializeEventData,
@@ -16,9 +11,9 @@ export {
     StringProperty,
     NumberProperty,
     BooleanProperty,
-    BindedProperty,
+    BindedSource,
     StatusBarAlignmentProperty,
-    StatusBarItem
+    StatusBarItem,
+    ConvertingProperty,
+    Element
  } from "./native/Controls/index";
-/*
-export const editor: Editor = CreateInstance(Editor,e);*/

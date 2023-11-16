@@ -5,7 +5,7 @@ import { BuildInPane, RedirectDestination as Destination } from "dynamic-editor/
 import { EditorContextManager } from "./EditorContext";
 /**@public */
 export interface EditorExtension {
-    Initialiaze?(extension: this): void
+    Initialize?(extension: this): void
     Ready?(extension: this):void
     Shutdown?(extension: this): void
 }

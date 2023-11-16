@@ -670,7 +670,7 @@ export declare class PlayerModeChangeEvent<T extends EditorExtension> extends Ex
 }
 /**@public */
 export interface EditorExtension {
-	Initialiaze?(extension: this): void;
+	Initialize?(extension: this): void;
 	Ready?(extension: this): void;
 	Shutdown?(extension: this): void;
 }
@@ -721,7 +721,7 @@ declare class EditorContextManager {
 	readonly clipboardManager: ClipboardManager | undefined;
 	readonly controlManager: EditorControlManager | undefined;
 	readonly extension: EditorExtension | undefined;
-	readonly onInitialiazeEvent: NativeEvent<[
+	readonly onInitializeEvent: NativeEvent<[
 		this
 	]>;
 	readonly onReadyEvent: NativeEvent<[

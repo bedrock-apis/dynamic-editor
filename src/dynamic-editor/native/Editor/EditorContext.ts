@@ -1,5 +1,5 @@
 import { ExtensionContext, ExtensionOptionalParameters, editor } from "@minecraft/server-editor-bindings";
-import { IPacket, NativeEvent, TriggerEvent, UNIQUE_SYMBOL, core } from "../../core/index";
+import { IPacket, NativeEvent, UNIQUE_SYMBOL, core } from "../../core/index";
 import { EditorExtension } from "./EditorExtension";
 import { Player } from "@minecraft/server";
 import { EditorControlManager } from "./EditorControlManager";
@@ -18,7 +18,7 @@ export class EditorContextManager{
     readonly clipboardManager;
     readonly controlManager;
     readonly extension;
-    readonly onInitialiazeEvent = new NativeEvent<[this]>();
+    readonly onInitializeEvent = new NativeEvent<[this]>();
     readonly onReadyEvent = new NativeEvent<[this]>();
     readonly onShutdownEvent = new NativeEvent<[this]>();
     readonly actionManager = new Map<string,Action>();
@@ -43,7 +43,7 @@ export class EditorContextManager{
         this.extension = (new EditorExtension(this,that)) as EditorExtension;
         core.isNativeCall = false;
         CONTEXT_BY_EXTENSION.set(this.extension,this);
-        this.onInitialiazeEvent.trigger(this);
+        this.onInitializeEvent.trigger(this);
     }
     shutdown(){
         this.display?.onClientReady.unsubscribe(this._eventReadyMethod);

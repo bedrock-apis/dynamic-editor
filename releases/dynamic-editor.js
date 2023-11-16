@@ -676,9 +676,9 @@ class EditorExtension{
         this.statusBar = context.controlManager.statusBar;
         this.menuBar = context.controlManager.menuBar;
         this.clipboard = context.clipboardManager;
-        context.onInitialiazeEvent.subscribe(()=>{
+        context.onInitializeEvent.subscribe(()=>{
             try {
-                this.Initialiaze?.(this.public);
+                this.Initialize?.(this.public);
             } catch (error) {console.error(error,error.stack);}
             TriggerEvent(this.onInitialize,new ExtensionInitializeEventData(this));
         });
@@ -1420,7 +1420,7 @@ class EditorContextManager {
     clipboardManager;
     controlManager;
     extension;
-    onInitialiazeEvent = new NativeEvent();
+    onInitializeEvent = new NativeEvent();
     onReadyEvent = new NativeEvent();
     onShutdownEvent = new NativeEvent();
     actionManager = new Map();
@@ -1445,7 +1445,7 @@ class EditorContextManager {
         this.extension = (new EditorExtension(this, that));
         Base_core.isNativeCall = false;
         CONTEXT_BY_EXTENSION.set(this.extension, this);
-        this.onInitialiazeEvent.trigger(this);
+        this.onInitializeEvent.trigger(this);
     }
     shutdown() {
         this.display?.onClientReady.unsubscribe(this._eventReadyMethod);
@@ -1497,8 +1497,7 @@ class EditorEventManager {
     [ReceiveEventId["Editor::ClientLifecycle"]](id, message, player) {
         if (message?.type === ReceiveLifecycleEventType.PlayerReady) {
             const display = new PlayerDisplayManager(player);
-            if (!display.isReady)
-                display.onClientReady.trigger({ player, display });
+            display.onClientReady.trigger({ player, display });
         }
     }
     [ReceiveEventId["Editor::ClientActionEvents"]](id, message, player) {

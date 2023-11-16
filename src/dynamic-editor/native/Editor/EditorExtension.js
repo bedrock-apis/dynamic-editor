@@ -22,9 +22,9 @@ export class EditorExtension{
         this.statusBar = context.controlManager.statusBar;
         this.menuBar = context.controlManager.menuBar;
         this.clipboard = context.clipboardManager;
-        context.onInitialiazeEvent.subscribe(()=>{
+        context.onInitializeEvent.subscribe(()=>{
             try {
-                this.Initialiaze?.(this.public);
+                this.Initialize?.(this.public);
             } catch (error) {console.error(error,error.stack);}
             TriggerEvent(this.onInitialize,new ExtensionInitializeEventData(this));
         });

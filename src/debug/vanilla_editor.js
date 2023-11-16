@@ -6,6 +6,17 @@ registerEditorExtension("sus",(uiSession)=>{    /*
     }});*/
     /**@type {ExtensionContext} */
     const context = uiSession.extensionContext;
+    const menu = uiSession.createMenu({name:"It me"});
+    try{
+        menu.addItem({name:"test"});
+        console.warn("test added");
+        menu.addSeparator();
+        console.warn("Seperator added");
+        menu.addItem({name:"lol"});
+        console.warn("lol added");
+    } catch (er){
+        console.error(er,er.stack);
+    }
     context.afterEvents.modeChange.subscribe((e)=>{console.warn(e.mode)});
 /*
     const b = uiSession.createMenu({name:"Menu",displayStringId:"Id"});

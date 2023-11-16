@@ -17,7 +17,7 @@ export class EditorEventManager{
     [ReceiveEventId["Editor::ClientLifecycle"]](id: typeof ReceiveEventId["Editor::ClientLifecycle"], message: {[key: string]: any}, player: Player){
         if(message?.type === ReceiveLifecycleEventType.PlayerReady){
             const display = new PlayerDisplayManager(player);
-            if(!display.isReady) display.onClientReady.trigger({player,display});
+            display.onClientReady.trigger({player,display});
         }
     }
     [ReceiveEventId["Editor::ClientActionEvents"]](id: typeof ReceiveEventId["Editor::ClientActionEvents"], message: {[key: string]: any}, player: Player){

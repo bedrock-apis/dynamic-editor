@@ -1,35 +1,49 @@
 import { system } from "@minecraft/server";
-import { BuildInPane, ConvertingProperty, Destination, EditorExtension, ExtensionReadyEvent, NumberProperty, StatusBarItem, StatusBarItemAlignment } from "dynamic-editor";
+import { 
+    EditorExtension,
+    MenuActionItem,
+    MenuOptionsItem
+} from "dynamic-editor";
 
 class MyExtension extends EditorExtension{
     Initialiaze(){
-        const myStatusBar = new StatusBarItem()
-        .setAlignmentt(StatusBarItemAlignment.Left)
-        .setText("Some text")
-        .setSize("Some Text".length * 1.25);
+
+        const a = new MenuActionItem("Sub Action")
+        // wrapping the onActionExecute.subscribe(...), cus builder syntax
+        .addActionHandler(()=>console.warn("Action"))
 
 
-        //basic type by type binding
-        myStatusBar.setProperty("enabled",myStatusBar.getProperty("visible"));
-        //bind size property depending on current text property and its length
-        myStatusBar.setProperty("size", new ConvertingProperty(myStatusBar.getProperty("text"),(value)=>value.length * 1.25));
-        //bind size element value to another text element value
-        StatusBarItem.BindProperty(myStatusBar, "size",myStatusBar,"text",(text)=>text?.length??0);
-
-        system.runTimeout(()=>myStatusBar.text = "Other Text",60);
-        this.statusBar.addItem(myStatusBar);
-    }
-    Ready(extension: this): void {
-        this.redirectTo(Destination.PauseScreen);
-        this.setBuildInPaneVisibility(BuildInPane.UISettings);
+        // more complex menu initialization
+        const menuOptions = new MenuOptionsItem("Main")
+        .addMenuItem(new MenuOptionsItem("Sub options")
+            .addMenuItem(new MenuActionItem("Sub Action")
+                .addActionHandler(()=>console.warn("Action2"))
+                .setContent("Sub sub Action Long Name")
+                .setCheckmarkEnabled(true).setChecked(true)
+            )
+        ).addMenuItem(a);
+        
+        // subscribe to action
+        a.onActionExecute.subscribe(()=>{});
+        // displaying and handling contents via menu bar
+        this.menuBar.addItem(menuOptions);
+        
+        
+        // testing dynamic features!
+        system.runTimeout(()=>a.setChecked(true),120);
     }
 }
 MyExtension.registry();
 
-class AutoSizeStatusBarItem extends StatusBarItem{
-    constructor(){
-        super();
-        //bind size property depending on current text property and its length
-        this.setProperty("size", new ConvertingProperty(this.getProperty("text"),(value)=>value.length * 1.25));
+class SubExtension extends EditorExtension{
+    static extensionName = "My Extension Name";
+    Initialiaze(extension: this): void {
+        //code for initialization, constrution functionality
+    }
+    Ready(extension: this): void {
+        //code triggered when player is ready to display an UI
+    }
+    Shutdown(extension: this): void {
+        //code for shuttingdown a extension
     }
 }

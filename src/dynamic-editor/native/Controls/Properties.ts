@@ -1,5 +1,5 @@
 import { StatusBarItemAlignment } from "dynamic-editor/core";
-import { CustomProperty } from "./GeneralUI";
+import { CustomProperty } from "./General";
 
 export class StatusBarAlignmentProperty extends CustomProperty<[StatusBarItemAlignment]>{
     static readonly UNIQUE_TYPE: symbol = Symbol("StatusBarAlignmentProperty");

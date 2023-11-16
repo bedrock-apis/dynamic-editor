@@ -1,11 +1,33 @@
-import { ActionType, InternalInputTypes, InternalInteractionTypes, MouseAction, NativeEvent, ServerActionEventType } from "dynamic-editor/core";
-import { UniquePostable } from "../Controls/index";
+import { 
+    ActionType, InternalInputTypes,
+    InternalInteractionTypes, PublicEvent,
+    ServerActionEventType, TriggerEvent 
+} from "dynamic-editor/core";
 import { Player, Vector3 } from "@minecraft/server";
+import { INIT_FLAG, PostActionPacket, REMOVE_FLAG, UPDATE_FLAG, UniquePostable } from "../Packets";
 
-export const PayloadLoaders = new Map<ActionType, typeof PayloadLoader>();
-export class Action extends UniquePostable{
-    protected readonly REMOVE_TYPE = ServerActionEventType.ReleaseAction;
-    protected readonly UPDATE_TYPE = ServerActionEventType.CreateAction;
+
+export class Action<AType extends ActionType = ActionType.NoArgsAction> extends UniquePostable<PostActionPacket>{
+    packetConstructor: new (data: any) => PostActionPacket = PostActionPacket;
+    protected readonly PACKET_TYPES = {
+        [UPDATE_FLAG]: ServerActionEventType.CreateAction,
+        [INIT_FLAG]: ServerActionEventType.CreateAction,
+        [REMOVE_FLAG]: ServerActionEventType.ReleaseAction,
+    };
+    readonly actionType;
+    readonly onActionExecute = new PublicEvent<[AType extends ActionType.MouseRayCastAction?MouseRayCastPayload:NoArgsPayload]>;
+    constructor(type: AType){
+        super();
+        this.actionType = type;
+    }
+    protected getMainPacketData(flags?: number | undefined): any {
+        const data = super.getMainPacketData(flags);
+        data.actionType = this.actionType;
+        return data;
+    }
+    execute(payload: AType extends ActionType.MouseRayCastAction?MouseRayCastPayload:NoArgsPayload){
+        TriggerEvent(this.onActionExecute,payload);
+    }
 }
 export class PayloadLoader{
     readonly type: ActionType;
@@ -45,5 +67,6 @@ export class MouseRayCastPayload extends PayloadLoader{
         this.inputType = inputType as InternalInputTypes;
     }
 }
+export const PayloadLoaders = new Map<ActionType, typeof PayloadLoader>();
 PayloadLoaders.set(ActionType.NoArgsAction,NoArgsPayload);
 PayloadLoaders.set(ActionType.MouseRayCastAction,MouseRayCastPayload);

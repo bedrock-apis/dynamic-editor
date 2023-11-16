@@ -1,41 +1,44 @@
 import { ExtensionContext, ExtensionOptionalParameters, editor } from "@minecraft/server-editor-bindings";
-import { NativeEvent, Packet, core } from "../../core/index";
+import { IPacket, NativeEvent, TriggerEvent, UNIQUE_SYMBOL, core } from "../../core/index";
 import { EditorExtension } from "./EditorExtension";
-import { editorEventManager } from "./EditorEventManager";
 import { Player } from "@minecraft/server";
 import { EditorControlManager } from "./EditorControlManager";
-import { Action } from "./EditorActionManager";
+import { Action } from "./EditorActions";
+import { PlayerDisplayManager } from "./EditorDisplayManager";
 
 const CONTEXT_MANAGERS = new WeakMap();
 export const CONTEXT_BY_EXTENSION = new WeakMap<any,EditorContextManager>();
 const POST = Player.prototype.postClientMessage;
 export class EditorContextManager{
     readonly context;
+    readonly display;
     readonly player;
     readonly transactionManager;
     readonly selectionManager;
+    readonly clipboardManager;
     readonly controlManager;
     readonly extension;
     readonly onInitialiazeEvent = new NativeEvent<[this]>();
     readonly onReadyEvent = new NativeEvent<[this]>();
     readonly onShutdownEvent = new NativeEvent<[this]>();
-    readonly onToolSelected = new NativeEvent();
-    readonly onActionExecuted = new NativeEvent();
-    readonly onPanePropertyChanged = new NativeEvent();
-    readonly onPaneVisibilityChanged = new NativeEvent();
     readonly actionManager = new Map<string,Action>();
-    isReady = false;
+    //@ts-ignore
+    readonly get isReady(): boolean {return this.display?.isReady;}
+
+    private _eventReadyMethod: any;
     /**@param {ExtensionContext} context  */
     constructor(context: ExtensionContext,that: new () => any){
         if(CONTEXT_MANAGERS.has(context)) return CONTEXT_MANAGERS.get(context);
         CONTEXT_MANAGERS.set(context,this);
         this.context = context;
+        this.display = new PlayerDisplayManager(context.player);
         this.transactionManager = context.transactionManager;
         this.selectionManager = context.selectionManager;
+        this.clipboardManager = context.clipboardManager;
         this.player = context.player;
         core.isNativeCall = true;
         this.controlManager = new EditorControlManager(this);
-        editorEventManager.registerContextManager(context.player,this);
+        this._eventReadyMethod = this.display.onClientReady.subscribe(()=>this.onReadyEvent.trigger(this));
         //@ts-ignore
         this.extension = (new EditorExtension(this,that)) as EditorExtension;
         core.isNativeCall = false;
@@ -43,24 +46,18 @@ export class EditorContextManager{
         this.onInitialiazeEvent.trigger(this);
     }
     shutdown(){
+        this.display?.onClientReady.unsubscribe(this._eventReadyMethod);
         this.onShutdownEvent.trigger(this);
-        this.isReady = false;
     }
     static Shutdown(context: ExtensionContext){
         const that = CONTEXT_MANAGERS.get(context);
         that?.shutdown();
     }
-    post(packet: Packet){POST.call(this.player,packet.id,packet.getMessage());}
-    _onReady(){
-        this.isReady = true;
-        this.onReadyEvent.trigger(this);
-    }
-    _onAction(id: string, data: any){
-        
-    }
-    _onPropertyChange(){
+    post(packet: IPacket){POST.call(this.player,packet.id,JSON.stringify(packet.data,(k,v)=>{
+        if(typeof v === "object" && UNIQUE_SYMBOL in v) return this.display?.openCreateUnique(v);
+        return v;
+    }));}
 
-    }
 }
 
 EditorExtension.registry = function (extensionName: string){

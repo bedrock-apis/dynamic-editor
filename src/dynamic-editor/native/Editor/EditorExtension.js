@@ -1,8 +1,9 @@
-import { BuildInPane, core, NoConstructor, ObjectBoundNotExist, RedirectDestination, RedirectToDestinationPacket, TriggerEvent, UpdateBuildInPanePacket } from "../../core/index";
+import { BuildInPane, core, NoConstructor, ObjectBoundNotExist, RedirectDestination, TriggerEvent } from "../../core/index";
 import { 
     ExtensionInitializeEvent, ExtensionInitializeEventData, 
     ExtensionReadyEvent, ExtensionReadyEventData, 
-    ExtensionShutdownEvent, ExtensionShutdownEventData } from "../Events";
+    ExtensionShutdownEvent, ExtensionShutdownEventData, PlayerModeChangeEvent, PlayerModeChangeEventData } from "../Events";
+import { RedirectToDestinationPacket, UpdateBuildInPanePacket } from "../Packets";
 import { CONTEXT_BY_EXTENSION } from "./EditorContext";
 
 /**@public */
@@ -13,12 +14,14 @@ export class EditorExtension{
     onInitialize = new ExtensionInitializeEvent();
     onReady = new ExtensionReadyEvent();
     onShutdown = new ExtensionShutdownEvent();
+    onPlayerModeChange = new PlayerModeChangeEvent();
     /**@param {import("./EditorContext").EditorContextManager} context  */
     constructor(context, that = EditorExtension){
         if(!core.isNativeCall) throw new TypeError(NoConstructor + EditorExtension.name);
         this.player = context.player;
-        this.client = context.client;
         this.statusBar = context.controlManager.statusBar;
+        this.menuBar = context.controlManager.menuBar;
+        this.clipboard = context.clipboardManager;
         context.onInitialiazeEvent.subscribe(()=>{
             try {
                 this.Initialiaze?.(this.public);
@@ -37,6 +40,7 @@ export class EditorExtension{
                 this.Shutdown?.(this.public);
             } catch (error) {console.error(error,error.stack);}
         });
+        context.context.afterEvents.modeChange.subscribe(e=>TriggerEvent(this.onPlayerModeChange,new PlayerModeChangeEventData(this,e.mode)));
         Object.setPrototypeOf(this,that.prototype??EditorExtension.prototype);
     }
     redirectTo(destination){

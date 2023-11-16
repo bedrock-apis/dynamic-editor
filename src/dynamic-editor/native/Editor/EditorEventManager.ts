@@ -1,11 +1,9 @@
 import { Player, world } from "@minecraft/server";
-import { ReceiveEventId, NativeEvent, ReceiveLifecycleEventType, ReceiveEventEnum, ReceiveActionEventType } from "../../core/index";
-import { EditorContextManager } from "./EditorContext";
-import { PayloadLoader, PayloadLoaders } from "./EditorActionManager";
+import { ReceiveEventId, ReceiveLifecycleEventType, ReceiveEventEnum, ReceiveActionEventType, TriggerEvent, PublicEvent } from "../../core/index";
+import { PayloadLoader, PayloadLoaders } from "./EditorActions";
+import { PlayerDisplayManager } from "./EditorDisplayManager";
 
 export class EditorEventManager{
-    readonly onClientReady = new NativeEvent<[{player: Player}]>();
-    readonly activeExtensions = new WeakMap<Player,Set<EditorContextManager>>();
     constructor(){
         world.afterEvents.messageReceive.subscribe(({id,message,player})=>{
             if(!(id in ReceiveEventId)) return;
@@ -18,25 +16,24 @@ export class EditorEventManager{
     }
     [ReceiveEventId["Editor::ClientLifecycle"]](id: typeof ReceiveEventId["Editor::ClientLifecycle"], message: {[key: string]: any}, player: Player){
         if(message?.type === ReceiveLifecycleEventType.PlayerReady){
-            this.getContextManagers(player).forEach(e=>e._onReady());
-            this.onClientReady.trigger({player});
+            const display = new PlayerDisplayManager(player);
+            if(!display.isReady) display.onClientReady.trigger({player,display});
         }
     }
     [ReceiveEventId["Editor::ClientActionEvents"]](id: typeof ReceiveEventId["Editor::ClientActionEvents"], message: {[key: string]: any}, player: Player){
         if(message?.type === ReceiveActionEventType.ActionExecuted){
-            this.getContextManagers(player).forEach(e=>e._onAction(message.id as string,new (PayloadLoaders.get(message.payload.type) as typeof PayloadLoader)(player,message.payload)));
+            const actionId = message.id;
+            const display = new PlayerDisplayManager(player);
+            if(!display.isReady) display.onClientReady.trigger({player,display});
+            if(!display.hasRegisteredAction(actionId)) return;
+            TriggerEvent(
+                display.getRegisteredAction(actionId)?.onActionExecute as PublicEvent<any>,
+                new (PayloadLoaders.get(message.payload.type) as typeof PayloadLoader)(player,message.payload)
+            );
         }
     }
     [ReceiveEventId["Editor::ClientUXEvents"]](id: typeof ReceiveEventId["Editor::ClientUXEvents"], message: {[key: string]: any}, player: Player){
         console.warn(`§8No handler implementation for §r§l${id}§r§7  -->  §r§l${message.type} §r§8[${ReceiveEventEnum[id][message.type]}]`);
-    }
-    getContextManagers(player: Player){
-        return this.activeExtensions.get(player)??new Set();
-    }
-    registerContextManager(player: Player,context: EditorContextManager){
-        if (!this.activeExtensions.has(player as Player)) this.activeExtensions.set(player as Player, new Set());
-        const set = this.activeExtensions.get(player as Player) as Set<EditorContextManager>;
-        set.add(context);
     }
 }
 export const editorEventManager = new EditorEventManager();

@@ -1,5 +1,5 @@
 import { Player, world } from "@minecraft/server";
-import { Packet } from "../core/index";
+import { IPacket } from "../core/index";
 
 export const READY_CLIENTS = new WeakSet();
 export const PLAYER_CLIENTS = new WeakMap();
@@ -20,7 +20,7 @@ export class Client{
         this.name = player.name;
         this.isReady = false;
     }
-    post(packet: Packet){POST.call(this.player,packet.id,packet.getMessage());}
+    post(packet: IPacket){POST.call(this.player,packet.id,JSON.stringify(packet.data));}
 }
 world.afterEvents.playerSpawn.subscribe(e=>{
     if(e.initialSpawn){

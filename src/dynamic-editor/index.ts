@@ -5,7 +5,9 @@ export { EditorExtension } from "./native/Editor/index";
 export { 
     ExtensionInitializeEvent, ExtensionInitializeEventData,
     ExtensionReadyEvent, ExtensionReadyEventData,
-    ExtensionShutdownEvent, ExtensionShutdownEventData
+    ExtensionShutdownEvent, ExtensionShutdownEventData,
+    PlayerModeChangeEvent, PlayerModeChangeEventData,
+    ValueChangeEvent, ValueChangeEventData
 } from "./native/Events";
 export { 
     StringProperty,
@@ -14,6 +16,14 @@ export {
     BindedSource,
     StatusBarAlignmentProperty,
     StatusBarItem,
+    MenuActionItem,
+    MenuOptionsItem,
+    AutoSizeStatusBarItem,
     ConvertingProperty,
     Element
  } from "./native/Controls/index";
+
+export {
+    ExtensionOptionalParameters,
+    EditorMode
+} from "@minecraft/server-editor-bindings";

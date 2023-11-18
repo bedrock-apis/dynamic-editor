@@ -1,7 +1,8 @@
 import { Player, world } from "@minecraft/server";
-import { ReceiveEventId, ReceiveLifecycleEventType, ReceiveEventEnum, ReceiveActionEventType, TriggerEvent, PublicEvent } from "../../core/index";
+import { ReceiveEventId, ReceiveLifecycleEventType, ReceiveEventEnum, ReceiveActionEventType, TriggerEvent, PublicEvent, ReceiveUXEventType } from "../../core/index";
 import { PayloadLoader, PayloadLoaders } from "./EditorActions";
 import { PlayerDisplayManager } from "./EditorDisplayManager";
+import { IUnkownTool } from "../Controls";
 
 export class EditorEventManager{
     constructor(){
@@ -24,7 +25,6 @@ export class EditorEventManager{
         if(message?.type === ReceiveActionEventType.ActionExecuted){
             const actionId = message.id;
             const display = new PlayerDisplayManager(player);
-            if(!display.isReady) display.onClientReady.trigger({player,display});
             if(!display.hasRegisteredAction(actionId)) return;
             TriggerEvent(
                 display.getRegisteredAction(actionId)?.onActionExecute as PublicEvent<any>,
@@ -33,7 +33,18 @@ export class EditorEventManager{
         }
     }
     [ReceiveEventId["Editor::ClientUXEvents"]](id: typeof ReceiveEventId["Editor::ClientUXEvents"], message: {[key: string]: any}, player: Player){
-        console.warn(`§8No handler implementation for §r§l${id}§r§7  -->  §r§l${message.type} §r§8[${ReceiveEventEnum[id][message.type]}]`);
+        if(!(message.type in this.uxEventsResolver)) console.warn(`§8No handler implementation for §r§l${id}§r§7  -->  §r§l${message.type} §r§8[${ReceiveEventEnum[id][message.type]}]`);
+        else this.uxEventsResolver[message.type](id,message,new PlayerDisplayManager(player));
     }
+    uxEventsResolver: {[key: number]: (id: string,message:any,display:PlayerDisplayManager)=>void} =  {
+        [ReceiveUXEventType.ToolActivate](id,message,display){
+            let tool;
+            if(message.id === "") tool = null;
+            else if(!display.hasReverses(message.id)) tool = {id:message.id} as IUnkownTool;
+            else tool = display.getReverses(message.id);
+            display.onToolAtivate.trigger({player:display.player,display,lastTool:display.lastTool,tool:tool});
+            display.lastTool = tool;
+        }
+    };
 }
 export const editorEventManager = new EditorEventManager();

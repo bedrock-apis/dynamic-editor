@@ -2,7 +2,7 @@ import { Player } from "@minecraft/server";
 import { PublicEvent } from "../core/index";
 import { EditorExtension } from "./Editor/EditorExtension";
 import { EditorMode } from "@minecraft/server-editor-bindings";
-import { Element, ElementExtendable, Property } from "./Controls";
+import { Element, ElementExtendable, ElementPropertyType, Property } from "./Controls";
 
 /**@beta */
 export class EditorEventData{constructor(){}}
@@ -39,12 +39,9 @@ export class PropertyValueChangeEventData<P extends ElementExtendable, E extends
     readonly element: E;
     readonly propertyName: keyof P;
     readonly property: P[keyof P];
-    //@ts-ignore
-    readonly oldValue: P[keyof P]["value"]
-    //@ts-ignore
-    readonly newValue: P[keyof P]["value"]
-    //@ts-ignore
-    constructor(element: E, propertyName: N, property: P[N], oldValue: P[N]["value"], newValue: P[N]["value"]){
+    readonly oldValue: ElementPropertyType<P[keyof P]>
+    readonly newValue: ElementPropertyType<P[keyof P]>
+    constructor(element: E, propertyName: N, property: P[N], oldValue:ElementPropertyType<P[keyof P]>, newValue:ElementPropertyType<P[keyof P]>){
         super();
         this.element = element;
         this.propertyName = propertyName;

@@ -21,6 +21,7 @@ export class EditorExtension{
         this.player = context.player;
         this.statusBar = context.controlManager.statusBar;
         this.menuBar = context.controlManager.menuBar;
+        this.toolBar = context.controlManager.toolBar;
         this.clipboard = context.clipboardManager;
         context.onInitializeEvent.subscribe(()=>{
             try {

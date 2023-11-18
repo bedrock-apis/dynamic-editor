@@ -1,42 +1,66 @@
-import { IUniqueObject, NoConstructor, PublicEvent, TriggerEvent, UNIQUE_SYMBOL, core } from "../../core/index";
+import { IUniqueObject, NoConstructor, TriggerEvent, UNIQUE_SYMBOL, core } from "../../core/index";
+import { Action } from "../Editor/EditorActions";
 import { EditorControlManager } from "../Editor/EditorControlManager";
 import { PropertyValueChangeEvent, PropertyValueChangeEventData, ValueChangeEvent, ValueChangeEventData } from "../Events";
-import { Displayable } from "../Packets";
+import { Displayable, ServerUXEventPacket } from "../Packets";
 
 export type ElementExtendable = {[key: string]: ElementProperty<any>};
 export type ElementConstruction<PropertyRecord> = {[K in keyof PropertyRecord]: {property: PropertyRecord[K],isFake?: boolean}}
+export type ElementPropertyType<T> = T extends ElementProperty<infer A>?A:never;
 export const NULL_TYPE: unique symbol = Symbol("NULL");
-
+export const OBJECT_TYPE: unique symbol = Symbol("SYMBOL_TYPE");
+export const ACTION_RETURNER: unique symbol = Symbol("ACTION_RETURNER");
 
 export interface IContentElement extends Element<any>{
     setContent(content: string): this;
+}
+export interface IObjectType{
+    readonly [OBJECT_TYPE]: symbol
+}
+export interface IActionLike{
+    readonly [ACTION_RETURNER]: Action<any>;
 }
 
 
 export class Property<T>{
     static readonly UNIQUE_TYPE: symbol = NULL_TYPE;
     static readonly EXPECTED_VALUE_TYPE?: string = undefined;
-    protected readonly _type?: symbol;
-    protected readonly _expectedType?: string;
+    /**@private*/
+    readonly _type?: symbol;
+    /**@private*/
+    readonly _expectedType?: string;
     readonly onValueChange = new ValueChangeEvent<T>;
     protected constructor(){this._type = new.target.UNIQUE_TYPE; this._expectedType = new.target.EXPECTED_VALUE_TYPE;};
 }
 export class ElementProperty<T> extends Property<T>{
-    protected readonly value: T | null;
-    protected readonly defualtValue?: T
+    /**@private*/
+    value: T | null;
+    protected readonly defualtValue: T | null;
     protected readonly _typeOf: string;
-    protected constructor(defaultValue: T){
+    protected readonly _bindedSetters = new WeakMap<ElementProperty<T>,(...params: any)=>any>();
+    protected constructor(defaultValue: T | null){
         super();
         this._typeOf = typeof defaultValue;
         this.value = defaultValue;
         this.defualtValue = defaultValue;
     }
+    removeSetterBinding(propertyGetter: ElementProperty<T>){
+        if(!this._bindedSetters.has(propertyGetter)) return this;
+        const m = this._bindedSetters.get(propertyGetter);
+        propertyGetter.onValueChange.unsubscribe(m as any);
+        this._bindedSetters.delete(propertyGetter);
+        return this;
+    }
+    addSetterBinding(propertyGetter: ElementProperty<T>){
+        if(this._bindedSetters.has(propertyGetter)) return this;
+        const m = propertyGetter.onValueChange.subscribe((e)=>this.setValue(e.newValue));
+        this._bindedSetters.set(propertyGetter,m);
+        return this;
+    }
     protected isValidType(v: any){return typeof v === this._typeOf;}
-    protected getType(v: T): T{return v;}
     setValue(value: T){
         if(!this.isValidType(value)) throw new TypeError("Invalid value type: '" + value + "' expected " + (this._expectedType??this._typeOf) );
-        //@ts-ignore
-        this.value = this.getType(value);
+        this.value = value;
         TriggerEvent(this.onValueChange,new ValueChangeEventData(this.value??this.defualtValue as T,value));
         return this;
     }
@@ -50,9 +74,8 @@ export class BindedSource<S extends ElementExtendable, T extends ElementExtendab
     readonly targetPropertyName: keyof T;
     readonly sourceElement: Element<S>;
     readonly sourcePropertyName: keyof S;
-    //@ts-ignore
     readonly method: (value: any)=>any
-    private constructor(targetElement: Element<T>, targetPropertyName: keyof T, sourceElement: Element<S>, sourcePropertyName: keyof S, method: (data: any)=>any){
+    constructor(targetElement: Element<T>, targetPropertyName: keyof T, sourceElement: Element<S>, sourcePropertyName: keyof S, method: (data: any)=>any){
         this.method = method;
         this.targetElement = targetElement;
         this.targetPropertyName = targetPropertyName;
@@ -60,29 +83,29 @@ export class BindedSource<S extends ElementExtendable, T extends ElementExtendab
         this.sourcePropertyName = sourcePropertyName;
     }
 }
-export class Element<PropertyRecord extends ElementExtendable = {}> extends Displayable implements IUniqueObject{
+export class Element<PropertyRecord extends ElementExtendable = {}> extends Displayable<ServerUXEventPacket> implements IUniqueObject{
     [UNIQUE_SYMBOL]: true = true;
-    //@ts-ignore
-    static BindProperty<L extends ElementExtendable, P extends ElementExtendable, K extends keyof L, K2 extends keyof P>(targetElement: Element<P>, targetPropertyName: K2,sourceElement: Element<L>, sourcePropertyName: K,convertor?:(value: L[K]["value"])=>P[K2]["value"]){
+    static BindProperty<L extends ElementExtendable, P extends ElementExtendable, K extends keyof L, K2 extends keyof P>(targetElement: Element<P>, targetPropertyName: K2,sourceElement: Element<L>, sourcePropertyName: K,convertor?:(value: ElementPropertyType<L[K]>)=>ElementPropertyType<P[K2]>){
         const method = sourceElement.onPropertyValueChange.subscribe(({newValue, propertyName})=>{
-            if(propertyName === sourcePropertyName) targetElement.setPropertyValue(targetPropertyName, convertor?.(newValue)??newValue);
+            if(propertyName === sourcePropertyName) targetElement.setPropertyValue(targetPropertyName, convertor?.(newValue)??newValue as any);
         });
-        //@ts-ignore
+
         return new BindedSource(targetElement,targetPropertyName,sourceElement,sourcePropertyName,method as any);
     }
     static UnbindProperty<L extends ElementExtendable, P extends ElementExtendable>(bindedSource: BindedSource<L,P>){
         bindedSource.sourceElement.onPropertyValueChange.unsubscribe(bindedSource.method);
         return null;
     }
-    //@ts-ignore
     readonly onPropertyValueChange = new PropertyValueChangeEvent<PropertyRecord,this>;
     protected readonly propertyBag: PropertyRecord;
     protected readonly _isFakes: Map<keyof PropertyRecord,boolean>;
     protected _isChanging = false;
     private readonly _methods;
+    private readonly _properties;
     protected constructor(properties: ElementConstruction<PropertyRecord>){
-        super();
+        super(ServerUXEventPacket);
         this._methods = new WeakMap();
+        this._properties = new WeakMap();
         this._isFakes = new Map();
         const bag = {} as any;
         for (const propertyName of Object.getOwnPropertyNames(properties)) {
@@ -99,28 +122,25 @@ export class Element<PropertyRecord extends ElementExtendable = {}> extends Disp
     }
     hasProperty<T extends string>(propertyName: T): boolean { return propertyName in this.propertyBag;}
     getProperty<T extends keyof PropertyRecord>(propertyName: T): PropertyRecord[T]{return this.propertyBag[propertyName];}
-    //@ts-ignore
-    getPropertyValue<T extends keyof PropertyRecord, V extends PropertyRecord[T]>(propertyName: T): V["value"] {return this.propertyBag[propertyName].getValue();}
+    getPropertyValue<T extends keyof PropertyRecord, V extends PropertyRecord[T]>(propertyName: T): ElementPropertyType<V> {return this.propertyBag[propertyName].getValue();}
     setProperty<T extends keyof PropertyRecord>(propertyName: T, property: PropertyRecord[T]): this{
         if(!this.hasProperty(propertyName as string)) throw new ReferenceError("Unknow property: " + (propertyName as string));
         const prop = this.propertyBag[propertyName];
-        //@ts-ignore
         if(property._type != prop._type) throw new TypeError("Can't assign '" + property._type?.description + "' type to type of '" + prop._type?.description + "'");
         prop.onValueChange.unsubscribe(this._methods.get(prop));
         this._methods.delete(prop);
-        const method = property.onValueChange.subscribe(e=>this._TriggerPropertyChange(this,e.newValue,propertyName,e.oldValue,property))
-        this._methods.set(property,method);
+        if(!this._methods.has(property)){ 
+            const method = property.onValueChange.subscribe(e=>this._TriggerPropertyChange(this,e.newValue,propertyName,e.oldValue,property));
+            this._methods.set(property,method);
+        }
 
         this.propertyBag[propertyName] = property;
-        //@ts-ignore
         if(prop.value !== property.value) {
-            //@ts-ignore
             this._TriggerPropertyChange(this,property.value,propertyName,prop.value,property);
         }
         return this;
     }    
-    //@ts-ignore
-    setPropertyValue<T extends keyof PropertyRecord>(propertyName: T, value: PropertyRecord[T]["value"]): this{
+    setPropertyValue<T extends keyof PropertyRecord>(propertyName: T, value: ElementPropertyType<PropertyRecord[T]>): this{
         this.propertyBag[propertyName].setValue(value);
         return this;
     }
@@ -129,11 +149,9 @@ export class Element<PropertyRecord extends ElementExtendable = {}> extends Disp
         for (const key of this.getPropertyNames()) if(!this._isFakes.get(key as string)) data[key] = this.propertyBag[key];
         return data;
     }
-    //@ts-ignore
-    protected _TriggerPropertyChange<T extends keyof PropertyRecord>(el: Element<PropertyRecord>,nV:PropertyRecord[T]["value"],pN: T,oV:PropertyRecord[T]["value"],p:PropertyRecord[T]){
+    protected _TriggerPropertyChange<T extends keyof PropertyRecord>(el: Element<PropertyRecord>,nV: ElementPropertyType<PropertyRecord[T]>,pN: T,oV: ElementPropertyType<PropertyRecord[T]>,p:PropertyRecord[T]){
         const baseChanging = this._isChanging;
         this._isChanging = true;
-        //@ts-ignore
         TriggerEvent(this.onPropertyValueChange,new PropertyValueChangeEventData(this,pN,p,oV,nV));
         this._isChanging = baseChanging;
         if(!this._isChanging) TriggerEvent(this.onUpdate,this);
@@ -149,18 +167,16 @@ export class Element<PropertyRecord extends ElementExtendable = {}> extends Disp
         return this._isFakes.get(key) !== true;
     }
 }
-export class BaseControl<T extends Displayable> extends Displayable{
+export class BaseControl<T extends Displayable<any>> extends Displayable<ServerUXEventPacket>{
     protected readonly _eventHandler = new Map<T,any>;
     protected readonly _manager;
     protected readonly _instanceConstructor;
     protected _isDisposed = false;
-    //@ts-ignore
-    readonly get isDisposed(){return this._isDisposed;}
-    //@ts-ignore
-    readonly get elementsCount(){return this._elements.size;}
+    get isDisposed(){return this._isDisposed;}
+    get elementsCount(){return this._eventHandler.size;}
     protected constructor(manager: EditorControlManager, instanceOf: (new ()=>T) | (()=>T)){
         if(!core.isNativeCall) throw new ReferenceError(NoConstructor + BaseControl.name);
-        super();
+        super(ServerUXEventPacket);
         this._instanceConstructor = instanceOf;
         this._manager = manager;
     }

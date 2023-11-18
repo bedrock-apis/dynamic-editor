@@ -32,7 +32,6 @@ __webpack_require__.d(__webpack_exports__, {
   xv: () => (/* reexport */ BooleanProperty),
   uf: () => (/* reexport */ BuildInPane),
   Os: () => (/* reexport */ ConvertingProperty),
-  o6: () => (/* reexport */ Destination),
   MC: () => (/* reexport */ EditorExtension),
   je: () => (/* reexport */ server_editor_bindings_namespaceObject.EditorMode),
   W_: () => (/* reexport */ Element),
@@ -42,15 +41,18 @@ __webpack_require__.d(__webpack_exports__, {
   CS: () => (/* reexport */ ExtensionReadyEventData),
   CG: () => (/* reexport */ ExtensionShutdownEvent),
   _4: () => (/* reexport */ ExtensionShutdownEventData),
+  u8: () => (/* reexport */ KeyboardKey),
   MK: () => (/* reexport */ MenuActionItem),
   hd: () => (/* reexport */ MenuOptionsItem),
   Y6: () => (/* reexport */ NumberProperty),
   $W: () => (/* reexport */ PlayerModeChangeEvent),
   uY: () => (/* reexport */ PlayerModeChangeEventData),
+  Pw: () => (/* reexport */ RedirectDestination),
   V7: () => (/* reexport */ StatusBarAlignmentProperty),
   wl: () => (/* reexport */ StatusBarItem),
   se: () => (/* reexport */ StatusBarItemAlignment),
   h_: () => (/* reexport */ StringProperty),
+  UA: () => (/* reexport */ Tool),
   My: () => (/* reexport */ ValueChangeEvent),
   xC: () => (/* reexport */ ValueChangeEventData)
 });
@@ -194,6 +196,12 @@ var RedirectDestination;
     RedirectDestination[RedirectDestination["Feedback"] = 2] = "Feedback";
     RedirectDestination[RedirectDestination["PauseScreen"] = 3] = "PauseScreen";
 })(RedirectDestination || (RedirectDestination = {}));
+var EditorInputContext;
+(function (EditorInputContext) {
+    EditorInputContext["GlobalEditor"] = "global.editor";
+    EditorInputContext["GlobalToolMode"] = "global.toolMode";
+    EditorInputContext["Viewport"] = "local.toolMode.viewport";
+})(EditorInputContext || (EditorInputContext = {}));
 /**@public */
 var BuildInPane;
 (function (BuildInPane) {
@@ -201,11 +209,11 @@ var BuildInPane;
     BuildInPane[BuildInPane["WelcomePage"] = 2] = "WelcomePage";
     BuildInPane[BuildInPane["LogPanel"] = 3] = "LogPanel";
 })(BuildInPane || (BuildInPane = {}));
-var ActionType;
+var Definitions_ActionType;
 (function (ActionType) {
     ActionType["NoArgsAction"] = "NoArgsAction";
     ActionType["MouseRayCastAction"] = "MouseRayCastAction";
-})(ActionType || (ActionType = {}));
+})(Definitions_ActionType || (Definitions_ActionType = {}));
 ;
 var InternalInputTypes;
 (function (InternalInputTypes) {
@@ -229,13 +237,13 @@ var MouseAction;
     MouseAction[MouseAction["Wheel"] = 2] = "Wheel";
     MouseAction[MouseAction["Drag"] = 3] = "Drag";
 })(MouseAction || (MouseAction = {}));
-var InputDivice;
-(function (InputDivice) {
-    InputDivice[InputDivice["KeyBoard"] = 1] = "KeyBoard";
-    InputDivice[InputDivice["Mouse"] = 2] = "Mouse";
-})(InputDivice || (InputDivice = {}));
+var InputDevice;
+(function (InputDevice) {
+    InputDevice[InputDevice["KeyBoard"] = 1] = "KeyBoard";
+    InputDevice[InputDevice["Mouse"] = 2] = "Mouse";
+})(InputDevice || (InputDevice = {}));
 ;
-var InputModifier;
+var Definitions_InputModifier;
 (function (InputModifier) {
     InputModifier[InputModifier["Unused"] = 0] = "Unused";
     InputModifier[InputModifier["None"] = 1] = "None";
@@ -243,7 +251,105 @@ var InputModifier;
     InputModifier[InputModifier["Control"] = 4] = "Control";
     InputModifier[InputModifier["Shift"] = 8] = "Shift";
     InputModifier[InputModifier["Any"] = 15] = "Any";
-})(InputModifier || (InputModifier = {}));
+})(Definitions_InputModifier || (Definitions_InputModifier = {}));
+/**
+ * Keyboard key from @minecarft/server-editor
+ */
+var KeyboardKey;
+(function (KeyboardKey) {
+    KeyboardKey[KeyboardKey["BACKSPACE"] = 8] = "BACKSPACE";
+    KeyboardKey[KeyboardKey["TAB"] = 9] = "TAB";
+    KeyboardKey[KeyboardKey["ENTER"] = 13] = "ENTER";
+    KeyboardKey[KeyboardKey["SHIFT"] = 16] = "SHIFT";
+    KeyboardKey[KeyboardKey["CTRL"] = 17] = "CTRL";
+    KeyboardKey[KeyboardKey["ALT"] = 18] = "ALT";
+    KeyboardKey[KeyboardKey["CAPS_LOCK"] = 20] = "CAPS_LOCK";
+    KeyboardKey[KeyboardKey["ESCAPE"] = 27] = "ESCAPE";
+    KeyboardKey[KeyboardKey["SPACE"] = 32] = "SPACE";
+    KeyboardKey[KeyboardKey["PAGE_UP"] = 33] = "PAGE_UP";
+    KeyboardKey[KeyboardKey["PAGE_DOWN"] = 34] = "PAGE_DOWN";
+    KeyboardKey[KeyboardKey["END"] = 35] = "END";
+    KeyboardKey[KeyboardKey["HOME"] = 36] = "HOME";
+    KeyboardKey[KeyboardKey["LEFT"] = 37] = "LEFT";
+    KeyboardKey[KeyboardKey["UP"] = 38] = "UP";
+    KeyboardKey[KeyboardKey["RIGHT"] = 39] = "RIGHT";
+    KeyboardKey[KeyboardKey["DOWN"] = 40] = "DOWN";
+    KeyboardKey[KeyboardKey["PRINT_SCREEN"] = 44] = "PRINT_SCREEN";
+    KeyboardKey[KeyboardKey["INSERT"] = 45] = "INSERT";
+    KeyboardKey[KeyboardKey["DELETE"] = 46] = "DELETE";
+    KeyboardKey[KeyboardKey["KEY_0"] = 48] = "KEY_0";
+    KeyboardKey[KeyboardKey["KEY_1"] = 49] = "KEY_1";
+    KeyboardKey[KeyboardKey["KEY_2"] = 50] = "KEY_2";
+    KeyboardKey[KeyboardKey["KEY_3"] = 51] = "KEY_3";
+    KeyboardKey[KeyboardKey["KEY_4"] = 52] = "KEY_4";
+    KeyboardKey[KeyboardKey["KEY_5"] = 53] = "KEY_5";
+    KeyboardKey[KeyboardKey["KEY_6"] = 54] = "KEY_6";
+    KeyboardKey[KeyboardKey["KEY_7"] = 55] = "KEY_7";
+    KeyboardKey[KeyboardKey["KEY_8"] = 56] = "KEY_8";
+    KeyboardKey[KeyboardKey["KEY_9"] = 57] = "KEY_9";
+    KeyboardKey[KeyboardKey["KEY_A"] = 65] = "KEY_A";
+    KeyboardKey[KeyboardKey["KEY_B"] = 66] = "KEY_B";
+    KeyboardKey[KeyboardKey["KEY_C"] = 67] = "KEY_C";
+    KeyboardKey[KeyboardKey["KEY_D"] = 68] = "KEY_D";
+    KeyboardKey[KeyboardKey["KEY_E"] = 69] = "KEY_E";
+    KeyboardKey[KeyboardKey["KEY_F"] = 70] = "KEY_F";
+    KeyboardKey[KeyboardKey["KEY_G"] = 71] = "KEY_G";
+    KeyboardKey[KeyboardKey["KEY_H"] = 72] = "KEY_H";
+    KeyboardKey[KeyboardKey["KEY_I"] = 73] = "KEY_I";
+    KeyboardKey[KeyboardKey["KEY_J"] = 74] = "KEY_J";
+    KeyboardKey[KeyboardKey["KEY_K"] = 75] = "KEY_K";
+    KeyboardKey[KeyboardKey["KEY_L"] = 76] = "KEY_L";
+    KeyboardKey[KeyboardKey["KEY_M"] = 77] = "KEY_M";
+    KeyboardKey[KeyboardKey["KEY_N"] = 78] = "KEY_N";
+    KeyboardKey[KeyboardKey["KEY_O"] = 79] = "KEY_O";
+    KeyboardKey[KeyboardKey["KEY_P"] = 80] = "KEY_P";
+    KeyboardKey[KeyboardKey["KEY_Q"] = 81] = "KEY_Q";
+    KeyboardKey[KeyboardKey["KEY_R"] = 82] = "KEY_R";
+    KeyboardKey[KeyboardKey["KEY_S"] = 83] = "KEY_S";
+    KeyboardKey[KeyboardKey["KEY_T"] = 84] = "KEY_T";
+    KeyboardKey[KeyboardKey["KEY_U"] = 85] = "KEY_U";
+    KeyboardKey[KeyboardKey["KEY_V"] = 86] = "KEY_V";
+    KeyboardKey[KeyboardKey["KEY_W"] = 87] = "KEY_W";
+    KeyboardKey[KeyboardKey["KEY_X"] = 88] = "KEY_X";
+    KeyboardKey[KeyboardKey["KEY_Y"] = 89] = "KEY_Y";
+    KeyboardKey[KeyboardKey["KEY_Z"] = 90] = "KEY_Z";
+    KeyboardKey[KeyboardKey["NUMPAD_0"] = 96] = "NUMPAD_0";
+    KeyboardKey[KeyboardKey["NUMPAD_1"] = 97] = "NUMPAD_1";
+    KeyboardKey[KeyboardKey["NUMPAD_2"] = 98] = "NUMPAD_2";
+    KeyboardKey[KeyboardKey["NUMPAD_3"] = 99] = "NUMPAD_3";
+    KeyboardKey[KeyboardKey["NUMPAD_4"] = 100] = "NUMPAD_4";
+    KeyboardKey[KeyboardKey["NUMPAD_5"] = 101] = "NUMPAD_5";
+    KeyboardKey[KeyboardKey["NUMPAD_6"] = 102] = "NUMPAD_6";
+    KeyboardKey[KeyboardKey["NUMPAD_7"] = 103] = "NUMPAD_7";
+    KeyboardKey[KeyboardKey["NUMPAD_8"] = 104] = "NUMPAD_8";
+    KeyboardKey[KeyboardKey["NUMPAD_9"] = 105] = "NUMPAD_9";
+    KeyboardKey[KeyboardKey["NUMPAD_MULTIPLY"] = 106] = "NUMPAD_MULTIPLY";
+    KeyboardKey[KeyboardKey["NUMPAD_ADD"] = 107] = "NUMPAD_ADD";
+    KeyboardKey[KeyboardKey["NUMPAD_SEPARATOR"] = 108] = "NUMPAD_SEPARATOR";
+    KeyboardKey[KeyboardKey["NUMPAD_SUBTRACT"] = 109] = "NUMPAD_SUBTRACT";
+    KeyboardKey[KeyboardKey["NUMPAD_DECIMAL"] = 110] = "NUMPAD_DECIMAL";
+    KeyboardKey[KeyboardKey["NUMPAD_DIVIDE"] = 111] = "NUMPAD_DIVIDE";
+    KeyboardKey[KeyboardKey["F1"] = 112] = "F1";
+    KeyboardKey[KeyboardKey["F2"] = 113] = "F2";
+    KeyboardKey[KeyboardKey["F3"] = 114] = "F3";
+    KeyboardKey[KeyboardKey["F4"] = 115] = "F4";
+    KeyboardKey[KeyboardKey["F5"] = 116] = "F5";
+    KeyboardKey[KeyboardKey["F6"] = 117] = "F6";
+    KeyboardKey[KeyboardKey["F7"] = 118] = "F7";
+    KeyboardKey[KeyboardKey["F8"] = 119] = "F8";
+    KeyboardKey[KeyboardKey["F9"] = 120] = "F9";
+    KeyboardKey[KeyboardKey["F10"] = 121] = "F10";
+    KeyboardKey[KeyboardKey["F11"] = 122] = "F11";
+    KeyboardKey[KeyboardKey["F12"] = 123] = "F12";
+    KeyboardKey[KeyboardKey["COMMA"] = 188] = "COMMA";
+    KeyboardKey[KeyboardKey["PERIOD"] = 190] = "PERIOD";
+    KeyboardKey[KeyboardKey["SLASH"] = 191] = "SLASH";
+    KeyboardKey[KeyboardKey["BACK_QUOTE"] = 192] = "BACK_QUOTE";
+    KeyboardKey[KeyboardKey["BRACKET_OPEN"] = 219] = "BRACKET_OPEN";
+    KeyboardKey[KeyboardKey["BACK_SLASH"] = 220] = "BACK_SLASH";
+    KeyboardKey[KeyboardKey["BRACKET_CLOSE"] = 221] = "BRACKET_CLOSE";
+    KeyboardKey[KeyboardKey["QUOTE"] = 222] = "QUOTE";
+})(KeyboardKey || (KeyboardKey = {}));
 var StatusBarItemAlignment;
 (function (StatusBarItemAlignment) {
     StatusBarItemAlignment[StatusBarItemAlignment["Right"] = 0] = "Right";
@@ -441,7 +547,8 @@ function CreateClass(name,properties,func, extending = FuncProto){
 }
 ;// CONCATENATED MODULE: ./src/dynamic-editor/core/Packets.ts
 const UNIQUE_SYMBOL = Symbol("UNIQUE");
-const IDENTITY_SYMBOL = Symbol("UNIQUE");
+const IDENTITY_SYMBOL = Symbol("IDENTITY_SYMBOL");
+const IDENTITY_DATA = Symbol("IDENTITY_DATA");
 class Packet {
     data;
     id;
@@ -528,11 +635,8 @@ class PropertyValueChangeEventData extends EditorEventData {
     element;
     propertyName;
     property;
-    //@ts-ignore
     oldValue;
-    //@ts-ignore
     newValue;
-    //@ts-ignore
     constructor(element, propertyName, property, oldValue, newValue) {
         super();
         this.element = element;
@@ -579,6 +683,11 @@ class ServerUXEventPacket extends Packet {
         super(PostEventId["Editor::ServerUXEvents"], data);
     }
 }
+class ServerInputBindingsEventPacket extends Packet {
+    constructor(data) {
+        super(PostEventId["Editor::ServerInputBindingEvents"], data);
+    }
+}
 class RedirectToDestinationPacket extends ServerUXEventPacket {
     constructor(destination) { super({ type: ServerUXEventType.RedirectToDestination, destination: destination }); }
 }
@@ -591,9 +700,14 @@ class ServerActionEventPacket extends Packet {
     }
 }
 class PostActionPacket extends ServerActionEventPacket {
-    [IDENTITY_SYMBOL] = ACTION_IDENTITY_SYMBOL;
+    [IDENTITY_SYMBOL] = IDENTITY_SYMBOL;
+    get [IDENTITY_DATA]() { return this.data.id; }
 }
-class PacketBuilder {
+class PostUIPacket extends ServerUXEventPacket {
+    [IDENTITY_SYMBOL] = IDENTITY_SYMBOL;
+    get [IDENTITY_DATA]() { return this.data.id; }
+}
+class Packets_PacketBuilder {
     static GetRedirectToDestinationPacket(destination) {
         if (!(destination in RedirectDestination))
             throw new ReferenceError("Invalid destination!");
@@ -608,18 +722,45 @@ class PacketBuilder {
         //@ts-ignore
         return new UpdateBuildInPanePacket(typeof pane === 'number' ? pane : BuildInPane[pane], visible);
     }
-    static BindActionToControlPacket(action, control) {
+    static BindActionToControl(action, control) {
         return new ServerUXEventPacket({
             type: ServerUXEventType.BindUIEvent,
             actionId: action,
             controlId: control
         });
     }
-    static UnbindActionToControlPacket(action, control) {
+    static UnbindActionToControl(action, control) {
         return new ServerUXEventPacket({
             type: ServerUXEventType.UnbindUIEvent,
             actionId: action,
             controlId: control
+        });
+    }
+    static BindKeyInputActionToContext(action, contextId, button, modifier) {
+        return new ServerInputBindingsEventPacket({
+            type: ServerInputBindingEventType.KeyActionBinding,
+            actionId: action,
+            contextId: contextId,
+            inputDevice: InputDevice.KeyBoard,
+            inputType: 1,
+            button,
+            modifier
+        });
+    }
+    static BindMouseInputActionToContext(action, contextId, mouseAction) {
+        return new ServerInputBindingsEventPacket({
+            type: ServerInputBindingEventType.MouseActionBinding,
+            actionId: action,
+            contextId: contextId,
+            inputDevice: InputDevice.Mouse,
+            mouseAction
+        });
+    }
+    static UnbindInputActionToContext(action, contextId) {
+        return new ServerInputBindingsEventPacket({
+            type: ServerUXEventType.UnbindUIEvent,
+            actionId: action,
+            contextId
         });
     }
 }
@@ -645,13 +786,29 @@ class UniquePostable extends Postable {
     }
 }
 class Displayable extends UniquePostable {
-    packetConstructor = ServerUXEventPacket;
+    packetConstructor;
+    constructor(constuct) {
+        super();
+        this.packetConstructor = constuct;
+    }
     onUpdate = new PublicEvent; //Keep displayble bc its not always a "this" reference
     onInit = new PublicEvent;
     onDispose = new PublicEvent;
     *displayInitPackets() { yield* this.getPackets(INIT_FLAG); }
     *displayUpdatePackets() { yield* this.getPackets(UPDATE_FLAG); }
     *displayDisposePackets() { yield* this.getPackets(REMOVE_FLAG); }
+}
+class FakeUpdatable {
+    packet;
+    constructor(packet) {
+        this.packet = packet;
+    }
+    *displayInitPackets() { yield this.packet; }
+    ;
+    *displayUpdatePackets() { yield this.packet; }
+    ;
+    *displayDisposePackets() { yield this.packet; }
+    ;
 }
 
 ;// CONCATENATED MODULE: ./src/dynamic-editor/native/Editor/EditorExtension.js
@@ -675,6 +832,7 @@ class EditorExtension{
         this.player = context.player;
         this.statusBar = context.controlManager.statusBar;
         this.menuBar = context.controlManager.menuBar;
+        this.toolBar = context.controlManager.toolBar;
         this.clipboard = context.clipboardManager;
         context.onInitializeEvent.subscribe(()=>{
             try {
@@ -719,32 +877,51 @@ const server_namespaceObject = server_x({ ["Player"]: () => __WEBPACK_EXTERNAL_M
 
 
 const NULL_TYPE = Symbol("NULL");
+const Base_OBJECT_TYPE = Symbol("SYMBOL_TYPE");
+const ACTION_RETURNER = Symbol("ACTION_RETURNER");
 class Property {
     static UNIQUE_TYPE = NULL_TYPE;
     static EXPECTED_VALUE_TYPE = undefined;
+    /**@private*/
     _type;
+    /**@private*/
     _expectedType;
     onValueChange = new ValueChangeEvent;
     constructor() { this._type = new.target.UNIQUE_TYPE; this._expectedType = new.target.EXPECTED_VALUE_TYPE; }
     ;
 }
-class ElementProperty extends Property {
+class Base_ElementProperty extends Property {
+    /**@private*/
     value;
     defualtValue;
     _typeOf;
+    _bindedSetters = new WeakMap();
     constructor(defaultValue) {
         super();
         this._typeOf = typeof defaultValue;
         this.value = defaultValue;
         this.defualtValue = defaultValue;
     }
+    removeSetterBinding(propertyGetter) {
+        if (!this._bindedSetters.has(propertyGetter))
+            return this;
+        const m = this._bindedSetters.get(propertyGetter);
+        propertyGetter.onValueChange.unsubscribe(m);
+        this._bindedSetters.delete(propertyGetter);
+        return this;
+    }
+    addSetterBinding(propertyGetter) {
+        if (this._bindedSetters.has(propertyGetter))
+            return this;
+        const m = propertyGetter.onValueChange.subscribe((e) => this.setValue(e.newValue));
+        this._bindedSetters.set(propertyGetter, m);
+        return this;
+    }
     isValidType(v) { return typeof v === this._typeOf; }
-    getType(v) { return v; }
     setValue(value) {
         if (!this.isValidType(value))
             throw new TypeError("Invalid value type: '" + value + "' expected " + (this._expectedType ?? this._typeOf));
-        //@ts-ignore
-        this.value = this.getType(value);
+        this.value = value;
         TriggerEvent(this.onValueChange, new ValueChangeEventData(this.value ?? this.defualtValue, value));
         return this;
     }
@@ -757,7 +934,6 @@ class BindedSource {
     targetPropertyName;
     sourceElement;
     sourcePropertyName;
-    //@ts-ignore
     method;
     constructor(targetElement, targetPropertyName, sourceElement, sourcePropertyName, method) {
         this.method = method;
@@ -769,28 +945,27 @@ class BindedSource {
 }
 class Element extends Displayable {
     [UNIQUE_SYMBOL] = true;
-    //@ts-ignore
     static BindProperty(targetElement, targetPropertyName, sourceElement, sourcePropertyName, convertor) {
         const method = sourceElement.onPropertyValueChange.subscribe(({ newValue, propertyName }) => {
             if (propertyName === sourcePropertyName)
                 targetElement.setPropertyValue(targetPropertyName, convertor?.(newValue) ?? newValue);
         });
-        //@ts-ignore
         return new BindedSource(targetElement, targetPropertyName, sourceElement, sourcePropertyName, method);
     }
     static UnbindProperty(bindedSource) {
         bindedSource.sourceElement.onPropertyValueChange.unsubscribe(bindedSource.method);
         return null;
     }
-    //@ts-ignore
     onPropertyValueChange = new PropertyValueChangeEvent;
     propertyBag;
     _isFakes;
     _isChanging = false;
     _methods;
+    _properties;
     constructor(properties) {
-        super();
+        super(ServerUXEventPacket);
         this._methods = new WeakMap();
+        this._properties = new WeakMap();
         this._isFakes = new Map();
         const bag = {};
         for (const propertyName of Object.getOwnPropertyNames(properties)) {
@@ -807,28 +982,25 @@ class Element extends Displayable {
     }
     hasProperty(propertyName) { return propertyName in this.propertyBag; }
     getProperty(propertyName) { return this.propertyBag[propertyName]; }
-    //@ts-ignore
     getPropertyValue(propertyName) { return this.propertyBag[propertyName].getValue(); }
     setProperty(propertyName, property) {
         if (!this.hasProperty(propertyName))
             throw new ReferenceError("Unknow property: " + propertyName);
         const prop = this.propertyBag[propertyName];
-        //@ts-ignore
         if (property._type != prop._type)
             throw new TypeError("Can't assign '" + property._type?.description + "' type to type of '" + prop._type?.description + "'");
         prop.onValueChange.unsubscribe(this._methods.get(prop));
         this._methods.delete(prop);
-        const method = property.onValueChange.subscribe(e => this._TriggerPropertyChange(this, e.newValue, propertyName, e.oldValue, property));
-        this._methods.set(property, method);
+        if (!this._methods.has(property)) {
+            const method = property.onValueChange.subscribe(e => this._TriggerPropertyChange(this, e.newValue, propertyName, e.oldValue, property));
+            this._methods.set(property, method);
+        }
         this.propertyBag[propertyName] = property;
-        //@ts-ignore
         if (prop.value !== property.value) {
-            //@ts-ignore
             this._TriggerPropertyChange(this, property.value, propertyName, prop.value, property);
         }
         return this;
     }
-    //@ts-ignore
     setPropertyValue(propertyName, value) {
         this.propertyBag[propertyName].setValue(value);
         return this;
@@ -840,11 +1012,9 @@ class Element extends Displayable {
                 data[key] = this.propertyBag[key];
         return data;
     }
-    //@ts-ignore
     _TriggerPropertyChange(el, nV, pN, oV, p) {
         const baseChanging = this._isChanging;
         this._isChanging = true;
-        //@ts-ignore
         TriggerEvent(this.onPropertyValueChange, new PropertyValueChangeEventData(this, pN, p, oV, nV));
         this._isChanging = baseChanging;
         if (!this._isChanging)
@@ -866,14 +1036,12 @@ class BaseControl extends Displayable {
     _manager;
     _instanceConstructor;
     _isDisposed = false;
-    //@ts-ignore
     get isDisposed() { return this._isDisposed; }
-    //@ts-ignore
-    get elementsCount() { return this._elements.size; }
+    get elementsCount() { return this._eventHandler.size; }
     constructor(manager, instanceOf) {
         if (!Base_core.isNativeCall)
             throw new ReferenceError(Base_NoConstructor + BaseControl.name);
-        super();
+        super(ServerUXEventPacket);
         this._instanceConstructor = instanceOf;
         this._manager = manager;
     }
@@ -926,30 +1094,42 @@ class BaseControl extends Displayable {
 
 ;// CONCATENATED MODULE: ./src/dynamic-editor/native/Controls/General.ts
 
-class StringProperty extends ElementProperty {
+
+
+class StringProperty extends Base_ElementProperty {
     static UNIQUE_TYPE = Symbol("StringProperty");
     constructor(value) { super(value ?? ""); }
 }
-class NumberProperty extends ElementProperty {
+class NumberProperty extends Base_ElementProperty {
     static UNIQUE_TYPE = Symbol("NumberProperty");
     constructor(value) { super(value ?? 0); }
 }
-class BooleanProperty extends ElementProperty {
+class BooleanProperty extends Base_ElementProperty {
     static UNIQUE_TYPE = Symbol("BooleanProperty");
     constructor(value) { super(value ?? false); }
 }
-class CustomProperty extends ElementProperty {
+class CustomProperty extends Base_ElementProperty {
     constructor(value) { super(value ?? false); }
 }
-class ConvertingProperty extends ElementProperty {
+class ConvertingProperty extends Base_ElementProperty {
     constructor(sourceProperty, convenrter, UNIQUE_TYPE) {
         super(convenrter(sourceProperty.getValue()));
         sourceProperty.onValueChange.subscribe(({ newValue }) => { super.setValue(convenrter(newValue)); });
-        //@ts-ignore
+        //@ts-ignores
         this._type = UNIQUE_TYPE;
     }
     setValue(value) {
         throw new ReferenceError("You can not set binded property.");
+    }
+}
+class ObjectProperty extends (/* unused pure expression or super */ null && (ElementProperty)) {
+    constructor(defualt, OBJ_TYPE) {
+        super(defualt);
+        //@ts-ignore
+        this._type = OBJ_TYPE ?? defualt?.[OBJECT_TYPE];
+    }
+    isValidType(v) {
+        return v[OBJECT_TYPE] === this._type;
     }
 }
 class VisualElement extends Element {
@@ -976,6 +1156,22 @@ class VisualElement extends Element {
 }
 class Control extends BaseControl {
 }
+class General_ActionBasedEvent extends Displayable {
+    constructor(contextId) {
+        super(ServerUXEventPacket);
+        this._context = contextId;
+    }
+    _context;
+    _actions = new WeakMap();
+    _subUpdate(a) {
+        TriggerEvent(this.onInit, a);
+        TriggerEvent(this.onUpdate, this);
+    }
+    _unsubUpdate(a) {
+        TriggerEvent(this.onUpdate, this);
+        TriggerEvent(this.onDispose, a);
+    }
+}
 
 ;// CONCATENATED MODULE: ./src/dynamic-editor/core.ts
 
@@ -994,6 +1190,7 @@ class StatusBarAlignmentProperty extends CustomProperty {
 ;// CONCATENATED MODULE: ./src/dynamic-editor/native/Editor/EditorActions.ts
 
 
+
 class Action extends UniquePostable {
     packetConstructor = PostActionPacket;
     PACKET_TYPES = {
@@ -1007,6 +1204,8 @@ class Action extends UniquePostable {
         super();
         this.actionType = type;
     }
+    get [ACTION_RETURNER]() { return this; }
+    ;
     getMainPacketData(flags) {
         const data = super.getMainPacketData(flags);
         data.actionType = this.actionType;
@@ -1014,6 +1213,60 @@ class Action extends UniquePostable {
     }
     execute(payload) {
         TriggerEvent(this.onActionExecute, payload);
+    }
+    *displayInitPackets() { yield super.getMainPacket(INIT_FLAG); }
+    *displayDisposePackets() { yield super.getMainPacket(REMOVE_FLAG); }
+    *displayUpdatePackets() { yield super.getMainPacket(UPDATE_FLAG); }
+}
+class ControlBindedAction extends Action {
+    control;
+    constructor(control) {
+        super(Definitions_ActionType.NoArgsAction);
+        this.control = control;
+    }
+    *displayInitPackets() {
+        yield* super.displayInitPackets();
+        yield Packets_PacketBuilder.BindActionToControl(this, this.control);
+    }
+    *displayDisposePackets() {
+        yield Packets_PacketBuilder.UnbindActionToControl(this, this.control);
+        yield* super.displayDisposePackets();
+    }
+}
+class EditorActions_KeyInputAction extends (/* unused pure expression or super */ null && (Action)) {
+    context;
+    button;
+    inputModifier;
+    constructor(context, button, inputModifier) {
+        super(ActionType.NoArgsAction);
+        this.context = context;
+        this.button = button;
+        this.inputModifier = inputModifier;
+    }
+    *displayInitPackets() {
+        yield* super.displayInitPackets();
+        yield PacketBuilder.BindKeyInputActionToContext(this, this.context, this.button, this.inputModifier);
+    }
+    *displayDisposePackets() {
+        yield PacketBuilder.UnbindInputActionToContext(this, this.context);
+        yield* super.displayDisposePackets();
+    }
+}
+class MouseInputAction extends Action {
+    context;
+    mouseAction;
+    constructor(context, mouseAction) {
+        super(Definitions_ActionType.MouseRayCastAction);
+        this.context = context;
+        this.mouseAction = mouseAction;
+    }
+    *displayInitPackets() {
+        yield* super.displayInitPackets();
+        yield Packets_PacketBuilder.BindMouseInputActionToContext(this, this.context, this.mouseAction);
+    }
+    *displayDisposePackets() {
+        yield Packets_PacketBuilder.UnbindInputActionToContext(this, this.context);
+        yield* super.displayDisposePackets();
     }
 }
 class PayloadLoader {
@@ -1038,7 +1291,6 @@ class MouseRayCastPayload extends PayloadLoader {
     hasAltModifier;
     hasShiftModifier;
     inputType;
-    //@ts-ignore
     get block() { return this.dimension.getBlock(this.blockLocation); }
     constructor(player, data) {
         super(player, data);
@@ -1056,10 +1308,63 @@ class MouseRayCastPayload extends PayloadLoader {
     }
 }
 const PayloadLoaders = new Map();
-PayloadLoaders.set(ActionType.NoArgsAction, NoArgsPayload);
-PayloadLoaders.set(ActionType.MouseRayCastAction, MouseRayCastPayload);
+PayloadLoaders.set(Definitions_ActionType.NoArgsAction, NoArgsPayload);
+PayloadLoaders.set(Definitions_ActionType.MouseRayCastAction, MouseRayCastPayload);
+
+;// CONCATENATED MODULE: ./src/dynamic-editor/native/Controls/Actions.ts
+
+
+
+class KeyInputActionsEvent extends (/* unused pure expression or super */ null && (ActionBasedEvent)) {
+    constructor(conextId) { super(conextId); }
+    subscribe(m, keyButton, inputModifier = InputModifier.Any) {
+        if (this._actions.has(m))
+            return m;
+        const action = new KeyInputAction(this._context, keyButton, inputModifier);
+        const mA = action.onActionExecute.subscribe((payload) => {
+            m(payload, keyButton, inputModifier);
+        });
+        this._actions.set(m, { action, ma: mA });
+        super._subUpdate(action);
+        return m;
+    }
+    unsubscribe(m) {
+        if (!this._actions.has(m))
+            return m;
+        const { action, ma } = this._actions.get(m);
+        action.onActionExecute.unsubscribe(ma);
+        this._actions.delete(m);
+        super._unsubUpdate(action);
+        return m;
+    }
+}
+class MouseInputActionsEvent extends General_ActionBasedEvent {
+    constructor(conextId) { super(conextId); }
+    subscribe(m, mouseAction) {
+        if (this._actions.has(m))
+            return m;
+        const action = new MouseInputAction(this._context, mouseAction);
+        const mA = action.onActionExecute.subscribe((payload) => {
+            m(payload);
+        });
+        this._actions.set(m, { action, ma: mA });
+        super._subUpdate(action);
+        return m;
+    }
+    unsubscribe(m) {
+        if (!this._actions.has(m))
+            return m;
+        const { action, ma } = this._actions.get(m);
+        action.onActionExecute.unsubscribe(ma);
+        this._actions.delete(m);
+        super._unsubUpdate(action);
+        return m;
+    }
+}
 
 ;// CONCATENATED MODULE: ./src/dynamic-editor/native/Controls/Elements.ts
+
+
 
 
 
@@ -1105,6 +1410,7 @@ class AutoSizeStatusBarItem extends StatusBarItem {
     }
 }
 class MenuItem extends VisualElement {
+    /**@private*/
     _parent = undefined;
     PACKET_TYPES = {
         [UPDATE_FLAG]: ServerUXEventType.UpdateItemMenu,
@@ -1135,14 +1441,16 @@ class MenuItem extends VisualElement {
     }
 }
 class MenuActionItem extends MenuItem {
-    _action = new Action(ActionType.NoArgsAction);
+    _action = new ControlBindedAction(this);
     onActionExecute;
+    _triggers = new Set;
     constructor(content = "") {
         super({
             checked: { property: new BooleanProperty(false), isFake: true }
         }, content);
         this.onActionExecute = this._action.onActionExecute;
     }
+    get [ACTION_RETURNER]() { return this._action; }
     get checkmarkEnabled() { return this._getPropertyRealness("checked"); }
     set checkmarkEnabled(v) { this.setCheckmarkEnabled(v); }
     get checked() { return this.getPropertyValue("checked") ?? false; }
@@ -1163,32 +1471,36 @@ class MenuActionItem extends MenuItem {
         this.onActionExecute.subscribe(handler);
         return this;
     }
+    addKeyboardTrigger(keyButton, modifier = Definitions_InputModifier.Any) {
+        this._triggers.add({ keyButton, modifier });
+        TriggerEvent(this.onInit, new FakeUpdatable(Packets_PacketBuilder.BindKeyInputActionToContext(this._action, EditorInputContext.GlobalToolMode, keyButton, modifier)));
+        return this;
+    }
+    clearKeyboardTriggers() {
+        TriggerEvent(this.onDispose, new FakeUpdatable(Packets_PacketBuilder.UnbindInputActionToContext(this._action, EditorInputContext.GlobalToolMode)));
+        this._triggers.clear();
+        return this;
+    }
     *displayInitPackets() {
-        //@ts-ignore
-        yield* this._action.getPackets(INIT_FLAG);
         yield* super.displayInitPackets();
-        yield PacketBuilder.BindActionToControlPacket(this._action, this);
+        yield* this._action.displayInitPackets();
+        for (const { keyButton, modifier } of this._triggers)
+            yield Packets_PacketBuilder.BindKeyInputActionToContext(this._action, EditorInputContext.GlobalToolMode, keyButton, modifier);
     }
     *displayDisposePackets() {
-        yield PacketBuilder.UnbindActionToControlPacket(this._action, this);
-        //@ts-ignore
-        yield* this._action.getPackets(REMOVE_FLAG);
+        yield* this._action.displayDisposePackets();
         yield* super.displayDisposePackets();
     }
 }
 class MenuOptionsItem extends MenuItem {
     constructor(content = "") { super({}, content); }
     _handlers = new Map;
-    //@ts-ignore
-    get elementsLength() { return this._menuItems.size; }
+    get elementsLength() { return this._handlers.size; }
     addMenuItem(item) {
-        //@ts-ignore
         if (item._parent === this)
             return this;
-        //@ts-ignore
         if (item._parent !== undefined)
             throw new Error("This menu item is already assigned to MenuBar or a MenuBarOptions");
-        //@ts-ignore
         item._parent = this;
         this._handlers.set(item, item.onUpdate.subscribe((e) => TriggerEvent(this.onUpdate, e)));
         TriggerEvent(this.onUpdate, this);
@@ -1196,10 +1508,8 @@ class MenuOptionsItem extends MenuItem {
         return this;
     }
     removeMenuItem(item) {
-        //@ts-ignore
         if (item._parent !== this)
             throw new Error("This menu item is not one of this menu options.");
-        //@ts-ignore
         item._parent = undefined;
         item.onUpdate.unsubscribe(this._handlers.get(item));
         this._handlers.delete(item);
@@ -1221,6 +1531,186 @@ class MenuOptionsItem extends MenuItem {
             yield* a.displayDisposePackets();
     }
 }
+const TOOL_OBJECT_TYPE = Symbol("Tool");
+class Tool extends VisualElement {
+    packetConstructor = PostUIPacket;
+    PACKET_TYPES = {
+        [INIT_FLAG]: ServerUXEventType.CreateTool,
+        [UPDATE_FLAG]: ServerUXEventType.CreateTool,
+        [REMOVE_FLAG]: ServerUXEventType.ReleaseTool
+    };
+    [Base_OBJECT_TYPE] = TOOL_OBJECT_TYPE;
+    onActivationStateChange = new PublicEvent;
+    onMouseInteract = new MouseInputActionsEvent(this);
+    isActivePropertyGetter = new BooleanProperty(false);
+    constructor(icon, title, description) {
+        const tSP = new StringProperty(title ?? "");
+        const dSP = new StringProperty(description ?? "");
+        super({
+            icon: { property: new StringProperty(icon ?? "") },
+            descriptionString: { property: dSP, isFake: true },
+            descriptionStringLocId: { property: dSP, isFake: true },
+            titleString: { property: tSP, isFake: true },
+            titleStringLocId: { property: tSP, isFake: true },
+        });
+        this.isActivePropertyGetter = new BooleanProperty(false);
+        this.onActivationStateChange.subscribe(e => (e.isSelected != this.isActivePropertyGetter.getValue()) ? this.isActivePropertyGetter.setValue(e.isSelected) : null);
+    }
+    get icon() { return this.getPropertyValue("icon") ?? ""; }
+    set icon(v) { this.setPropertyValue("icon", v); }
+    get title() { return this.getPropertyValue("titleString") ?? ""; }
+    set title(v) { this.setPropertyValue("titleString", v); }
+    get description() { return this.getPropertyValue("descriptionString") ?? ""; }
+    set description(v) { this.setPropertyValue("descriptionString", v); }
+    setIcon(icon) {
+        this.setPropertyValue("icon", icon);
+        return this;
+    }
+    /**@author ConMaster2112 */
+    setTitle(text) {
+        this.setPropertyValue("titleString", text);
+        return this;
+    }
+    /**@deprecated This state of tool doesn't really do anything, but maybe in future its going to do.*/
+    setEnable(enable) {
+        return super.setEnable(enable);
+    }
+    /**@deprecated This state of tool doesn't really do anything, but maybe in future its going to do.*/
+    setVisibility(visible) {
+        return super.setVisibility(visible);
+    }
+    setDescription(text) {
+        this.setPropertyValue("descriptionString", text);
+        return this;
+    }
+    getMainPacketData(flags) {
+        const data = super.getMainPacketData(flags);
+        data.tooltipData = {
+            descriptionString: this.propertyBag["descriptionString"],
+            descriptionStringLocId: this.propertyBag["descriptionStringLocId"],
+            titleString: this.propertyBag["titleString"],
+            titleStringLocId: this.propertyBag["titleStringLocId"]
+        };
+        return data;
+    }
+}
+const KNOWN_TOOLS = new WeakSet();
+class ToolBar extends VisualElement {
+    PACKET_TYPES = {
+        [UPDATE_FLAG]: ServerUXEventType.SetActiveTool,
+        [REMOVE_FLAG]: ServerUXEventType.ReleaseToolRail,
+        [INIT_FLAG]: ServerUXEventType.SetActiveTool
+    };
+    _eventHandler = new Map();
+    activeTool = null;
+    get toolsCount() { return this._eventHandler.size; }
+    constructor(display) {
+        if (!Base_core.isNativeCall)
+            throw new ReferenceError(Base_NoConstructor + ToolBar.name);
+        display.onToolAtivate.subscribe(({ tool }) => { this.activeTool = tool; });
+        super({});
+    }
+    setActiveTool(item) {
+        this.activeTool = item;
+        TriggerEvent(this.onUpdate, this);
+    }
+    getActiveTool() {
+        return this.activeTool;
+    }
+    *getTools() { for (const K of this._eventHandler.keys())
+        yield K; }
+    addTool(item) {
+        if (item[Base_OBJECT_TYPE] !== TOOL_OBJECT_TYPE)
+            throw new TypeError("Object is not type of Tool.");
+        if (this._eventHandler.has(item))
+            return true;
+        if (KNOWN_TOOLS.has(item))
+            throw new ReferenceError("This tool is already used by different person.");
+        TriggerEvent(this.onInit, item);
+        const method = item.onUpdate.subscribe((e) => TriggerEvent(this.onUpdate, e));
+        this._eventHandler.set(item, method);
+        KNOWN_TOOLS.add(item);
+        return true;
+    }
+    removeTool(item) {
+        if (item[Base_OBJECT_TYPE] !== TOOL_OBJECT_TYPE)
+            throw new TypeError("Object is not type of Tool.");
+        if (!this._eventHandler.has(item))
+            return false;
+        TriggerEvent(this.onDispose, item);
+        item.onUpdate.unsubscribe(this._eventHandler.get(item));
+        this._eventHandler.delete(item);
+        KNOWN_TOOLS.delete(item);
+        return true;
+    }
+    hasTool(item) { return this._eventHandler.has(item); }
+    getMainPacketData(flags) {
+        const data = super.getMainPacketData(flags);
+        if (this.activeTool === null)
+            data.selectedOptionId = "";
+        else if (this.activeTool[Base_OBJECT_TYPE] === TOOL_OBJECT_TYPE)
+            data.selectedOptionId = this.activeTool;
+        else
+            data.selectedOptionId = this.activeTool.id;
+        return data;
+    }
+    /**@private */
+    *displayInitPackets() {
+        yield* super.displayInitPackets();
+        for (const item of this._eventHandler.keys())
+            yield* item.displayInitPackets();
+    }
+    /**@private */
+    *displayDisposePackets() {
+        for (const item of this._eventHandler.keys()) {
+            item.onUpdate.unsubscribe(this._eventHandler.get(item));
+            yield* item.displayDisposePackets();
+        }
+        this._eventHandler.clear();
+        yield* super.displayDisposePackets();
+    }
+    /**@deprecated This value could be desynced by other addons, you shouldn't depend on this feature */
+    get isEnabled() {
+        return super.isEnabled;
+    }
+    /**@deprecated */
+    set isEnabled(v) {
+        super.isEnabled = v;
+    }
+    /**@deprecated This value could be desynced by other addons, you shouldn't depend on this feature */
+    get isVisible() {
+        return super.isVisible;
+    }
+    /**@deprecated */
+    set isVisible(v) {
+        super.isVisible = v;
+    }
+    /**@deprecated This value could be desynced by other addons, you shouldn't depend on this feature */
+    getProperty(propertyName) {
+        return super.getProperty(propertyName);
+    }
+    /**@deprecated This value could be desynced by other addons, you can set, but you should not depend on returned information */
+    //
+    getPropertyValue(propertyName) {
+        return super.getPropertyValue(propertyName);
+    }
+    /**@deprecated This value could be desynced by other addons, you shouldn't depend on this feature */
+    setProperty(propertyName, property) {
+        return super.setProperty(propertyName, property);
+    }
+    /**@deprecated This value could be desynced by other addons, you shouldn't depend on this feature */
+    setPropertyValue(propertyName, value) {
+        return super.setPropertyValue(propertyName, value);
+    }
+    /**@deprecated This value could be desynced by other addons, you shouldn't depend on this feature */
+    setEnable(enable) {
+        return super.setEnable(enable);
+    }
+    /**@deprecated This value could be desynced by other addons, you shouldn't depend on this feature */
+    setVisibility(visible) {
+        return super.setVisibility(visible);
+    }
+}
 
 ;// CONCATENATED MODULE: ./src/dynamic-editor/native/Controls/Controls.ts
 
@@ -1231,12 +1721,10 @@ class StatusBarControl extends Control {
 class MenuBarControl extends Control {
     constructor(manager) { super(manager, MenuItem); }
     addItem(item) {
-        //@ts-ignore
         if (typeof item._parent === "object")
             throw new ReferenceError("This item is already assigned as menu option");
         const hasBefore = super.hasItem(item);
         if (super.addItem(item) && !hasBefore) {
-            //@ts-ignore
             item._parent = (item._parent ?? 0) + 1;
             return true;
         }
@@ -1244,9 +1732,7 @@ class MenuBarControl extends Control {
     }
     removeItem(item) {
         if (super.removeItem(item)) {
-            //@ts-ignore
             item._parent--;
-            //@ts-ignore
             if (item._parent <= 0)
                 item._parent = undefined;
             return true;
@@ -1272,6 +1758,7 @@ class EditorControlManager {
     changes;
     statusBar;
     menuBar;
+    toolBar;
     get isReady() { return this._ready ?? this.context.isReady; }
     set isReady(v) { this._ready = v; }
     constructor(context) {
@@ -1282,12 +1769,16 @@ class EditorControlManager {
         this.context.onReadyEvent.subscribe(async () => {
             this.resolvePackets(this.statusBar.displayInitPackets());
             this.resolvePackets(this.menuBar.displayInitPackets());
+            this.resolvePackets(this.toolBar.displayInitPackets());
             this.statusBar.onUpdate.subscribe(e => this.whenUpdate(e, UPDATE_FLAG));
-            this.menuBar.onUpdate.subscribe(e => this.whenUpdate(e, UPDATE_FLAG));
             this.statusBar.onInit.subscribe(e => this.whenUpdate(e, INIT_FLAG));
-            this.menuBar.onInit.subscribe(e => this.whenUpdate(e, INIT_FLAG));
             this.statusBar.onDispose.subscribe(e => this.whenUpdate(e, REMOVE_FLAG));
+            this.menuBar.onUpdate.subscribe(e => this.whenUpdate(e, UPDATE_FLAG));
+            this.menuBar.onInit.subscribe(e => this.whenUpdate(e, INIT_FLAG));
             this.menuBar.onDispose.subscribe(e => this.whenUpdate(e, REMOVE_FLAG));
+            this.toolBar.onUpdate.subscribe(e => this.whenUpdate(e, UPDATE_FLAG));
+            this.toolBar.onInit.subscribe(e => this.whenUpdate(e, INIT_FLAG));
+            this.toolBar.onDispose.subscribe(e => this.whenUpdate(e, REMOVE_FLAG));
         });
         this.context.onShutdownEvent.subscribe(() => {
             this.isReady = false;
@@ -1299,6 +1790,8 @@ class EditorControlManager {
                 null; //do nothing bc player session is already ending
             for (const disposePackets of this.menuBar.displayDisposePackets())
                 null; //do nothing bc player session is already ending
+            for (const disposePackets of this.toolBar.displayDisposePackets())
+                null;
             //@ts-ignore
             this.statusBar = null;
             //@ts-ignore
@@ -1309,6 +1802,8 @@ class EditorControlManager {
         this.statusBar = new StatusBarControl(this);
         //@ts-ignore
         this.menuBar = new MenuBarControl(this);
+        //@ts-ignore
+        this.toolBar = new ToolBar(this.context.display);
     }
     whenUpdate(control, flag) {
         const getFlag = this.changes.get(control);
@@ -1349,8 +1844,8 @@ class EditorControlManager {
         [INIT_FLAG]: "displayInitPackets"
     };
     packetResolvers = {
-        [ACTION_IDENTITY_SYMBOL](controlManager, context, packet) {
-            context.display?.setRegisterAction(packet.data.id);
+        [IDENTITY_SYMBOL](controlM, context, packet) {
+            context.display?.addReverses(packet[IDENTITY_DATA]);
             context.post(packet);
         }
     };
@@ -1358,16 +1853,21 @@ class EditorControlManager {
 
 ;// CONCATENATED MODULE: ./src/dynamic-editor/native/Editor/EditorDisplayManager.ts
 
+
 const DISPLAY_MANAGERS = new WeakMap();
 class PlayerDisplayManager {
     static hasDisplayManager(player) { return DISPLAY_MANAGERS.has(player); }
     static getDisplayManager(player) { return DISPLAY_MANAGERS.get(player); }
     //@ts-ignore
+    activeTool;
+    //@ts-ignore
     player;
     uniques = new WeakMap();
+    reverses = new Map();
     isReady = false;
     onClientReady = new NativeEvent();
-    actions = new Map();
+    onToolAtivate = new NativeEvent;
+    lastTool = null;
     constructor(player) {
         if (DISPLAY_MANAGERS.has(player))
             return DISPLAY_MANAGERS.get(player);
@@ -1377,16 +1877,32 @@ class PlayerDisplayManager {
             //@ts-ignore
             this.isReady = true;
         });
+        this.onToolAtivate.subscribe(({ tool, lastTool }) => {
+            if (lastTool?.[Base_OBJECT_TYPE] === TOOL_OBJECT_TYPE && tool !== lastTool)
+                TriggerEvent(lastTool.onActivationStateChange, { tool: lastTool, isSelected: false });
+            if (tool?.[Base_OBJECT_TYPE] === TOOL_OBJECT_TYPE)
+                TriggerEvent(tool.onActivationStateChange, { tool: tool, isSelected: true });
+        });
     }
     setRegisterAction(action) {
         let uuid = this.getUnique(action) ?? UUID.generate();
-        if (!this.actions.has(uuid))
-            this.actions.set(uuid, action);
+        if (!this.reverses.has(uuid))
+            this.reverses.set(uuid, action);
         this.setUnique(action, uuid);
         return uuid;
     }
-    getRegisteredAction(uuid) { return this.actions.get(uuid); }
-    hasRegisteredAction(uuid) { return this.actions.has(uuid); }
+    getRegisteredAction(uuid) { return this.reverses.get(uuid); }
+    hasRegisteredAction(uuid) { return this.reverses.has(uuid); }
+    addReverses(reverse) {
+        let uuid = this.getUnique(reverse) ?? UUID.generate();
+        if (!this.reverses.has(uuid))
+            this.reverses.set(uuid, reverse);
+        this.setUnique(reverse, uuid);
+        return uuid;
+    }
+    getReverses(uuid) { return this.reverses.get(uuid); }
+    hasReverses(uuid) { return this.reverses.has(uuid); }
+    removeReveres(uuid) { return this.reverses.delete(uuid); }
     hasUnique(obj) { return this.uniques.get(obj); }
     setUnique(obj, uuid) { return this.uniques.set(obj, uuid); }
     getUnique(obj) { return this.uniques.get(obj); }
@@ -1424,8 +1940,7 @@ class EditorContextManager {
     onReadyEvent = new NativeEvent();
     onShutdownEvent = new NativeEvent();
     actionManager = new Map();
-    //@ts-ignore
-    get isReady() { return this.display?.isReady; }
+    get isReady() { return this.display?.isReady ?? false; }
     _eventReadyMethod;
     /**@param {ExtensionContext} context  */
     constructor(context, that) {
@@ -1457,7 +1972,7 @@ class EditorContextManager {
     }
     post(packet) {
         POST.call(this.player, packet.id, JSON.stringify(packet.data, (k, v) => {
-            if (typeof v === "object" && UNIQUE_SYMBOL in v)
+            if (typeof v === "object" && v?.[UNIQUE_SYMBOL])
                 return this.display?.openCreateUnique(v);
             return v;
         }));
@@ -1504,16 +2019,30 @@ class EditorEventManager {
         if (message?.type === ReceiveActionEventType.ActionExecuted) {
             const actionId = message.id;
             const display = new PlayerDisplayManager(player);
-            if (!display.isReady)
-                display.onClientReady.trigger({ player, display });
             if (!display.hasRegisteredAction(actionId))
                 return;
             TriggerEvent(display.getRegisteredAction(actionId)?.onActionExecute, new (PayloadLoaders.get(message.payload.type))(player, message.payload));
         }
     }
     [ReceiveEventId["Editor::ClientUXEvents"]](id, message, player) {
-        console.warn(`§8No handler implementation for §r§l${id}§r§7  -->  §r§l${message.type} §r§8[${ReceiveEventEnum[id][message.type]}]`);
+        if (!(message.type in this.uxEventsResolver))
+            console.warn(`§8No handler implementation for §r§l${id}§r§7  -->  §r§l${message.type} §r§8[${ReceiveEventEnum[id][message.type]}]`);
+        else
+            this.uxEventsResolver[message.type](id, message, new PlayerDisplayManager(player));
     }
+    uxEventsResolver = {
+        [ReceiveUXEventType.ToolActivate](id, message, display) {
+            let tool;
+            if (message.id === "")
+                tool = null;
+            else if (!display.hasReverses(message.id))
+                tool = { id: message.id };
+            else
+                tool = display.getReverses(message.id);
+            display.onToolAtivate.trigger({ player: display.player, display, lastTool: display.lastTool, tool: tool });
+            display.lastTool = tool;
+        }
+    };
 }
 const editorEventManager = new EditorEventManager();
 
@@ -1525,8 +2054,6 @@ const editorEventManager = new EditorEventManager();
 
 ;// CONCATENATED MODULE: ./src/dynamic-editor/index.ts
 
-
-const Destination = RedirectDestination;
 
 
 
@@ -1540,7 +2067,6 @@ var __webpack_exports__BindedSource = __webpack_exports__.mj;
 var __webpack_exports__BooleanProperty = __webpack_exports__.xv;
 var __webpack_exports__BuildInPane = __webpack_exports__.uf;
 var __webpack_exports__ConvertingProperty = __webpack_exports__.Os;
-var __webpack_exports__Destination = __webpack_exports__.o6;
 var __webpack_exports__EditorExtension = __webpack_exports__.MC;
 var __webpack_exports__EditorMode = __webpack_exports__.je;
 var __webpack_exports__Element = __webpack_exports__.W_;
@@ -1550,15 +2076,18 @@ var __webpack_exports__ExtensionReadyEvent = __webpack_exports__.hV;
 var __webpack_exports__ExtensionReadyEventData = __webpack_exports__.CS;
 var __webpack_exports__ExtensionShutdownEvent = __webpack_exports__.CG;
 var __webpack_exports__ExtensionShutdownEventData = __webpack_exports__._4;
+var __webpack_exports__KeyboardKey = __webpack_exports__.u8;
 var __webpack_exports__MenuActionItem = __webpack_exports__.MK;
 var __webpack_exports__MenuOptionsItem = __webpack_exports__.hd;
 var __webpack_exports__NumberProperty = __webpack_exports__.Y6;
 var __webpack_exports__PlayerModeChangeEvent = __webpack_exports__.$W;
 var __webpack_exports__PlayerModeChangeEventData = __webpack_exports__.uY;
+var __webpack_exports__RedirectDestination = __webpack_exports__.Pw;
 var __webpack_exports__StatusBarAlignmentProperty = __webpack_exports__.V7;
 var __webpack_exports__StatusBarItem = __webpack_exports__.wl;
 var __webpack_exports__StatusBarItemAlignment = __webpack_exports__.se;
 var __webpack_exports__StringProperty = __webpack_exports__.h_;
+var __webpack_exports__Tool = __webpack_exports__.UA;
 var __webpack_exports__ValueChangeEvent = __webpack_exports__.My;
 var __webpack_exports__ValueChangeEventData = __webpack_exports__.xC;
-export { __webpack_exports__AutoSizeStatusBarItem as AutoSizeStatusBarItem, __webpack_exports__BindedSource as BindedSource, __webpack_exports__BooleanProperty as BooleanProperty, __webpack_exports__BuildInPane as BuildInPane, __webpack_exports__ConvertingProperty as ConvertingProperty, __webpack_exports__Destination as Destination, __webpack_exports__EditorExtension as EditorExtension, __webpack_exports__EditorMode as EditorMode, __webpack_exports__Element as Element, __webpack_exports__ExtensionInitializeEvent as ExtensionInitializeEvent, __webpack_exports__ExtensionInitializeEventData as ExtensionInitializeEventData, __webpack_exports__ExtensionReadyEvent as ExtensionReadyEvent, __webpack_exports__ExtensionReadyEventData as ExtensionReadyEventData, __webpack_exports__ExtensionShutdownEvent as ExtensionShutdownEvent, __webpack_exports__ExtensionShutdownEventData as ExtensionShutdownEventData, __webpack_exports__MenuActionItem as MenuActionItem, __webpack_exports__MenuOptionsItem as MenuOptionsItem, __webpack_exports__NumberProperty as NumberProperty, __webpack_exports__PlayerModeChangeEvent as PlayerModeChangeEvent, __webpack_exports__PlayerModeChangeEventData as PlayerModeChangeEventData, __webpack_exports__StatusBarAlignmentProperty as StatusBarAlignmentProperty, __webpack_exports__StatusBarItem as StatusBarItem, __webpack_exports__StatusBarItemAlignment as StatusBarItemAlignment, __webpack_exports__StringProperty as StringProperty, __webpack_exports__ValueChangeEvent as ValueChangeEvent, __webpack_exports__ValueChangeEventData as ValueChangeEventData };
+export { __webpack_exports__AutoSizeStatusBarItem as AutoSizeStatusBarItem, __webpack_exports__BindedSource as BindedSource, __webpack_exports__BooleanProperty as BooleanProperty, __webpack_exports__BuildInPane as BuildInPane, __webpack_exports__ConvertingProperty as ConvertingProperty, __webpack_exports__EditorExtension as EditorExtension, __webpack_exports__EditorMode as EditorMode, __webpack_exports__Element as Element, __webpack_exports__ExtensionInitializeEvent as ExtensionInitializeEvent, __webpack_exports__ExtensionInitializeEventData as ExtensionInitializeEventData, __webpack_exports__ExtensionReadyEvent as ExtensionReadyEvent, __webpack_exports__ExtensionReadyEventData as ExtensionReadyEventData, __webpack_exports__ExtensionShutdownEvent as ExtensionShutdownEvent, __webpack_exports__ExtensionShutdownEventData as ExtensionShutdownEventData, __webpack_exports__KeyboardKey as KeyboardKey, __webpack_exports__MenuActionItem as MenuActionItem, __webpack_exports__MenuOptionsItem as MenuOptionsItem, __webpack_exports__NumberProperty as NumberProperty, __webpack_exports__PlayerModeChangeEvent as PlayerModeChangeEvent, __webpack_exports__PlayerModeChangeEventData as PlayerModeChangeEventData, __webpack_exports__RedirectDestination as RedirectDestination, __webpack_exports__StatusBarAlignmentProperty as StatusBarAlignmentProperty, __webpack_exports__StatusBarItem as StatusBarItem, __webpack_exports__StatusBarItemAlignment as StatusBarItemAlignment, __webpack_exports__StringProperty as StringProperty, __webpack_exports__Tool as Tool, __webpack_exports__ValueChangeEvent as ValueChangeEvent, __webpack_exports__ValueChangeEventData as ValueChangeEventData };

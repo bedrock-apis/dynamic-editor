@@ -22,8 +22,7 @@ export class EditorContextManager{
     readonly onReadyEvent = new NativeEvent<[this]>();
     readonly onShutdownEvent = new NativeEvent<[this]>();
     readonly actionManager = new Map<string,Action>();
-    //@ts-ignore
-    readonly get isReady(): boolean {return this.display?.isReady;}
+    get isReady(): boolean {return this.display?.isReady??false;}
 
     private _eventReadyMethod: any;
     /**@param {ExtensionContext} context  */
@@ -54,7 +53,7 @@ export class EditorContextManager{
         that?.shutdown();
     }
     post(packet: IPacket){POST.call(this.player,packet.id,JSON.stringify(packet.data,(k,v)=>{
-        if(typeof v === "object" && UNIQUE_SYMBOL in v) return this.display?.openCreateUnique(v);
+        if(typeof v === "object" && v?.[UNIQUE_SYMBOL]) return this.display?.openCreateUnique(v);
         return v;
     }));}
 

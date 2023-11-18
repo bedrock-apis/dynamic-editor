@@ -1,8 +1,18 @@
-import { BuildInPane, IDENTITY_SYMBOL, IIdentityPacket, IPacket, IUniqueObject, Packet, PostEventId, PublicEvent, RedirectDestination, ServerUXEventType, UNIQUE_SYMBOL } from "dynamic-editor/core/index";
+import { 
+    BuildInPane, IDENTITY_DATA, IDENTITY_SYMBOL, IIdentityPacket, IPacket, 
+    IUniqueObject, InputDevice, InputModifier, KeyboardKey, MouseAction, Packet,
+    PostEventId, PublicEvent, RedirectDestination, ServerInputBindingEventType, 
+    ServerUXEventType, UNIQUE_SYMBOL, EditorInputContext
+} from "dynamic-editor/core/index";
 export const ACTION_IDENTITY_SYMBOL = Symbol("ACTION_IDENTITY");
 export class ServerUXEventPacket extends Packet{
     constructor(data: any){
         super(PostEventId["Editor::ServerUXEvents"],data);
+    }
+}
+export class ServerInputBindingsEventPacket extends Packet{
+    constructor(data: any){
+        super(PostEventId["Editor::ServerInputBindingEvents"],data);
     }
 }
 export class RedirectToDestinationPacket extends ServerUXEventPacket{
@@ -17,7 +27,12 @@ export class ServerActionEventPacket extends Packet{
     }
 }
 export class PostActionPacket extends ServerActionEventPacket implements IIdentityPacket {
-    [IDENTITY_SYMBOL] = ACTION_IDENTITY_SYMBOL;
+    [IDENTITY_SYMBOL] = IDENTITY_SYMBOL;
+    get [IDENTITY_DATA](){return this.data.id;}
+}
+export class PostUIPacket extends ServerUXEventPacket implements IIdentityPacket{
+    [IDENTITY_SYMBOL] = IDENTITY_SYMBOL;
+    get [IDENTITY_DATA](){return this.data.id;}
 }
 export class PacketBuilder{
     static GetRedirectToDestinationPacket(destination: RedirectDestination){
@@ -31,18 +46,45 @@ export class PacketBuilder{
         //@ts-ignore
         return new UpdateBuildInPanePacket(typeof pane === 'number'?pane:BuildInPane[pane],visible);
     }
-    static BindActionToControlPacket(action: IUniqueObject, control: IUniqueObject){
+    static BindActionToControl(action: IUniqueObject, control: IUniqueObject){
         return new ServerUXEventPacket({
             type:ServerUXEventType.BindUIEvent,
             actionId:action,
             controlId:control
         });
     }
-    static UnbindActionToControlPacket(action: IUniqueObject, control: IUniqueObject){
+    static UnbindActionToControl(action: IUniqueObject, control: IUniqueObject){
         return new ServerUXEventPacket({
             type:ServerUXEventType.UnbindUIEvent,
             actionId:action,
             controlId:control
+        });
+    }
+    static BindKeyInputActionToContext(action: IUniqueObject, contextId: IUniqueObject | EditorInputContext, button: KeyboardKey, modifier: InputModifier){
+        return new ServerInputBindingsEventPacket({
+            type:ServerInputBindingEventType.KeyActionBinding,
+            actionId:action,
+            contextId:contextId,
+            inputDevice: InputDevice.KeyBoard,
+            inputType:1,
+            button,
+            modifier
+        });
+    }
+    static BindMouseInputActionToContext(action: IUniqueObject, contextId: IUniqueObject | EditorInputContext, mouseAction: MouseAction){
+        return new ServerInputBindingsEventPacket({
+            type:ServerInputBindingEventType.MouseActionBinding,
+            actionId:action,
+            contextId:contextId,
+            inputDevice: InputDevice.Mouse,
+            mouseAction
+        });
+    }
+    static UnbindInputActionToContext(action: IUniqueObject, contextId: IUniqueObject | EditorInputContext,){
+        return new ServerInputBindingsEventPacket({
+            type:ServerUXEventType.UnbindUIEvent,
+            actionId:action,
+            contextId
         });
     }
 }
@@ -61,19 +103,37 @@ export abstract class Postable<K extends IPacket>{
     protected *getPackets(flags: number): Generator<IPacket>{ yield this.getMainPacket(flags);}
 }
 export abstract class UniquePostable<K extends IPacket> extends Postable<K> implements IUniqueObject{
-    [UNIQUE_SYMBOL]: true = true;
+    [UNIQUE_SYMBOL]: boolean = true;
     protected getMainPacketData(flags?: number) {
         const data = super.getMainPacketData(flags);
         data.id = this;
         return data;
     }
 }
-export class Displayable extends UniquePostable<ServerUXEventPacket>{
-    protected readonly packetConstructor: new (data: any) => ServerUXEventPacket = ServerUXEventPacket;
-    readonly onUpdate = new PublicEvent<[Displayable]>; //Keep displayble bc its not always a "this" reference
-    readonly onInit = new PublicEvent<[Displayable]>;
-    readonly onDispose = new PublicEvent<[Displayable]>;
+export interface IUpdateable{
+    displayInitPackets(): Generator<IPacket>;
+    displayUpdatePackets(): Generator<IPacket>;
+    displayDisposePackets(): Generator<IPacket>;
+}
+export class Displayable<T extends IPacket> extends UniquePostable<T> implements IUpdateable{
+    protected readonly packetConstructor: new (data: any) => T;
+    constructor(constuct: new (data: any)=>T){
+        super();
+        this.packetConstructor = constuct;
+    }
+    readonly onUpdate = new PublicEvent<[IUpdateable]>; //Keep displayble bc its not always a "this" reference
+    readonly onInit = new PublicEvent<[IUpdateable]>;
+    readonly onDispose = new PublicEvent<[IUpdateable]>;
     *displayInitPackets(): Generator<IPacket>{ yield * this.getPackets(INIT_FLAG);}
     *displayUpdatePackets(): Generator<IPacket>{ yield * this.getPackets(UPDATE_FLAG);}
     *displayDisposePackets(): Generator<IPacket>{yield * this.getPackets(REMOVE_FLAG);}
+}
+export class FakeUpdatable implements IUpdateable{
+    packet: IPacket;
+    constructor(packet: IPacket){
+        this.packet = packet;
+    }
+    *displayInitPackets(): Generator<IPacket>{yield this.packet};
+    *displayUpdatePackets(): Generator<IPacket>{yield this.packet};
+    *displayDisposePackets(): Generator<IPacket>{yield this.packet};
 }

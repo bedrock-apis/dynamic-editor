@@ -19,7 +19,6 @@ export class PublicEvent<args extends any[]> {
     unsubscribe<M extends (...params: args)=>void>(method: M): M
 }
 /**@beta */
-//@ts-ignore
 export class ClientReadyEvent extends PublicEvent<[{readonly client: Client}]>{
     private constructor();
 }

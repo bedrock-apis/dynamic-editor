@@ -1,6 +1,8 @@
-import { RedirectDestination } from "./core/index";
-export {BuildInPane, StatusBarItemAlignment} from "./core/index";
-export const Destination = RedirectDestination;
+export { 
+    BuildInPane, StatusBarItemAlignment, 
+    KeyboardKey, RedirectDestination,
+    MouseAction
+} from "./core/index";
 export { EditorExtension } from "./native/Editor/index";
 export { 
     ExtensionInitializeEvent, ExtensionInitializeEventData,
@@ -20,7 +22,8 @@ export {
     MenuOptionsItem,
     AutoSizeStatusBarItem,
     ConvertingProperty,
-    Element
+    Element,
+    Tool
  } from "./native/Controls/index";
 
 export {

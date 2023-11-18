@@ -1,7 +1,8 @@
 import { PostEventId, ReceiveEventId } from "./Definitions";
 
 export const UNIQUE_SYMBOL: unique symbol = Symbol("UNIQUE");
-export const IDENTITY_SYMBOL: unique symbol = Symbol("UNIQUE");
+export const IDENTITY_SYMBOL: unique symbol = Symbol("IDENTITY_SYMBOL");
+export const IDENTITY_DATA: unique symbol = Symbol("IDENTITY_DATA");
 
 
 export interface IPacket{
@@ -13,6 +14,7 @@ export interface IUniqueObject{
 }
 export interface IIdentityPacket extends IPacket{
     [IDENTITY_SYMBOL]: symbol
+    [IDENTITY_DATA]: any
 }
 export interface IPacketCommand extends IPacket{
     readonly commandId: symbol;

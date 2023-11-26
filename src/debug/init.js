@@ -17,7 +17,7 @@ Player.prototype.postClientMessage = function(id,message){
     if(!id.startsWith("Editor::")) return;
     //if(!(id in PostEventIds)) return console.warn("Unknow Post Event: " + id);
     const data = JSON.parse(message);
-    console.warn(id,message);
+    console.warn(id,message.length > 3000?message.substring(0,3000) + " ...":message);
     /*if(!(data.type in PostEventIdTypes[id])) {
         console.warn(`Unknow Post ${PostEventNames[id]} type: ` + data.type);
     }*/

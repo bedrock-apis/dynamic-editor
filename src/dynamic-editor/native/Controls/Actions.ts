@@ -44,3 +44,18 @@ export class MouseInputActionsEvent extends ActionBasedEvent<MouseInputAction,IU
         return m;
     }
 }
+export class MouseClickEvent extends MouseInputActionsEvent{
+    subscribe<M extends (payload: MouseRayCastPayload) => void>(m: M): M {
+        return super.subscribe(m,MouseAction.ButtonClick);
+    }
+}
+export class MouseDragEvent extends MouseInputActionsEvent{
+    subscribe<M extends (payload: MouseRayCastPayload) => void>(m: M): M {
+        return super.subscribe(m,MouseAction.Drag);
+    }
+}
+export class MouseWheelEvent extends MouseInputActionsEvent{
+    subscribe<M extends (payload: MouseRayCastPayload) => void>(m: M): M {
+        return super.subscribe(m,MouseAction.Wheel);
+    }
+}

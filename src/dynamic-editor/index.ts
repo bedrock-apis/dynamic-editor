@@ -1,7 +1,8 @@
 export { 
     BuildInPane, StatusBarItemAlignment, 
     KeyboardKey, RedirectDestination,
-    MouseAction
+    MouseAction, ButtonVariant, 
+    InputModifier, MouseInteractions, MouseInteractionType
 } from "./core/index";
 export { EditorExtension } from "./native/Editor/index";
 export { 
@@ -15,18 +16,48 @@ export {
     StringProperty,
     NumberProperty,
     BooleanProperty,
-    BindedSource,
+    Vector3Property,
+    ButtonVariantProperty,
     StatusBarAlignmentProperty,
+    
+    Element,
+    BindedSource,
+
     StatusBarItem,
     MenuActionItem,
     MenuOptionsItem,
     AutoSizeStatusBarItem,
-    ConvertingProperty,
-    Element,
-    Tool
+    DropdownItemsMapingProperty,
+
+    Tool,
+    ToolView,
+
+    EditorPane,
+    PermutationPickerPane,
+    DividerPaneElement,
+    BooleanPaneElement,
+    StringPaneElement,
+    NumberPaneElement,
+    ButtonPaneElement,
+    VectorPaneElement,
+    DropdownPaneElement,
+    BlockPickerPaneElement,
+    BlockTypePickerPaneElement
  } from "./native/Controls/index";
 
 export {
     ExtensionOptionalParameters,
-    EditorMode
+    EditorMode,
+    CursorProperties,
+    Cursor,
+    Selection,
+    SelectionManager,
+    TransactionManager,
+    ClipboardItem,
+    ClipboardManager,
+    ClipboardMirrorAxis,
+    ClipboardRotation,
+    ClipboardWriteOptions,
+    CursorControlMode,
+    CursorTargetMode
 } from "@minecraft/server-editor-bindings";

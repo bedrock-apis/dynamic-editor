@@ -52,7 +52,7 @@ export class PropertyValueChangeEventData<P extends ElementExtendable, E extends
 }
 export class ValueChangeEventData<T> extends EditorEventData{
     readonly oldValue: T;
-    readonly newValue: T;
+    newValue: T;
     constructor(oV: T,nV: T){
         super();
         this.oldValue = oV;

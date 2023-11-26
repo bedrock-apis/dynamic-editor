@@ -7,7 +7,7 @@ export enum RedirectDestination {
 export enum EditorInputContext {
     GlobalEditor = 'global.editor',
     GlobalToolMode = 'global.toolMode',
-    Viewport = 'local.toolMode.viewport',
+    Viewport = 'local.toolMode.viewport'
 }
 /**@public */
 export enum BuildInPane {
@@ -15,20 +15,37 @@ export enum BuildInPane {
     WelcomePage = 2,
     LogPanel = 3
 }
+export enum InternalPaneElementTypes {
+    "String" = "editorUI:String",
+    "Number" = "editorUI:Number",
+    "Boolean" = "editorUI:Boolean",
+    "Button" = "editorUI:Action",
+    "Vector3" = "editorUI:Vec3",
+    "Dropdown" = "editorUI:Dropdown",
+    "BlockPicker" = "editorUI:BlockPicker",
+    "Divider" = "editorUI:Divider",
+    "SubPane" = "editorUI:SubPane"
+}
+export enum ButtonVariant {
+    'secondary'='secondary',
+    'primary'='primary',
+    'destructive'='destructive',
+    'hero'='hero'
+}
 export enum ActionType {
     NoArgsAction = "NoArgsAction",
     MouseRayCastAction = "MouseRayCastAction"
 };
-export enum InternalInputTypes {
+export enum MouseInteractionType {
     ButtonDown = 1,
     ButtonUp = 2,
     WheelDown = 3,
-    WheelUo = 4,
+    WheelUp = 4,
     DragStart = 5,
     Draging = 6,
     DragStop = 7,
 }
-export enum InternalInteractionTypes {
+export enum MouseInteractions {
     LeftButton = 1,
     MiddleButton = 2,
     Scroll = 4 
@@ -166,7 +183,9 @@ export enum ServerUXEventType {
     SetActiveTool = 9,
     ReleaseToolRail = 10,
     BindUIEvent = 11, //controlId actionId
-    UnbindUIEvent = 12,
+    UnbindUIEvent = 12, //lol
+    UpdatePaneControl = 13, //paneId, id, ...
+    ReleasePaneControl = 14,
     RedirectToDestination = 15,
     UpdateBuildInPanes = 18
 }

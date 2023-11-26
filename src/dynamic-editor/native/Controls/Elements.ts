@@ -1,22 +1,22 @@
-import { EditorInputContext, IPacket, InputModifier, KeyboardKey, NoConstructor, PublicEvent, ServerUXEventType, StatusBarItemAlignment, TriggerEvent, core } from "dynamic-editor/core/index";
-import { BooleanProperty, NumberProperty, StringProperty, VisualElement } from "./General";
+import { EditorInputContext, IPacket, InputModifier, KeyboardKey, PublicEvent, ServerUXEventType, StatusBarItemAlignment, TriggerEvent, UNIQUE_SYMBOL } from "dynamic-editor/core/index";
+import { BooleanProperty, NumberProperty, StringProperty, ModedElement, RenderingElement } from "./General";
 import { StatusBarAlignmentProperty } from "./Properties";
 import { ControlBindedAction, NoArgsPayload } from "../Editor/EditorActions";
-import { FakeUpdatable, INIT_FLAG, PacketBuilder, PostUIPacket, REMOVE_FLAG, ServerUXEventPacket, UPDATE_FLAG } from "../Packets";
-import { ACTION_RETURNER, ElementConstruction, ElementExtendable, ElementPropertyType, IActionLike, IContentElement, IObjectType, OBJECT_TYPE } from "./Base";
+import { FakeUpdatable, INIT_FLAG, PacketBuilder, REMOVE_FLAG, ServerUXEventPacket, UPDATE_FLAG } from "../Packets";
+import { ACTION_RETURNER, Element, ElementConstruction, ElementExtendable, ElementProperty, IActionLike, IContentElement, IObjectType, OBJECT_TYPE } from "./Base";
+import { KeyInputActionsEvent, MouseClickEvent, MouseDragEvent, MouseInputActionsEvent, MouseWheelEvent } from "./Actions";
 import { PlayerDisplayManager } from "../Editor/EditorDisplayManager";
-import { MouseInputActionsEvent } from "./Actions";
 
-export class StatusBarItem extends VisualElement<{size:NumberProperty,text:StringProperty,alignment:StatusBarAlignmentProperty}> implements IContentElement{
+export class StatusBarItem extends ModedElement<{size:NumberProperty,text:StringProperty,alignment:StatusBarAlignmentProperty}> implements IContentElement{
     protected readonly PACKET_TYPES = { 
         [UPDATE_FLAG]: ServerUXEventType.UpdateStatusBarItem,
         [REMOVE_FLAG]: ServerUXEventType.ReleaseStatusBarItem,
         [INIT_FLAG]: ServerUXEventType.UpdateStatusBarItem
     };
-    constructor(){
+    constructor(content?: string){
         super({
             alignment:{property:new StatusBarAlignmentProperty(0)},
-            text:{property:new StringProperty("")},
+            text:{property:new StringProperty(content??"")},
             size:{property: new NumberProperty(0)}
         });
     }
@@ -39,14 +39,7 @@ export class StatusBarItem extends VisualElement<{size:NumberProperty,text:Strin
         return this;
     }
 }
-export class AutoSizeStatusBarItem extends StatusBarItem{
-    constructor(){
-        super();
-        //bind size property depending on current text property and its length
-        StatusBarItem.BindProperty(this,"size",this,"text",n=>(n?.length??0)*1.25);
-    }
-}
-export class MenuItem<SubProperties extends ElementExtendable = {}> extends VisualElement<{displayStringLocId:StringProperty,name:StringProperty} & SubProperties> implements IContentElement{
+export class MenuItem<SubProperties extends ElementExtendable = {}> extends ModedElement<{displayStringLocId:StringProperty,name:StringProperty} & SubProperties> implements IContentElement{
     /**@private*/
     _parent: any = undefined;
     protected readonly PACKET_TYPES = { 
@@ -69,8 +62,8 @@ export class MenuItem<SubProperties extends ElementExtendable = {}> extends Visu
         this.setPropertyValue("name",displayText as any);
         return this;
     }
-    getMainPacketData(flags?: number | undefined): any {
-        const object = super.getMainPacketData(flags);
+    getMainPacketData(flags: number, packets: IPacket[]): any {
+        const object = super.getMainPacketData(flags,packets);
         if(typeof this._parent === "object") object.parentId = this._parent;
         object.shortcut = ""; //unknown usage from vanilla editor
         return object;
@@ -98,7 +91,7 @@ export class MenuActionItem extends MenuItem<{checked:BooleanProperty}> implemen
     setCheckmarkEnabled(enabled: boolean){
         if(enabled === this._isPropertyReal("checked")) return this;
         this._setPropertyRealness("checked",enabled);
-        if(!this._isChanging) TriggerEvent(this.onUpdate,this);
+        if(!this._isChanging) TriggerEvent(this.onUpdate,this,UPDATE_FLAG);
         return this;
     }
     addActionHandler(handler: (param: NoArgsPayload)=>void){
@@ -107,11 +100,11 @@ export class MenuActionItem extends MenuItem<{checked:BooleanProperty}> implemen
     }
     addKeyboardTrigger(keyButton: KeyboardKey, modifier: InputModifier = InputModifier.Any){
         this._triggers.add({keyButton,modifier});
-        TriggerEvent(this.onInit,new FakeUpdatable(PacketBuilder.BindKeyInputActionToContext(this._action,EditorInputContext.GlobalToolMode,keyButton,modifier)));
+        TriggerEvent(this.onUpdate,new FakeUpdatable(PacketBuilder.BindKeyInputActionToContext(this._action,EditorInputContext.GlobalToolMode,keyButton,modifier)),INIT_FLAG);
         return this;
     }
     clearKeyboardTriggers(){
-        TriggerEvent(this.onDispose,new FakeUpdatable(PacketBuilder.UnbindInputActionToContext(this._action,EditorInputContext.GlobalToolMode)));
+        TriggerEvent(this.onUpdate,new FakeUpdatable(PacketBuilder.UnbindInputActionToContext(this._action,EditorInputContext.GlobalToolMode)),REMOVE_FLAG);
         this._triggers.clear();
         return this;
     }
@@ -133,9 +126,9 @@ export class MenuOptionsItem extends MenuItem<{}>{
         if(item._parent === this) return this;
         if(item._parent !== undefined) throw new Error("This menu item is already assigned to MenuBar or a MenuBarOptions");
         item._parent = this;
-        this._handlers.set(item,item.onUpdate.subscribe((e: any)=>TriggerEvent(this.onUpdate,e)))
-        TriggerEvent(this.onUpdate,this);
-        TriggerEvent(this.onInit, item);
+        this._handlers.set(item,item.onUpdate.subscribe((...a: any)=>TriggerEvent(this.onUpdate,...a)))
+        TriggerEvent(this.onUpdate,this,UPDATE_FLAG);
+        TriggerEvent(this.onUpdate, item, INIT_FLAG);
         return this;
     }
     removeMenuItem(item: MenuItem<any>){
@@ -143,8 +136,8 @@ export class MenuOptionsItem extends MenuItem<{}>{
         item._parent = undefined;
         item.onUpdate.unsubscribe(this._handlers.get(item));
         this._handlers.delete(item);
-        TriggerEvent(this.onUpdate,this);
-        TriggerEvent(this.onDispose,item);
+        TriggerEvent(this.onUpdate,this,UPDATE_FLAG);
+        TriggerEvent(this.onUpdate,item,REMOVE_FLAG);
         return this;
     }
     *getMenuItems(){for (const e of this._handlers.keys()) yield e;}
@@ -162,17 +155,23 @@ export interface IUnkownTool{
     readonly id: string
 } 
 export const TOOL_OBJECT_TYPE = Symbol("Tool");
-export class Tool extends VisualElement<{icon:StringProperty,titleString:StringProperty,titleStringLocId:StringProperty,descriptionString:StringProperty,descriptionStringLocId:StringProperty}> implements IObjectType{
-    protected packetConstructor: new (data: any) => ServerUXEventPacket = PostUIPacket;
+export class Tool extends ModedElement<{icon:StringProperty,titleString:StringProperty,titleStringLocId:StringProperty,descriptionString:StringProperty,descriptionStringLocId:StringProperty}> implements IObjectType{
+    protected packetConstructor: new (data: any) => ServerUXEventPacket = ServerUXEventPacket;
+    protected _propertyBindings = new WeakMap();
+    protected _isActive = false;
     protected readonly PACKET_TYPES: { [key: number]: number | null; } = {
         [INIT_FLAG]: ServerUXEventType.CreateTool,
         [UPDATE_FLAG]: ServerUXEventType.CreateTool,
         [REMOVE_FLAG]: ServerUXEventType.ReleaseTool
     };
+    [UNIQUE_SYMBOL](d: PlayerDisplayManager){return d.addReverses(this,"tool-");}
     readonly [OBJECT_TYPE]: symbol = TOOL_OBJECT_TYPE;
     readonly onActivationStateChange: PublicEvent<[{isSelected: boolean, tool: Tool}]> = new PublicEvent;
-    readonly onMouseInteract = new MouseInputActionsEvent(this);
-    readonly isActivePropertyGetter = new BooleanProperty(false);
+    readonly onMouseDrag = new MouseDragEvent(this);
+    readonly onMouseClick = new MouseClickEvent(this);
+    readonly onMouseWheel = new MouseWheelEvent(this);
+    readonly onKeyboardKeyPress = new KeyInputActionsEvent(this);
+    readonly isActivePropertyGetter = new BooleanProperty<boolean>(false);
     constructor(icon?: string, title?: string, description?:string){
         const tSP = new StringProperty(title??"");
         const dSP = new StringProperty(description??"");
@@ -183,11 +182,14 @@ export class Tool extends VisualElement<{icon:StringProperty,titleString:StringP
             titleString:{property:tSP,isFake:true},
             titleStringLocId:{property:tSP,isFake:true},
         });
-        this.isActivePropertyGetter = new BooleanProperty(false);
-        this.onActivationStateChange.subscribe(e=>(e.isSelected != this.isActivePropertyGetter.getValue())?this.isActivePropertyGetter.setValue(e.isSelected):null);
-        this.onMouseInteract.onInit.subscribe((...p)=>TriggerEvent(this.onInit,...p));
-        this.onMouseInteract.onUpdate.subscribe((...p)=>TriggerEvent(this.onUpdate,...p));
-        this.onMouseInteract.onDispose.subscribe((...p)=>TriggerEvent(this.onDispose,...p));
+        this.onActivationStateChange.subscribe(e=>{
+            this._isActive = e.isSelected;
+            (e.isSelected != this.isActivePropertyGetter.getValue())?this.isActivePropertyGetter.setValue(e.isSelected):null;
+        });
+        this.onMouseClick.onUpdate.subscribe((...p)=>TriggerEvent(this.onUpdate,...p));
+        this.onMouseDrag.onUpdate.subscribe((...p)=>TriggerEvent(this.onUpdate,...p));
+        this.onMouseWheel.onUpdate.subscribe((...p)=>TriggerEvent(this.onUpdate,...p));
+        this.onKeyboardKeyPress.onUpdate.subscribe((...p)=>TriggerEvent(this.onUpdate,...p));
     }
     get icon():string{return this.getPropertyValue("icon")??"";}
     set icon(v:string){this.setPropertyValue("icon",v);}
@@ -195,6 +197,7 @@ export class Tool extends VisualElement<{icon:StringProperty,titleString:StringP
     set title(v:string){this.setPropertyValue("titleString",v);}
     get description():string{return this.getPropertyValue("descriptionString")??"";}
     set description(v:string){this.setPropertyValue("descriptionString",v);}
+    get isActivated(): boolean{return this._isActive;}
     setIcon(icon: string){
         this.setPropertyValue("icon",icon);
         return this;
@@ -216,8 +219,28 @@ export class Tool extends VisualElement<{icon:StringProperty,titleString:StringP
         this.setPropertyValue("descriptionString",text);
         return this;
     }
-    getMainPacketData(flags?: number | undefined) {
-        const data = super.getMainPacketData(flags);
+    bindVisibleElements(...elements: RenderingElement<any>[]){
+        for (const pane of elements) {
+            if(this._propertyBindings.has(pane)) continue;
+            const method = this.isActivePropertyGetter.onValueChange.subscribe(e=>{
+                pane.setPropertyValue("visible", e.newValue);
+            });
+            pane.setPropertyValue("visible",this.isActivated);
+            this._propertyBindings.set(pane,method);
+        }
+        return this;
+    }
+    unbindVisibleElements(...elements: RenderingElement<any>[]){
+        for (const pane of elements) {
+            if(!this._propertyBindings.has(pane)) continue;
+            const method = this._propertyBindings.get(pane);
+            this.isActivePropertyGetter.onValueChange.unsubscribe(method);
+            this._propertyBindings.delete(pane);
+        }
+        return this;
+    }
+    getMainPacketData(flags: number, packets: IPacket[]) {
+        const data = super.getMainPacketData(flags, packets);
         data.tooltipData = {
             descriptionString:this.propertyBag["descriptionString"],
             descriptionStringLocId:this.propertyBag["descriptionStringLocId"],
@@ -226,120 +249,20 @@ export class Tool extends VisualElement<{icon:StringProperty,titleString:StringP
         };
         return data;
     }
-    *displayInitPackets(): Generator<IPacket, any, unknown> {
-        console.warn("INIT");
+    /**@deprecated Internal method */
+    *displayInitPackets(){
         yield * super.displayInitPackets();
-        yield * this.onMouseInteract.displayInitPackets();   
+        yield * this.onMouseClick.displayInitPackets();   
+        yield * this.onMouseDrag.displayInitPackets();   
+        yield * this.onMouseWheel.displayInitPackets();   
+        yield * this.onKeyboardKeyPress.displayInitPackets();
     }
+    /**@deprecated Internal method */
     *displayDisposePackets(){
-        console.warn("DISPOSE");
-        yield * this.onMouseInteract.displayDisposePackets();
+        yield * this.onKeyboardKeyPress.displayDisposePackets();
+        yield * this.onMouseWheel.displayInitPackets();
+        yield * this.onMouseDrag.displayInitPackets();
+        yield * this.onMouseClick.displayInitPackets();
         yield * super.displayDisposePackets();
-    }
-}
-export const KNOWN_TOOLS = new WeakSet();
-export class ToolBar extends VisualElement<{}>{
-    protected readonly PACKET_TYPES = { 
-        [UPDATE_FLAG]: ServerUXEventType.SetActiveTool,
-        [REMOVE_FLAG]: ServerUXEventType.ReleaseToolRail,
-        [INIT_FLAG]: ServerUXEventType.SetActiveTool
-    };
-    protected readonly _eventHandler = new Map<Tool,any>(); 
-    protected activeTool: any = null;
-    get toolsCount(){return this._eventHandler.size;}
-    private constructor(display: PlayerDisplayManager){
-        if(!core.isNativeCall) throw new ReferenceError(NoConstructor + ToolBar.name);
-        display.onToolAtivate.subscribe(({tool})=>{this.activeTool = tool;});
-        super({});
-    }
-    setActiveTool(item: Tool | null){
-        this.activeTool = item;
-        TriggerEvent(this.onUpdate,this);
-    }
-    getActiveTool(): Tool | IUnkownTool | null{
-        return this.activeTool;
-    }
-    *getTools(){for (const K of this._eventHandler.keys()) yield K;}
-    addTool(item: Tool){
-        if(item[OBJECT_TYPE] !== TOOL_OBJECT_TYPE) throw new TypeError("Object is not type of Tool.");
-        if(this._eventHandler.has(item)) return true;
-        if(KNOWN_TOOLS.has(item)) throw new ReferenceError("This tool is already used by different person.");
-        TriggerEvent(this.onInit,item);
-        const method = item.onUpdate.subscribe((e)=>TriggerEvent(this.onUpdate,e));
-        this._eventHandler.set(item,method);
-        KNOWN_TOOLS.add(item);
-        return true;
-    }
-    removeTool(item: Tool){
-        if(item[OBJECT_TYPE] !== TOOL_OBJECT_TYPE) throw new TypeError("Object is not type of Tool.");
-        if(!this._eventHandler.has(item)) return false;
-        TriggerEvent(this.onDispose,item);
-        item.onUpdate.unsubscribe(this._eventHandler.get(item));
-        this._eventHandler.delete(item);
-        KNOWN_TOOLS.delete(item);
-        return true;
-    }
-    hasTool(item: any){return this._eventHandler.has(item);}
-    getMainPacketData(flags?: number | undefined) {
-        const data = super.getMainPacketData(flags);
-        if(this.activeTool === null) data.selectedOptionId = "";
-        else if(this.activeTool[OBJECT_TYPE] === TOOL_OBJECT_TYPE) data.selectedOptionId = this.activeTool;
-        else data.selectedOptionId = this.activeTool.id;
-        return data;
-    }
-    /**@private */
-    *displayInitPackets(): Generator<IPacket, any, unknown> {
-        yield * super.displayInitPackets();  
-        for (const item of this._eventHandler.keys()) yield * item.displayInitPackets();
-    }
-    /**@private */
-    *displayDisposePackets(): Generator<IPacket, any, unknown> {
-        for (const item of this._eventHandler.keys()){
-            item.onUpdate.unsubscribe(this._eventHandler.get(item));
-            yield * item.displayDisposePackets();
-        }
-        this._eventHandler.clear();
-        yield * super.displayDisposePackets();
-    }
-    /**@deprecated This value could be desynced by other addons, you shouldn't depend on this feature */
-    get isEnabled(): NonNullable<boolean | null> {
-        return super.isEnabled;
-    }
-    /**@deprecated */
-    set isEnabled(v: NonNullable<boolean | null>) {
-        super.isEnabled = v;
-    }
-    /**@deprecated This value could be desynced by other addons, you shouldn't depend on this feature */
-    get isVisible(): NonNullable<boolean | null> {
-        return super.isVisible;
-    }
-    /**@deprecated */
-    set isVisible(v: NonNullable<boolean | null>) {
-        super.isVisible = v;
-    }
-    /**@deprecated This value could be desynced by other addons, you shouldn't depend on this feature */
-    getProperty<T extends "visible" | "enabled">(propertyName: T): ({ visible: BooleanProperty; enabled: BooleanProperty; })[T] {
-        return super.getProperty(propertyName);
-    }
-    /**@deprecated This value could be desynced by other addons, you can set, but you should not depend on returned information */
-    //
-    getPropertyValue<T extends "visible" | "enabled", V extends ({ visible: BooleanProperty; enabled: BooleanProperty; })[T]>(propertyName: T): ElementPropertyType<V> {
-        return super.getPropertyValue(propertyName);
-    }
-    /**@deprecated This value could be desynced by other addons, you shouldn't depend on this feature */
-    setProperty<T extends "visible" | "enabled">(propertyName: T, property: { visible: BooleanProperty; enabled: BooleanProperty; }[T]): this {
-        return super.setProperty(propertyName,property);
-    }
-    /**@deprecated This value could be desynced by other addons, you shouldn't depend on this feature */
-    setPropertyValue<T extends "visible" | "enabled">(propertyName: T, value: ElementPropertyType<{ visible: BooleanProperty; enabled: BooleanProperty; }[T]>): this {
-        return super.setPropertyValue(propertyName,value);
-    }
-    /**@deprecated This value could be desynced by other addons, you shouldn't depend on this feature */
-    setEnable(enable: boolean): this {
-        return super.setEnable(enable);
-    }
-    /**@deprecated This value could be desynced by other addons, you shouldn't depend on this feature */
-    setVisibility(visible: boolean): this {
-        return super.setVisibility(visible);
     }
 }

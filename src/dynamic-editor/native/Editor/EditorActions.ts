@@ -1,15 +1,19 @@
 import { 
-    ActionType, EditorInputContext, IPacket, IUniqueObject, InputModifier, InternalInputTypes,
-    InternalInteractionTypes, KeyboardKey, MouseAction, PublicEvent,
-    ServerActionEventType, TriggerEvent 
+    ActionType, EditorInputContext, IPacket, IUniqueObject, InputModifier, MouseInteractionType,
+    MouseInteractions, KeyboardKey, MouseAction, PublicEvent,
+    ServerActionEventType, TriggerEvent, UNIQUE_SYMBOL 
 } from "dynamic-editor/core/index";
 import { Player, Vector3 } from "@minecraft/server";
-import { INIT_FLAG, IUpdateable, PacketBuilder, PostActionPacket, REMOVE_FLAG, UPDATE_FLAG, UniquePostable } from "../Packets";
+import { INIT_FLAG, IUpdateable, PacketBuilder,REMOVE_FLAG, ServerActionEventPacket, UPDATE_FLAG, UniquePostable } from "../Packets";
 import { ACTION_RETURNER, IActionLike } from "../Controls/index";
+import { PlayerDisplayManager } from "./EditorDisplayManager";
 
 
-export class Action<AType extends ActionType = ActionType.NoArgsAction> extends UniquePostable<PostActionPacket> implements IActionLike, IUpdateable{
-    protected packetConstructor: new (data: any) => PostActionPacket = PostActionPacket;
+export class Action<AType extends ActionType = ActionType.NoArgsAction> extends UniquePostable<ServerActionEventPacket> implements IActionLike, IUpdateable{
+    protected packetConstructor: new (data: any) => ServerActionEventPacket = ServerActionEventPacket;
+    [UNIQUE_SYMBOL](d: PlayerDisplayManager){
+        return d.addReverses(this, "action-");
+    }
     protected readonly PACKET_TYPES = {
         [UPDATE_FLAG]: ServerActionEventType.CreateAction,
         [INIT_FLAG]: ServerActionEventType.CreateAction,
@@ -22,17 +26,17 @@ export class Action<AType extends ActionType = ActionType.NoArgsAction> extends 
         this.actionType = type;
     }
     get [ACTION_RETURNER](){return this};
-    protected getMainPacketData(flags?: number | undefined): any {
-        const data = super.getMainPacketData(flags);
+    protected getMainPacketData(flags: number, packets: IPacket[]): any {
+        const data = super.getMainPacketData(flags, packets);
         data.actionType = this.actionType;
         return data;
     }
     execute(payload: AType extends ActionType.MouseRayCastAction?MouseRayCastPayload:NoArgsPayload){
         TriggerEvent(this.onActionExecute,payload);
     }
-    *displayInitPackets(): Generator<IPacket>{ yield super.getMainPacket(INIT_FLAG); }
-    *displayDisposePackets(): Generator<IPacket>{ yield super.getMainPacket(REMOVE_FLAG); }
-    *displayUpdatePackets(): Generator<IPacket>{yield super.getMainPacket(UPDATE_FLAG);}
+    *displayInitPackets(): Generator<IPacket,any,any>{ yield * super.getPackets(INIT_FLAG); }
+    *displayDisposePackets(): Generator<IPacket>{ yield * super.getPackets(REMOVE_FLAG);}
+    *displayUpdatePackets(): Generator<IPacket>{yield * super.getPackets(UPDATE_FLAG);}
 }
 export class ControlBindedAction extends Action<ActionType.NoArgsAction>{
     readonly control;
@@ -101,11 +105,11 @@ export class MouseRayCastPayload extends PayloadLoader{
     readonly direction: Vector3;
     readonly blockLocation: Vector3;
     readonly rayHit: boolean;
-    readonly actionType: InternalInteractionTypes;
+    readonly actionType: MouseInteractions;
     readonly hasCtrlModifier: boolean;
     readonly hasAltModifier: boolean;
     readonly hasShiftModifier: boolean;
-    readonly inputType: InternalInputTypes;
+    readonly inputType: MouseInteractionType;
     get block(){return this.dimension.getBlock(this.blockLocation); }
     constructor(player: Player, data: any){
         super(player, data);
@@ -118,8 +122,8 @@ export class MouseRayCastPayload extends PayloadLoader{
         this.hasCtrlModifier = ctrl;
         this.hasAltModifier = alt;
         this.hasShiftModifier = shift;
-        this.actionType = mouseAction as InternalInteractionTypes;
-        this.inputType = inputType as InternalInputTypes;
+        this.actionType = mouseAction as MouseInteractions;
+        this.inputType = inputType as MouseInteractionType;
     }
 }
 export const PayloadLoaders = new Map<ActionType, typeof PayloadLoader>();

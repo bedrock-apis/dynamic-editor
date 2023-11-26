@@ -5,6 +5,8 @@ import { Player } from "@minecraft/server";
 import { EditorControlManager } from "./EditorControlManager";
 import { Action } from "./EditorActions";
 import { PlayerDisplayManager } from "./EditorDisplayManager";
+//@ts-ignore
+import { globalContextRef } from "./EditorExtension";
 
 const CONTEXT_MANAGERS = new WeakMap();
 export const CONTEXT_BY_EXTENSION = new WeakMap<any,EditorContextManager>();
@@ -13,6 +15,7 @@ export class EditorContextManager{
     readonly context;
     readonly display;
     readonly player;
+    readonly cursor;
     readonly transactionManager;
     readonly selectionManager;
     readonly clipboardManager;
@@ -26,7 +29,7 @@ export class EditorContextManager{
 
     private _eventReadyMethod: any;
     /**@param {ExtensionContext} context  */
-    constructor(context: ExtensionContext,that: new () => any){
+    constructor(context: ExtensionContext, that: new () => EditorExtension){
         if(CONTEXT_MANAGERS.has(context)) return CONTEXT_MANAGERS.get(context);
         CONTEXT_MANAGERS.set(context,this);
         this.context = context;
@@ -35,11 +38,19 @@ export class EditorContextManager{
         this.selectionManager = context.selectionManager;
         this.clipboardManager = context.clipboardManager;
         this.player = context.player;
+        this.cursor = context.cursor;
         core.isNativeCall = true;
         this.controlManager = new EditorControlManager(this);
         this._eventReadyMethod = this.display.onClientReady.subscribe(()=>this.onReadyEvent.trigger(this));
-        //@ts-ignore
-        this.extension = (new EditorExtension(this,that)) as EditorExtension;
+        globalContextRef.context = this;
+        try {
+            this.extension = new that();
+        } catch (error) {
+            globalContextRef.context = null;
+            core.isNativeCall = false;
+            throw error;
+        }
+        globalContextRef.context = null;
         core.isNativeCall = false;
         CONTEXT_BY_EXTENSION.set(this.extension,this);
         this.onInitializeEvent.trigger(this);
@@ -52,10 +63,13 @@ export class EditorContextManager{
         const that = CONTEXT_MANAGERS.get(context);
         that?.shutdown();
     }
-    post(packet: IPacket){POST.call(this.player,packet.id,JSON.stringify(packet.data,(k,v)=>{
-        if(typeof v === "object" && v?.[UNIQUE_SYMBOL]) return this.display?.openCreateUnique(v);
-        return v;
-    }));}
+    post(packet: IPacket){
+        const d = this.display;
+        POST.call(this.player,packet.id,JSON.stringify(packet.data,(k,v)=>{
+            if(typeof v?.[UNIQUE_SYMBOL] === "function") return v?.[UNIQUE_SYMBOL]?.(d,this);
+            return v;
+        }));
+    }
 
 }
 

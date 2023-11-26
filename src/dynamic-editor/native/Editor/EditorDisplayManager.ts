@@ -30,16 +30,8 @@ export class PlayerDisplayManager{
             if((tool as any)?.[OBJECT_TYPE] === TOOL_OBJECT_TYPE) TriggerEvent((tool as Tool).onActivationStateChange,{tool:tool as Tool,isSelected:true});
         });
     }
-    setRegisterAction(action: Action){
-        let uuid = this.getUnique(action)??UUID.generate();
-        if(!this.reverses.has(uuid)) this.reverses.set(uuid,action);
-        this.setUnique(action,uuid);
-        return uuid;
-    }
-    getRegisteredAction(uuid: string){return this.reverses.get(uuid);}
-    hasRegisteredAction(uuid: string){return this.reverses.has(uuid);}
-    addReverses(reverse: any){
-        let uuid = this.getUnique(reverse)??UUID.generate();
+    addReverses(reverse: any,as = ""){
+        let uuid = this.getUnique(reverse)??(as + UUID.generate());
         if(!this.reverses.has(uuid)) this.reverses.set(uuid,reverse);
         this.setUnique(reverse,uuid);
         return uuid;
@@ -50,10 +42,10 @@ export class PlayerDisplayManager{
     hasUnique(obj: any){return this.uniques.get(obj);}
     setUnique(obj: any, uuid: string){return this.uniques.set(obj,uuid)}
     getUnique(obj: any){return this.uniques.get(obj);}
-    openCreateUnique(obj: any){
+    openCreateUnique(obj: any,as = ""){
         if(this.uniques.has(obj)) return this.uniques.get(obj);
         else{
-            const uid = UUID.generate();
+            const uid = (as + UUID.generate());
             this.uniques.set(obj,uid);
             return uid;
         }

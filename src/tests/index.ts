@@ -1,30 +1,91 @@
+import { BlockPermutation, BlockStates, Difficulty, Direction, system } from "@minecraft/server";
+import { GraphicsSettingsProperty } from "@minecraft/server-editor-bindings";
 import { 
     EditorExtension,
+    EditorPane,
+    StringPaneElement,
+    NumberPaneElement,
+    StringProperty,
+    NumberProperty,
+    Element,
+    ToolView,
+    AutoSizeStatusBarItem,
+    BooleanProperty,
+    StatusBarItem,
     Tool,
-    MouseAction
+    BlockTypePickerPaneElement,
+    ButtonPaneElement,
+    DropdownPaneElement,
+    BooleanPaneElement,
+    PermutationPickerPane,
+    RedirectDestination,
+    KeyboardKey,
+    InputModifier,
+    MouseAction,
+    MouseInteractions,
+    MouseInteractionType,
+    CursorControlMode,
+    CursorTargetMode,
+    StatusBarItemAlignment
 } from "dynamic-editor";
+
+
 class MyExtension extends EditorExtension{
-    readonly m: any;
-    Initialize(){
-        const tool = new Tool("","Title");
-        tool.onMouseInteract.subscribe((p)=>{
-            console.warn(JSON.stringify(p.blockLocation));
-        },MouseAction.ButtonClick);
-        /*
-        const menu = new MenuOptionsItem("Options")
-        .addMenuItem(new MenuActionItem("MyMenu").addActionHandler(()=>console.warn("action")).addKeyboardTrigger(KeyboardKey.KEY_M).clearKeyboardTriggers())
-        .setVisibility(false);
-        const statusBar = new AutoSizeStatusBarItem().setContent(" RandomContent");
-
-        menu.getProperty("visible").addSetterBinding(tool.isActivePropertyGetter);
-        statusBar.getProperty("visible").addSetterBinding(tool.isActivePropertyGetter);
-
-        this.toolBar.addTool(tool);
-        this.menuBar.addItem(menu);
-        //system.runTimeout(()=>tool.setVisibility(false),60);
-        this.statusBar.addItem(statusBar);
-        */
-        this.toolBar.addTool(tool);
+    async Initialize(){
+        const pane = new EditorPane();
+        const dropdown = new DropdownPaneElement("Dropdown items").setDropdownItems(Object.keys(Direction));
+        pane.addElements(dropdown,new ButtonPaneElement("Change to difficulty").addClickHandler(()=>dropdown.setDropdownItems(Object.keys(Difficulty))));
+        this.toolView.addEditorPanes(pane);
     }
 }
 MyExtension.registry();
+/*
+class PermutationPickerPane extends EditorPane{
+    protected readonly blockTypePicker = new BlockTypePickerPaneElement("Type");
+    protected readonly pane = new EditorPane("Permutation");
+    protected permutation = BlockPermutation.resolve("air");
+    get blockPermutation(){return this.permutation;};
+    constructor(title: string){
+        super(title??"Permutation Picker");
+        this.blockTypePicker.setValue("air");
+        this.blockTypePicker.onPropertyValueChange.subscribe(({newValue,propertyName})=>{
+            if(propertyName === "value"){
+                this.permutation = BlockPermutation.resolve(newValue as string);
+                const states = this.permutation.getAllStates();
+                for (const e of this.pane.getElements()) this.pane.removeElement(e);
+                for (const n of Object.getOwnPropertyNames(states)) {
+                    const vs = BlockStates.get(n)?.validValues as any;
+                    const a = new DropdownPaneElement(n,vs);
+                    a.onUserInputValue.subscribe(e=>{
+                        console.warn(n,vs[e.newValue]);
+                        this.permutation = this.permutation.withState(n,vs[e.newValue] as any)
+                    });
+                    this.pane.addElement(a);
+                }
+            }
+        });
+        this.addElements(this.blockTypePicker,this.pane);
+    }
+}
+*/
+
+
+function delay(num: number){
+    return new Promise(res=>system.runTimeout(res as any,num));
+}
+/*
+class MyPane extends EditorPaneElement{
+    constructor(ins?: StringPaneElement){
+        super();
+        const input = ins??new StringPaneElement("Input");
+        this.addElements(
+            input, 
+            new ButtonPaneElement("Submit").addClickHandler(()=>{
+                this.setVisibility(false);
+                this.removeElement(input);
+                console.warn(input.proxyValues.value);
+            })
+        )
+        this.setVisibility(true);
+    }
+}*/

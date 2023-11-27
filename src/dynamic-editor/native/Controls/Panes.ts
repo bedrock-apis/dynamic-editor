@@ -1,4 +1,4 @@
-import { ActionType, IPacket, InternalPaneElementTypes, PublicEvent, ServerUXEventType, TriggerEvent, UNIQUE_SYMBOL, UUID } from "dynamic-editor/core";
+import { ActionType, IPacket, InternalPaneElementTypes, ServerUXEventType, TriggerEvent, UNIQUE_SYMBOL, UUID } from "dynamic-editor/core";
 import { BooleanProperty, ModingElement, NumberProperty, RenderingElement, StringProperty } from "./General";
 import { Displayable, INIT_FLAG, PacketBuilder, REMOVE_FLAG, UPDATE_FLAG } from "../Packets";
 import { ElementConstruction, ElementExtendable, ElementProperty, ElementPropertyType } from "./Base";

@@ -80,16 +80,16 @@ declare enum ActionType {
 	NoArgsAction = "NoArgsAction",
 	MouseRayCastAction = "MouseRayCastAction"
 }
-declare enum InternalInputTypes {
+export declare enum MouseInteractionType {
 	ButtonDown = 1,
 	ButtonUp = 2,
 	WheelDown = 3,
-	WheelUo = 4,
+	WheelUp = 4,
 	DragStart = 5,
 	Draging = 6,
 	DragStop = 7
 }
-declare enum InternalInteractionTypes {
+export declare enum MouseInteractions {
 	LeftButton = 1,
 	MiddleButton = 2,
 	Scroll = 4
@@ -99,7 +99,7 @@ export declare enum MouseAction {
 	Wheel = 2,
 	Drag = 3
 }
-declare enum InputModifier {
+export declare enum InputModifier {
 	Unused = 0,
 	None = 1,
 	Alt = 2,
@@ -211,23 +211,23 @@ export declare enum StatusBarItemAlignment {
 declare enum ServerUXEventType {
 	UpdatePropertyPane = 1,
 	ReleasePropertyPane = 2,
-	UpdateItemMenu = 3,
+	UpdateItemMenu = 3,//[parentId] name: string, enabled, visible, displayStringLocId, shortcut
 	ReleaseItemMenu = 4,
-	UpdateStatusBarItem = 5,
+	UpdateStatusBarItem = 5,//aligment: 0, size: number, id: uuid, enabled: boolien, visible: boolien, text: string
 	ReleaseStatusBarItem = 6,
-	CreateTool = 7,
+	CreateTool = 7,//id: uuid, enabled: boolien, visible: boolien, icon: "", toolTipData:{titleString,descriptionString , ..LocId}
 	ReleaseTool = 8,
 	SetActiveTool = 9,
 	ReleaseToolRail = 10,
-	BindUIEvent = 11,
-	UnbindUIEvent = 12,
-	UpdatePaneControl = 13,
+	BindUIEvent = 11,//controlId actionId
+	UnbindUIEvent = 12,//lol
+	UpdatePaneControl = 13,//paneId, id, ...
 	ReleasePaneControl = 14,
 	RedirectToDestination = 15,
 	UpdateBuildInPanes = 18
 }
 declare enum ServerActionEventType {
-	CreateAction = 1,
+	CreateAction = 1,//actionType: ActionTypes, id: actionId
 	ReleaseAction = 2
 }
 declare enum PostEventId {
@@ -337,11 +337,11 @@ declare class MouseRayCastPayload extends PayloadLoader {
 	readonly direction: Vector3;
 	readonly blockLocation: Vector3;
 	readonly rayHit: boolean;
-	readonly actionType: InternalInteractionTypes;
+	readonly actionType: MouseInteractions;
 	readonly hasCtrlModifier: boolean;
 	readonly hasAltModifier: boolean;
 	readonly hasShiftModifier: boolean;
-	readonly inputType: InternalInputTypes;
+	readonly inputType: MouseInteractionType;
 	get block(): import("@minecraft/server").Block | undefined;
 	constructor(player: Player, data: any);
 }
@@ -371,10 +371,10 @@ export enum EditorMode {
 	Crosshair = "Crosshair",
 	Tool = "Tool"
 }
-declare enum GraphicsSettingsProperty {
+export enum GraphicsSettingsProperty {
 	ShowInvisibleBlocks = "ShowInvisibleBlocks"
 }
-declare enum PlaytestSessionResult {
+export enum PlaytestSessionResult {
 	EditorSystemFailure = 7,
 	InvalidLevelId = 8,
 	InvalidSessionHandle = 1,
@@ -390,14 +390,14 @@ declare enum PlaytestSessionResult {
 }
 export class ClipboardItem {
 	private constructor();
-	readonly isEmpty: number;
+	readonly isEmpty: boolean;
 	clear(): void;
 	getPredictedWriteAsCompoundBlockVolume(location: _10.Vector3, options?: ClipboardWriteOptions): _10.CompoundBlockVolume;
 	getPredictedWriteAsSelection(location: _10.Vector3, options?: ClipboardWriteOptions): Selection;
 	getSize(): _10.Vector3;
 	readFromSelection(selection: Selection): void;
 	readFromWorld(from: _10.Vector3, to: _10.Vector3): void;
-	writeToWorld(location: _10.Vector3, options?: ClipboardWriteOptions): number;
+	writeToWorld(location: _10.Vector3, options?: ClipboardWriteOptions): boolean;
 }
 export class ClipboardManager {
 	private constructor();
@@ -407,7 +407,7 @@ export class ClipboardManager {
 export class Cursor {
 	private constructor();
 	readonly faceDirection: number;
-	readonly isVisible: number;
+	readonly isVisible: boolean;
 	getPosition(): _10.Vector3;
 	getProperties(): CursorProperties;
 	hide(): void;
@@ -432,12 +432,19 @@ declare class ExtensionContextAfterEvents {
 	private constructor();
 	readonly modeChange: ModeChangeAfterEventSignal;
 }
-declare class GraphicsSettings {
+export class GraphicsSettings {
 	private constructor();
-	get(property: GraphicsSettingsProperty): number | number | string;
-	getAll(): Record<string, number | number | string>;
-	set(property: GraphicsSettingsProperty, value: number | number | string): void;
-	setAll(properties: Record<string, number | number | string>): void;
+	get(property: GraphicsSettingsProperty): boolean | number | string;
+	getAll(): Record<string, boolean | number | string>;
+	set(property: GraphicsSettingsProperty, value: boolean | number | string): void;
+	setAll(properties: Record<string, boolean | number | string>): void;
+}
+export class Logger {
+	private constructor();
+	debug(message: string, properties?: LogProperties): void;
+	error(message: string, properties?: LogProperties): void;
+	info(message: string, properties?: LogProperties): void;
+	warning(message: string, properties?: LogProperties): void;
 }
 declare class ModeChangeAfterEvent {
 	private constructor();
@@ -448,15 +455,15 @@ declare class ModeChangeAfterEventSignal {
 	subscribe(callback: (arg0: ModeChangeAfterEvent) => void): (arg0: ModeChangeAfterEvent) => void;
 	unsubscribe(callback: (arg0: ModeChangeAfterEvent) => void): void;
 }
-declare class PlaytestManager {
+export class PlaytestManager {
 	private constructor();
 	beginPlaytest(options: PlaytestGameOptions): Promise<PlaytestSessionResult>;
 	getPlaytestSessionAvailability(): PlaytestSessionResult;
 }
 export class Selection {
 	private constructor();
-	readonly isEmpty: number;
-	visible: number;
+	readonly isEmpty: boolean;
+	visible: boolean;
 	clear(): void;
 	getBlockLocationIterator(): _10.BlockLocationIterator;
 	getBoundingBox(): _10.BoundingBox;
@@ -477,23 +484,28 @@ export class SelectionManager {
 	readonly selection: Selection;
 	create(): Selection;
 }
-declare class SettingsManager {
+export class SettingsManager {
 	private constructor();
 	readonly graphics: GraphicsSettings;
 }
+export class SimulationState {
+	private constructor();
+	isPaused(): boolean;
+	setPaused(isPaused: boolean): void;
+}
 export class TransactionManager {
 	private constructor();
-	commitOpenTransaction(): number;
+	commitOpenTransaction(): boolean;
 	commitTrackedChanges(): number;
-	discardOpenTransaction(): number;
+	discardOpenTransaction(): boolean;
 	discardTrackedChanges(): number;
-	openTransaction(name: string): number;
+	openTransaction(name: string): boolean;
 	redo(): void;
 	redoSize(): number;
-	trackBlockChangeArea(from: _10.Vector3, to: _10.Vector3): number;
-	trackBlockChangeCompoundBlockVolume(compoundBlockVolume: _10.CompoundBlockVolume): number;
-	trackBlockChangeList(locations: _10.Vector3[]): number;
-	trackBlockChangeSelection(selection: Selection): number;
+	trackBlockChangeArea(from: _10.Vector3, to: _10.Vector3): boolean;
+	trackBlockChangeCompoundBlockVolume(compoundBlockVolume: _10.CompoundBlockVolume): boolean;
+	trackBlockChangeList(locations: _10.Vector3[]): boolean;
+	trackBlockChangeSelection(selection: Selection): boolean;
 	undo(): void;
 	undoSize(): number;
 }
@@ -508,18 +520,22 @@ export interface CursorProperties {
 	fixedModeDistance?: number;
 	outlineColor?: _10.RGBA;
 	targetMode?: CursorTargetMode;
-	visible?: number;
+	visible?: boolean;
 }
 export interface ExtensionOptionalParameters {
 	description?: string;
 	notes?: string;
 }
+export interface LogProperties {
+	player?: _10.Player;
+	tags?: string[];
+}
 export interface PlaytestGameOptions {
-	alwaysDay?: number;
+	alwaysDay?: boolean;
 	difficulty?: _10.Difficulty;
-	disableWeather?: number;
+	disableWeather?: boolean;
 	gameMode?: _10.GameMode;
-	showCoordinates?: number;
+	showCoordinates?: boolean;
 	spawnPosition?: _10.Vector3;
 	timeOfDay?: number;
 }
@@ -592,12 +608,15 @@ export abstract class EditorExtension {
 	readonly onPlayerModeChange: PlayerModeChangeEvent<this>;
 	/**Main object for registering menus, panes, tools, status bar items.*/
 	readonly toolView: ToolView;
+	readonly settings: SettingsManager;
 	/**ClipboardManager known from native editor APIs.*/
 	readonly clipboardManager: ClipboardManager;
 	/**TransactionManager known from native editor APIs.*/
 	readonly transactionManager: TransactionManager;
 	/**SelectionManager known from native editor APIs.*/
 	readonly selectionManager: SelectionManager;
+	/**SelectionManager known from native editor APIs.*/
+	readonly playtestManager: PlaytestManager;
 	/**Selection known from native editor APIs.*/
 	readonly mainSelection: Selection;
 	/**ClipboardItem known from native editor APIs.*/
@@ -712,7 +731,7 @@ declare class Property<T> {
 	protected constructedWith: new (...any: any) => this;
 	protected constructor(n: T);
 	isValidType(v: any): boolean;
-	static canAssign(p: Property<any>): boolean;
+	static CanAssign(p: Property<any>): boolean;
 	setValue(value: T): this;
 	addOnValueChangeHandler(a: Parameters<ValueChangeEvent<T>["subscribe"]>[0]): this;
 	removeOnValueChangeHandler(a: Parameters<ValueChangeEvent<T>["subscribe"]>[0]): this;
@@ -821,7 +840,9 @@ declare class ActionBasedEvent<T extends KeyInputAction | MouseInputAction, C ex
 	}>;
 	protected _subUpdate(a: T): void;
 	protected _unsubUpdate(a: T): void;
+	/**@deprecated Internal method */
 	displayInitPackets(): Generator<IPacket, void, any>;
+	/**@deprecated Internal method */
 	displayDisposePackets(): Generator<IPacket, void, unknown>;
 }
 export interface IDropdownItem {
@@ -848,10 +869,152 @@ declare class ArrayProperty<K> extends ElementProperty<K[]> {
 export declare class DropdownItemsMapingProperty extends ArrayProperty<IDropdownItem> {
 	constructor(array?: IDropdownItem[]);
 }
+declare class KeyInputActionsEvent extends ActionBasedEvent<KeyInputAction, IUniqueObject | EditorInputContext> {
+	constructor(conextId: IUniqueObject | EditorInputContext);
+	subscribe<M extends (payload: NoArgsPayload, key: KeyboardKey, inputModifier: InputModifier) => void>(m: M, keyButton: KeyboardKey, inputModifier?: InputModifier): M;
+	unsubscribe<M extends (payload: NoArgsPayload, key: KeyboardKey, inputModifier: InputModifier) => void>(m: M): M;
+}
 declare class MouseInputActionsEvent extends ActionBasedEvent<MouseInputAction, IUniqueObject> {
 	constructor(conextId: IUniqueObject);
 	subscribe<M extends (payload: MouseRayCastPayload) => void>(m: M, mouseAction: MouseAction): M;
 	unsubscribe<M extends (payload: MouseRayCastPayload) => void>(m: M): M;
+}
+declare class MouseClickEvent extends MouseInputActionsEvent {
+	subscribe<M extends (payload: MouseRayCastPayload) => void>(m: M): M;
+}
+declare class MouseDragEvent extends MouseInputActionsEvent {
+	subscribe<M extends (payload: MouseRayCastPayload) => void>(m: M): M;
+}
+declare class MouseWheelEvent extends MouseInputActionsEvent {
+	subscribe<M extends (payload: MouseRayCastPayload) => void>(m: M): M;
+}
+export declare class StatusBarItem extends ModedElement<{
+	size: NumberProperty;
+	text: StringProperty;
+	alignment: StatusBarAlignmentProperty;
+}> implements IContentElement {
+	protected readonly PACKET_TYPES: {
+		2: ServerUXEventType;
+		0: ServerUXEventType;
+		1: ServerUXEventType;
+	};
+	constructor(content?: string);
+	get alignment(): StatusBarItemAlignment;
+	set alignment(v: StatusBarItemAlignment);
+	get content(): string;
+	set content(v: string);
+	get size(): number;
+	set size(v: number);
+	setContent(text: string): this;
+	setSize(size: number): this;
+	setAlignment(alignment: StatusBarItemAlignment): this;
+}
+declare class MenuItem<SubProperties extends ElementExtendable = {}> extends ModedElement<{
+	displayStringLocId: StringProperty;
+	name: StringProperty;
+} & SubProperties> implements IContentElement {
+	/**@private*/
+	_parent: any;
+	protected readonly PACKET_TYPES: {
+		2: ServerUXEventType;
+		0: ServerUXEventType;
+		1: ServerUXEventType;
+	};
+	protected constructor(properties: ElementConstruction<SubProperties>, content: string);
+	get content(): string;
+	set content(v: string);
+	setContent(displayText: string): this;
+	/**@deprecated Internal method */
+	getMainPacketData(flags: number, packets: IPacket[]): any;
+}
+export declare class MenuActionItem extends MenuItem<{
+	checked: BooleanProperty;
+}> implements IActionLike {
+	protected readonly _action: ControlBindedAction;
+	readonly onActionExecute: PublicEvent<[
+		NoArgsPayload
+	]>;
+	protected readonly _triggers: Set<any>;
+	constructor(content?: string);
+	get [ACTION_RETURNER](): ControlBindedAction;
+	get checkmarkEnabled(): boolean;
+	set checkmarkEnabled(v: boolean);
+	get checked(): boolean;
+	set checked(v: boolean);
+	setChecked(isChecked: boolean): this;
+	setCheckmarkEnabled(enabled: boolean): this;
+	addActionHandler(handler: (param: NoArgsPayload) => void): this;
+	addKeyboardTrigger(keyButton: KeyboardKey, modifier?: InputModifier): this;
+	clearKeyboardTriggers(): this;
+	displayInitPackets(): Generator<IPacket, void, any>;
+	displayDisposePackets(): Generator<IPacket, void, unknown>;
+}
+export declare class MenuOptionsItem extends MenuItem<{}> {
+	constructor(content?: string);
+	protected readonly _handlers: Map<MenuItem<any>, any>;
+	get elementsLength(): number;
+	addMenuItem(item: MenuItem<any>): this;
+	removeMenuItem(item: MenuItem<any>): this;
+	getMenuItems(): Generator<MenuItem<any>, void, unknown>;
+	hasMenuItem(item: MenuItem<any>): boolean;
+	/**@deprecated Internal method */
+	displayInitPackets(): Generator<IPacket, void, unknown>;
+	/**@deprecated Internal method */
+	displayDisposePackets(): Generator<IPacket, void, unknown>;
+}
+export interface IUnkownTool {
+	readonly id: string;
+}
+export declare class Tool extends ModedElement<{
+	icon: StringProperty;
+	titleString: StringProperty;
+	titleStringLocId: StringProperty;
+	descriptionString: StringProperty;
+	descriptionStringLocId: StringProperty;
+}> implements IObjectType {
+	protected packetConstructor: new (data: any) => ServerUXEventPacket;
+	protected _propertyBindings: WeakMap<WeakKey, any>;
+	protected _isActive: boolean;
+	protected readonly PACKET_TYPES: {
+		[key: number]: number | null;
+	};
+	[UNIQUE_SYMBOL](d: PlayerDisplayManager): string;
+	readonly [OBJECT_TYPE]: symbol;
+	readonly onActivationStateChange: PublicEvent<[
+		{
+			isSelected: boolean;
+			tool: Tool;
+		}
+	]>;
+	readonly onMouseDrag: MouseDragEvent;
+	readonly onMouseClick: MouseClickEvent;
+	readonly onMouseWheel: MouseWheelEvent;
+	readonly onKeyboardKeyPress: KeyInputActionsEvent;
+	readonly isActivePropertyGetter: BooleanProperty<boolean>;
+	constructor(icon?: string, title?: string, description?: string);
+	get icon(): string;
+	set icon(v: string);
+	get title(): string;
+	set title(v: string);
+	get description(): string;
+	set description(v: string);
+	get isActivated(): boolean;
+	setIcon(icon: string): this;
+	/**@author ConMaster2112 */
+	setTitle(text: string): this;
+	/**@deprecated This state of tool doesn't really do anything, but maybe in future its going to do.*/
+	setEnable(enable: boolean): this;
+	/**@deprecated This state of tool doesn't really do anything, but maybe in future its going to do.*/
+	setVisibility(visible: boolean): this;
+	setDescription(text: string): this;
+	bindVisibleElements(...elements: RenderingElement<any>[]): this;
+	unbindVisibleElements(...elements: RenderingElement<any>[]): this;
+	/**@deprecated Internal method */
+	getMainPacketData(flags: number, packets: IPacket[]): any;
+	/**@deprecated Internal method */
+	displayInitPackets(): Generator<IPacket, void, any>;
+	/**@deprecated Internal method */
+	displayDisposePackets(): Generator<IPacket, void, any>;
 }
 export interface IPaneElement<T extends PaneElement<any, any>> extends Displayable<any> {
 	getSelfElement(): T;
@@ -1024,123 +1187,6 @@ export declare class BlockPickerPaneElement extends ValuePaneElement<InternalPan
 	constructor(title: string);
 	protected getMainPacketDataItemOptions(flags: number, packets: IPacket[]): any;
 }
-export declare class StatusBarItem extends ModedElement<{
-	size: NumberProperty;
-	text: StringProperty;
-	alignment: StatusBarAlignmentProperty;
-}> implements IContentElement {
-	protected readonly PACKET_TYPES: {
-		2: ServerUXEventType;
-		0: ServerUXEventType;
-		1: ServerUXEventType;
-	};
-	constructor(content?: string);
-	get alignment(): StatusBarItemAlignment;
-	set alignment(v: StatusBarItemAlignment);
-	get content(): string;
-	set content(v: string);
-	get size(): number;
-	set size(v: number);
-	setContent(text: string): this;
-	setSize(size: number): this;
-	setAlignment(alignment: StatusBarItemAlignment): this;
-}
-declare class MenuItem<SubProperties extends ElementExtendable = {}> extends ModedElement<{
-	displayStringLocId: StringProperty;
-	name: StringProperty;
-} & SubProperties> implements IContentElement {
-	/**@private*/
-	_parent: any;
-	protected readonly PACKET_TYPES: {
-		2: ServerUXEventType;
-		0: ServerUXEventType;
-		1: ServerUXEventType;
-	};
-	protected constructor(properties: ElementConstruction<SubProperties>, content: string);
-	get content(): string;
-	set content(v: string);
-	setContent(displayText: string): this;
-	getMainPacketData(flags: number, packets: IPacket[]): any;
-}
-export declare class MenuActionItem extends MenuItem<{
-	checked: BooleanProperty;
-}> implements IActionLike {
-	protected readonly _action: ControlBindedAction;
-	readonly onActionExecute: PublicEvent<[
-		NoArgsPayload
-	]>;
-	protected readonly _triggers: Set<any>;
-	constructor(content?: string);
-	get [ACTION_RETURNER](): ControlBindedAction;
-	get checkmarkEnabled(): boolean;
-	set checkmarkEnabled(v: boolean);
-	get checked(): boolean;
-	set checked(v: boolean);
-	setChecked(isChecked: boolean): this;
-	setCheckmarkEnabled(enabled: boolean): this;
-	addActionHandler(handler: (param: NoArgsPayload) => void): this;
-	addKeyboardTrigger(keyButton: KeyboardKey, modifier?: InputModifier): this;
-	clearKeyboardTriggers(): this;
-	displayInitPackets(): Generator<IPacket, void, any>;
-	displayDisposePackets(): Generator<IPacket, void, unknown>;
-}
-export declare class MenuOptionsItem extends MenuItem<{}> {
-	constructor(content?: string);
-	protected readonly _handlers: Map<MenuItem<any>, any>;
-	get elementsLength(): number;
-	addMenuItem(item: MenuItem<any>): this;
-	removeMenuItem(item: MenuItem<any>): this;
-	getMenuItems(): Generator<MenuItem<any>, void, unknown>;
-	hasMenuItem(item: MenuItem<any>): boolean;
-	displayInitPackets(): Generator<IPacket, void, unknown>;
-	displayDisposePackets(): Generator<IPacket, void, unknown>;
-}
-export interface IUnkownTool {
-	readonly id: string;
-}
-export declare class Tool extends ModedElement<{
-	icon: StringProperty;
-	titleString: StringProperty;
-	titleStringLocId: StringProperty;
-	descriptionString: StringProperty;
-	descriptionStringLocId: StringProperty;
-}> implements IObjectType {
-	protected packetConstructor: new (data: any) => ServerUXEventPacket;
-	protected _propertyBindings: WeakMap<WeakKey, any>;
-	protected readonly PACKET_TYPES: {
-		[key: number]: number | null;
-	};
-	[UNIQUE_SYMBOL](d: PlayerDisplayManager): string;
-	readonly [OBJECT_TYPE]: symbol;
-	readonly onActivationStateChange: PublicEvent<[
-		{
-			isSelected: boolean;
-			tool: Tool;
-		}
-	]>;
-	readonly onMouseInteract: MouseInputActionsEvent;
-	readonly isActivePropertyGetter: BooleanProperty<boolean>;
-	constructor(icon?: string, title?: string, description?: string);
-	get icon(): string;
-	set icon(v: string);
-	get title(): string;
-	set title(v: string);
-	get description(): string;
-	set description(v: string);
-	setIcon(icon: string): this;
-	/**@author ConMaster2112 */
-	setTitle(text: string): this;
-	/**@deprecated This state of tool doesn't really do anything, but maybe in future its going to do.*/
-	setEnable(enable: boolean): this;
-	/**@deprecated This state of tool doesn't really do anything, but maybe in future its going to do.*/
-	setVisibility(visible: boolean): this;
-	setDescription(text: string): this;
-	bindPropertyPanes(...panes: EditorPane[]): this;
-	unbindPropertyPanes(...panes: EditorPane[]): this;
-	getMainPacketData(flags: number, packets: IPacket[]): any;
-	displayInitPackets(): Generator<IPacket, void, any>;
-	displayDisposePackets(): Generator<IPacket, void, unknown>;
-}
 export declare class ToolView extends Displayable<IPacket> {
 	protected readonly PACKET_TYPES: {
 		2: ServerUXEventType;
@@ -1189,7 +1235,8 @@ export declare class ToolView extends Displayable<IPacket> {
 	/**@deprecated Internal function */
 	displayInitPackets(): Generator<IPacket, void, any>;
 	/**@deprecated Internal function */
-	displayDisposePackets(): Generator<IPacket, void, unknown>;
+	displayDisposePackets(): Generator<IPacket, void, any>;
+	/**@deprecated Internal method */
 	protected getMainPacketData(flags?: number | undefined): any;
 }
 export declare class AutoSizeStatusBarItem extends StatusBarItem {
@@ -1240,6 +1287,17 @@ declare class PlayerDisplayManager {
 	getUnique(obj: any): string | undefined;
 	openCreateUnique(obj: any, as?: string): string | undefined;
 }
+export declare class Editor {
+	readonly events: EditorEvents;
+	get isSimulationPaused(): boolean;
+	set isSimulationPaused(v: boolean);
+	readonly get logger(): Logger;
+	constructor();
+}
+export declare class EditorEvents {
+	constructor();
+}
+export declare const editor: Editor;
 declare const UNIQUE_SYMBOL: unique symbol;
 export interface IPacket {
 	readonly id: string;

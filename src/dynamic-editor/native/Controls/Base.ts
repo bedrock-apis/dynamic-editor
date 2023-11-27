@@ -61,12 +61,22 @@ export class Property<T>{
     readonly onValueChange = new ValueChangeEvent<T>;
     /**@deprecated @private Be care full this assignment doesn't update the property*/
     readonly _onValueChange = new PublicEvent<[{newValue: T, oldValue:T}]>();
-    /**@deprecated Be care full this assignment doesn't update the property*/
+    /**@deprecated Be care full this assignment doesn't update the property, use setValue(v) method*/
     value: T;
     protected constructedWith: new (...any: any)=>this;
     protected constructor(n: T){this.value = n; this.constructedWith = new.target as any;};
+    /**
+     * @param v Checks if v is valid for this property
+     */
     isValidType(v: any){ return true;}
-    static canAssign(p: Property<any>): boolean {return p instanceof this};
+    /**Internal usage */
+    static CanAssign(p: Property<any>): boolean {return p instanceof this};
+    
+    /**
+     * @param value Updates current value of this propert
+     * @returns this
+     * @throws If value is not valid type than it could throw errors, when event handlers updates that value than it could throw error by that handler
+     */
     setValue(value: T){
         if(!this.isValidType(value)) throw new TypeError("Invalid value type: '" + value + "'");
         const a = new ValueChangeEventData(this.value,value);
@@ -76,21 +86,36 @@ export class Property<T>{
         TriggerEvent(this._onValueChange,a);
         return this;
     }
+    /**
+     * @param a Event method handler
+     * @returns this
+     */
     addOnValueChangeHandler(a: Parameters<ValueChangeEvent<T>["subscribe"]>[0]){
         this.onValueChange.subscribe(a);
         return this;
     }
+    /**
+     * @param a Event method handler
+     * @returns this
+     */
     removeOnValueChangeHandler(a: Parameters<ValueChangeEvent<T>["subscribe"]>[0]){
         this.onValueChange.unsubscribe(a);
         return this;
     }
 }
 export class ElementProperty<T> extends Property<T>{
+    /**
+     * @param elemetPropertySetter The property to set when this propery updates
+     * @param converter The converting function, converts from updated value to setter property value type
+     * @param updateValue If true, then it updates current values for binded setter 
+     * @returns elementPropertySetter
+     */
     createPropertyBinder<K, EP extends ElementProperty<K>>(elemetPropertySetter: EP, converter: (v: T, source: this, target: ElementProperty<K>)=>K, updateValue: boolean = false){
         this._onValueChange.subscribe(e=>elemetPropertySetter.setValue(converter?.(e.newValue,this,elemetPropertySetter)??e.newValue as any));
         if(updateValue) elemetPropertySetter.setValue(converter?.(this.value,this,elemetPropertySetter)??this.value as any);
         return elemetPropertySetter;
     }
+    /**get its current value */
     getValue(): T{return this.value;}
     toJSON(){return this.getValue();}
     valueOf(){return this.getValue();}
@@ -154,11 +179,17 @@ export class Element<PropertyRecord extends ElementExtendable = {}> extends Disp
     hasProperty<T extends string>(propertyName: T): boolean { return propertyName in this.propertyBag;}
     getProperty<T extends keyof PropertyRecord>(propertyName: T): PropertyRecord[T]{return this.propertyBag[propertyName].property;}
     getPropertyValue<T extends keyof PropertyRecord, V extends PropertyRecord[T]>(propertyName: T): ElementPropertyType<V> {return this.propertyBag[propertyName].property.getValue();}
+    /**
+     * After assignment you can lose some property bindings, use Element.BindProperty to keep bindings after reassignment
+     * @param propertyName name of elements property
+     * @param property new property to assign
+     * @returns this
+     */
     setProperty<T extends keyof PropertyRecord>(propertyName: T, property: PropertyRecord[T]): this{
         if(!this.hasProperty(propertyName as string)) throw new ReferenceError("Unknow property: " + (propertyName as string));
         const p = this.propertyBag[propertyName];
         const prop = p.property;
-        if(!p.construct.canAssign(property)) throw new TypeError("Can't assign '" + property.constructor.name + "' type to type of '" + p.construct.name + "'");
+        if(!p.construct.CanAssign(property)) throw new TypeError("Can't assign '" + property.constructor.name + "' type to type of '" + p.construct.name + "'");
         prop._onValueChange.unsubscribe(this._methods.get(prop));
         this._methods.delete(prop);
         if(!this._methods.has(property)){ 

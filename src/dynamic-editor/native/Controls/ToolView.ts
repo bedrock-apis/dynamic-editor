@@ -191,6 +191,7 @@ export class ToolView extends Displayable<IPacket>{
         this._EditorPaneEvenHandler.clear();
         yield * super.displayDisposePackets();
     }
+    /**@deprecated Internal method */
     protected getMainPacketData(flags?: number | undefined) {
         const data = {visible:this._visible,enabled:this._enabled} as any;
         if(this._activeTool === null) data.selectedOptionId = "";

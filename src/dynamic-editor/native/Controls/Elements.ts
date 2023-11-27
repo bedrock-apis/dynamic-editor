@@ -62,6 +62,7 @@ export class MenuItem<SubProperties extends ElementExtendable = {}> extends Mode
         this.setPropertyValue("name",displayText as any);
         return this;
     }
+    /**@deprecated Internal method */
     getMainPacketData(flags: number, packets: IPacket[]): any {
         const object = super.getMainPacketData(flags,packets);
         if(typeof this._parent === "object") object.parentId = this._parent;
@@ -142,10 +143,12 @@ export class MenuOptionsItem extends MenuItem<{}>{
     }
     *getMenuItems(){for (const e of this._handlers.keys()) yield e;}
     hasMenuItem(item: MenuItem<any>){return this._handlers.has(item);}
+    /**@deprecated Internal method */
     *displayInitPackets(){
         yield * super.displayInitPackets();
         for (const a of this._handlers.keys()) yield * a.displayInitPackets();
     }
+    /**@deprecated Internal method */
     *displayDisposePackets(){
         yield * super.displayDisposePackets();
         for (const a of this._handlers.keys()) yield * a.displayDisposePackets();
@@ -239,6 +242,7 @@ export class Tool extends ModedElement<{icon:StringProperty,titleString:StringPr
         }
         return this;
     }
+    /**@deprecated Internal method */
     getMainPacketData(flags: number, packets: IPacket[]) {
         const data = super.getMainPacketData(flags, packets);
         data.tooltipData = {

@@ -5,7 +5,9 @@ import { IUnkownTool, OBJECT_TYPE, TOOL_OBJECT_TYPE, Tool } from "../Controls/in
 
 const DISPLAY_MANAGERS = new WeakMap();
 export class PlayerDisplayManager{
+    //internal
     static hasDisplayManager(player: Player){return DISPLAY_MANAGERS.has(player);}
+    //internal
     static getDisplayManager(player: Player){return DISPLAY_MANAGERS.get(player);}
     //@ts-ignore
     readonly activeTool: IUnkownTool | null;

@@ -4,7 +4,10 @@ export {
     MouseAction, ButtonVariant, 
     InputModifier, MouseInteractions, MouseInteractionType
 } from "./core/index";
-export { EditorExtension } from "./native/Editor/index";
+export { 
+    EditorExtension, 
+    editor, Editor, EditorEvents
+} from "./native/Editor/index";
 export { 
     ExtensionInitializeEvent, ExtensionInitializeEventData,
     ExtensionReadyEvent, ExtensionReadyEventData,
@@ -59,5 +62,14 @@ export {
     ClipboardRotation,
     ClipboardWriteOptions,
     CursorControlMode,
-    CursorTargetMode
+    CursorTargetMode,
+    PlaytestGameOptions,
+    PlaytestSessionResult,
+    PlaytestManager,
+    SettingsManager,
+    GraphicsSettings,
+    GraphicsSettingsProperty,
+    SimulationState,
+    LogProperties,
+    Logger
 } from "@minecraft/server-editor-bindings";

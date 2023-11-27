@@ -47,6 +47,8 @@ __webpack_require__.d(__webpack_exports__, {
   Jh: () => (/* reexport */ DividerPaneElement),
   ct: () => (/* reexport */ DropdownItemsMapingProperty),
   Aw: () => (/* reexport */ DropdownPaneElement),
+  ML: () => (/* reexport */ Editor),
+  Wi: () => (/* reexport */ EditorEvents),
   MC: () => (/* reexport */ EditorExtension),
   je: () => (/* reexport */ server_editor_bindings_namespaceObject.EditorMode),
   J4: () => (/* reexport */ EditorPane),
@@ -57,18 +59,28 @@ __webpack_require__.d(__webpack_exports__, {
   CS: () => (/* reexport */ ExtensionReadyEventData),
   CG: () => (/* reexport */ ExtensionShutdownEvent),
   _4: () => (/* reexport */ ExtensionShutdownEventData),
+  kZ: () => (/* reexport */ server_editor_bindings_namespaceObject.GraphicsSettings),
+  fT: () => (/* reexport */ server_editor_bindings_namespaceObject.GraphicsSettingsProperty),
+  P3: () => (/* reexport */ InputModifier),
   u8: () => (/* reexport */ KeyboardKey),
+  Yd: () => (/* reexport */ server_editor_bindings_namespaceObject.Logger),
   MK: () => (/* reexport */ MenuActionItem),
   hd: () => (/* reexport */ MenuOptionsItem),
   oX: () => (/* reexport */ MouseAction),
+  V1: () => (/* reexport */ MouseInteractionType),
+  Y2: () => (/* reexport */ MouseInteractions),
   VW: () => (/* reexport */ NumberPaneElement),
   Y6: () => (/* reexport */ NumberProperty),
   SY: () => (/* reexport */ PermutationPickerPane),
   $W: () => (/* reexport */ PlayerModeChangeEvent),
   uY: () => (/* reexport */ PlayerModeChangeEventData),
+  uG: () => (/* reexport */ server_editor_bindings_namespaceObject.PlaytestManager),
+  YY: () => (/* reexport */ server_editor_bindings_namespaceObject.PlaytestSessionResult),
   Pw: () => (/* reexport */ RedirectDestination),
   Y1: () => (/* reexport */ server_editor_bindings_namespaceObject.Selection),
   ZE: () => (/* reexport */ server_editor_bindings_namespaceObject.SelectionManager),
+  pz: () => (/* reexport */ server_editor_bindings_namespaceObject.SettingsManager),
+  BH: () => (/* reexport */ server_editor_bindings_namespaceObject.SimulationState),
   V7: () => (/* reexport */ StatusBarAlignmentProperty),
   wl: () => (/* reexport */ StatusBarItem),
   se: () => (/* reexport */ StatusBarItemAlignment),
@@ -80,7 +92,8 @@ __webpack_require__.d(__webpack_exports__, {
   My: () => (/* reexport */ ValueChangeEvent),
   xC: () => (/* reexport */ ValueChangeEventData),
   G7: () => (/* reexport */ Vector3Property),
-  Bk: () => (/* reexport */ VectorPaneElement)
+  Bk: () => (/* reexport */ VectorPaneElement),
+  j6: () => (/* reexport */ editor)
 });
 
 ;// CONCATENATED MODULE: ./src/dynamic-editor/core/Events.ts
@@ -254,28 +267,28 @@ var ButtonVariant;
     ButtonVariant["destructive"] = "destructive";
     ButtonVariant["hero"] = "hero";
 })(ButtonVariant || (ButtonVariant = {}));
-var Definitions_ActionType;
+var ActionType;
 (function (ActionType) {
     ActionType["NoArgsAction"] = "NoArgsAction";
     ActionType["MouseRayCastAction"] = "MouseRayCastAction";
-})(Definitions_ActionType || (Definitions_ActionType = {}));
+})(ActionType || (ActionType = {}));
 ;
-var InternalInputTypes;
-(function (InternalInputTypes) {
-    InternalInputTypes[InternalInputTypes["ButtonDown"] = 1] = "ButtonDown";
-    InternalInputTypes[InternalInputTypes["ButtonUp"] = 2] = "ButtonUp";
-    InternalInputTypes[InternalInputTypes["WheelDown"] = 3] = "WheelDown";
-    InternalInputTypes[InternalInputTypes["WheelUo"] = 4] = "WheelUo";
-    InternalInputTypes[InternalInputTypes["DragStart"] = 5] = "DragStart";
-    InternalInputTypes[InternalInputTypes["Draging"] = 6] = "Draging";
-    InternalInputTypes[InternalInputTypes["DragStop"] = 7] = "DragStop";
-})(InternalInputTypes || (InternalInputTypes = {}));
-var InternalInteractionTypes;
-(function (InternalInteractionTypes) {
-    InternalInteractionTypes[InternalInteractionTypes["LeftButton"] = 1] = "LeftButton";
-    InternalInteractionTypes[InternalInteractionTypes["MiddleButton"] = 2] = "MiddleButton";
-    InternalInteractionTypes[InternalInteractionTypes["Scroll"] = 4] = "Scroll";
-})(InternalInteractionTypes || (InternalInteractionTypes = {}));
+var MouseInteractionType;
+(function (MouseInteractionType) {
+    MouseInteractionType[MouseInteractionType["ButtonDown"] = 1] = "ButtonDown";
+    MouseInteractionType[MouseInteractionType["ButtonUp"] = 2] = "ButtonUp";
+    MouseInteractionType[MouseInteractionType["WheelDown"] = 3] = "WheelDown";
+    MouseInteractionType[MouseInteractionType["WheelUp"] = 4] = "WheelUp";
+    MouseInteractionType[MouseInteractionType["DragStart"] = 5] = "DragStart";
+    MouseInteractionType[MouseInteractionType["Draging"] = 6] = "Draging";
+    MouseInteractionType[MouseInteractionType["DragStop"] = 7] = "DragStop";
+})(MouseInteractionType || (MouseInteractionType = {}));
+var MouseInteractions;
+(function (MouseInteractions) {
+    MouseInteractions[MouseInteractions["LeftButton"] = 1] = "LeftButton";
+    MouseInteractions[MouseInteractions["MiddleButton"] = 2] = "MiddleButton";
+    MouseInteractions[MouseInteractions["Scroll"] = 4] = "Scroll";
+})(MouseInteractions || (MouseInteractions = {}));
 var MouseAction;
 (function (MouseAction) {
     MouseAction[MouseAction["ButtonClick"] = 1] = "ButtonClick";
@@ -288,7 +301,7 @@ var InputDevice;
     InputDevice[InputDevice["Mouse"] = 2] = "Mouse";
 })(InputDevice || (InputDevice = {}));
 ;
-var Definitions_InputModifier;
+var InputModifier;
 (function (InputModifier) {
     InputModifier[InputModifier["Unused"] = 0] = "Unused";
     InputModifier[InputModifier["None"] = 1] = "None";
@@ -296,7 +309,7 @@ var Definitions_InputModifier;
     InputModifier[InputModifier["Control"] = 4] = "Control";
     InputModifier[InputModifier["Shift"] = 8] = "Shift";
     InputModifier[InputModifier["Any"] = 15] = "Any";
-})(Definitions_InputModifier || (Definitions_InputModifier = {}));
+})(InputModifier || (InputModifier = {}));
 /**
  * Keyboard key from @minecarft/server-editor
  */
@@ -618,9 +631,19 @@ class Packet {
 
 
 
+;// CONCATENATED MODULE: external "@minecraft/server-editor-bindings"
+var x = y => { var x = {}; __webpack_require__.d(x, y); return x; }
+var y = x => () => x
+const server_editor_bindings_namespaceObject = x({ ["ClipboardItem"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_editor_bindings_e2bf1028__.ClipboardItem, ["ClipboardManager"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_editor_bindings_e2bf1028__.ClipboardManager, ["ClipboardMirrorAxis"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_editor_bindings_e2bf1028__.ClipboardMirrorAxis, ["ClipboardRotation"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_editor_bindings_e2bf1028__.ClipboardRotation, ["Cursor"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_editor_bindings_e2bf1028__.Cursor, ["CursorControlMode"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_editor_bindings_e2bf1028__.CursorControlMode, ["CursorTargetMode"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_editor_bindings_e2bf1028__.CursorTargetMode, ["EditorMode"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_editor_bindings_e2bf1028__.EditorMode, ["GraphicsSettings"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_editor_bindings_e2bf1028__.GraphicsSettings, ["GraphicsSettingsProperty"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_editor_bindings_e2bf1028__.GraphicsSettingsProperty, ["Logger"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_editor_bindings_e2bf1028__.Logger, ["PlaytestManager"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_editor_bindings_e2bf1028__.PlaytestManager, ["PlaytestSessionResult"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_editor_bindings_e2bf1028__.PlaytestSessionResult, ["Selection"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_editor_bindings_e2bf1028__.Selection, ["SelectionManager"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_editor_bindings_e2bf1028__.SelectionManager, ["SettingsManager"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_editor_bindings_e2bf1028__.SettingsManager, ["SimulationState"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_editor_bindings_e2bf1028__.SimulationState, ["TransactionManager"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_editor_bindings_e2bf1028__.TransactionManager, ["editor"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_editor_bindings_e2bf1028__.editor });
 ;// CONCATENATED MODULE: ./src/dynamic-editor/native/Editor/Editor.ts
+
 class Editor {
     events;
+    get isSimulationPaused() { return server_editor_bindings_namespaceObject.editor.simulation.isPaused(); }
+    set isSimulationPaused(v) { server_editor_bindings_namespaceObject.editor.simulation.setPaused(v); }
+    //@ts-ignore
+    get logger() { return server_editor_bindings_namespaceObject.editor.log; }
+    ;
     constructor() {
         this.events = new EditorEvents();
     }
@@ -630,10 +653,6 @@ class EditorEvents {
 }
 const editor = new Editor();
 
-;// CONCATENATED MODULE: external "@minecraft/server-editor-bindings"
-var x = y => { var x = {}; __webpack_require__.d(x, y); return x; }
-var y = x => () => x
-const server_editor_bindings_namespaceObject = x({ ["ClipboardItem"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_editor_bindings_e2bf1028__.ClipboardItem, ["ClipboardManager"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_editor_bindings_e2bf1028__.ClipboardManager, ["ClipboardMirrorAxis"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_editor_bindings_e2bf1028__.ClipboardMirrorAxis, ["ClipboardRotation"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_editor_bindings_e2bf1028__.ClipboardRotation, ["Cursor"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_editor_bindings_e2bf1028__.Cursor, ["CursorControlMode"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_editor_bindings_e2bf1028__.CursorControlMode, ["CursorTargetMode"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_editor_bindings_e2bf1028__.CursorTargetMode, ["EditorMode"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_editor_bindings_e2bf1028__.EditorMode, ["Selection"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_editor_bindings_e2bf1028__.Selection, ["SelectionManager"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_editor_bindings_e2bf1028__.SelectionManager, ["TransactionManager"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_editor_bindings_e2bf1028__.TransactionManager, ["editor"]: () => __WEBPACK_EXTERNAL_MODULE__minecraft_server_editor_bindings_e2bf1028__.editor });
 ;// CONCATENATED MODULE: ./src/dynamic-editor/native/Events.ts
 
 /**@beta */
@@ -746,7 +765,7 @@ class ServerActionEventPacket extends Packet {
         super(PostEventId["Editor::ServerActionEvents"], data);
     }
 }
-class Packets_PacketBuilder {
+class PacketBuilder {
     static GetRedirectToDestinationPacket(destination) {
         if (!(destination in RedirectDestination))
             throw new ReferenceError("Invalid destination!");
@@ -888,21 +907,23 @@ class EditorExtension{
         this.clipboardManager = context.clipboardManager;
         this.transactionManager = context.transactionManager;
         this.selectionManager = context.selectionManager;
+        this.playtestManager = context.context.playtest;
         this.mainSelection = context.selectionManager.selection;
         this.mainClipboard = context.clipboardManager.clipboard;
         this.cursor = context.context.cursor;
+        this.settings = context.context.settings;
         context.context.cursor
         context.onInitializeEvent.subscribe(()=>{
-            (async ()=>this.Initialize?.(this))().catch(er=>console.warn(er,er?.stack));
+            (async ()=>this.Initialize?.(this))().catch(er=>console.error(er,er?.stack));
             TriggerEvent(onInitializeEvent,new ExtensionInitializeEventData(this));
         });
         context.onReadyEvent.subscribe(()=>{
-            (async ()=>this.Ready?.(this))().catch(er=>console.warn(er,er?.stack));
+            (async ()=>this.Ready?.(this))().catch(er=>console.error(er,er?.stack));
             TriggerEvent(this.onReady,new ExtensionReadyEventData(this));
         });
         context.onShutdownEvent.subscribe(()=>{
             TriggerEvent(this.onShutdown,new ExtensionShutdownEventData(this));
-            (async ()=>this.Shutdown?.(this))().catch(er=>console.warn(er,er?.stack));
+            (async ()=>this.Shutdown?.(this))().catch(er=>console.error(er,er?.stack));
         });
         context.context.afterEvents.modeChange.subscribe(e=>TriggerEvent(onPlayerModeChangeEvent,new PlayerModeChangeEventData(this,e.mode)));
         this.player = context.player;
@@ -996,14 +1017,23 @@ class Property {
     onValueChange = new ValueChangeEvent;
     /**@deprecated @private Be care full this assignment doesn't update the property*/
     _onValueChange = new PublicEvent();
-    /**@deprecated Be care full this assignment doesn't update the property*/
+    /**@deprecated Be care full this assignment doesn't update the property, use setValue(v) method*/
     value;
     constructedWith;
     constructor(n) { this.value = n; this.constructedWith = new.target; }
     ;
+    /**
+     * @param v Checks if v is valid for this property
+     */
     isValidType(v) { return true; }
-    static canAssign(p) { return p instanceof this; }
+    /**Internal usage */
+    static CanAssign(p) { return p instanceof this; }
     ;
+    /**
+     * @param value Updates current value of this propert
+     * @returns this
+     * @throws If value is not valid type than it could throw errors, when event handlers updates that value than it could throw error by that handler
+     */
     setValue(value) {
         if (!this.isValidType(value))
             throw new TypeError("Invalid value type: '" + value + "'");
@@ -1015,22 +1045,37 @@ class Property {
         TriggerEvent(this._onValueChange, a);
         return this;
     }
+    /**
+     * @param a Event method handler
+     * @returns this
+     */
     addOnValueChangeHandler(a) {
         this.onValueChange.subscribe(a);
         return this;
     }
+    /**
+     * @param a Event method handler
+     * @returns this
+     */
     removeOnValueChangeHandler(a) {
         this.onValueChange.unsubscribe(a);
         return this;
     }
 }
 class ElementProperty extends Property {
+    /**
+     * @param elemetPropertySetter The property to set when this propery updates
+     * @param converter The converting function, converts from updated value to setter property value type
+     * @param updateValue If true, then it updates current values for binded setter
+     * @returns elementPropertySetter
+     */
     createPropertyBinder(elemetPropertySetter, converter, updateValue = false) {
         this._onValueChange.subscribe(e => elemetPropertySetter.setValue(converter?.(e.newValue, this, elemetPropertySetter) ?? e.newValue));
         if (updateValue)
             elemetPropertySetter.setValue(converter?.(this.value, this, elemetPropertySetter) ?? this.value);
         return elemetPropertySetter;
     }
+    /**get its current value */
     getValue() { return this.value; }
     toJSON() { return this.getValue(); }
     valueOf() { return this.getValue(); }
@@ -1095,12 +1140,18 @@ class Element extends Displayable {
     hasProperty(propertyName) { return propertyName in this.propertyBag; }
     getProperty(propertyName) { return this.propertyBag[propertyName].property; }
     getPropertyValue(propertyName) { return this.propertyBag[propertyName].property.getValue(); }
+    /**
+     * After assignment you can lose some property bindings, use Element.BindProperty to keep bindings after reassignment
+     * @param propertyName name of elements property
+     * @param property new property to assign
+     * @returns this
+     */
     setProperty(propertyName, property) {
         if (!this.hasProperty(propertyName))
             throw new ReferenceError("Unknow property: " + propertyName);
         const p = this.propertyBag[propertyName];
         const prop = p.property;
-        if (!p.construct.canAssign(property))
+        if (!p.construct.CanAssign(property))
             throw new TypeError("Can't assign '" + property.constructor.name + "' type to type of '" + p.construct.name + "'");
         prop._onValueChange.unsubscribe(this._methods.get(prop));
         this._methods.delete(prop);
@@ -1220,7 +1271,7 @@ class ModedElement extends RenderingElement {
         return this;
     }
 }
-class General_ActionBasedEvent extends Displayable {
+class ActionBasedEvent extends Displayable {
     constructor(contextId) {
         super(ServerUXEventPacket);
         this._context = contextId;
@@ -1235,10 +1286,12 @@ class General_ActionBasedEvent extends Displayable {
         TriggerEvent(this.onUpdate, this, UPDATE_FLAG);
         TriggerEvent(this.onUpdate, a, REMOVE_FLAG);
     }
+    /**@deprecated Internal method */
     *displayInitPackets() {
         for (const { action } of this._actions.values())
             yield* action.displayInitPackets();
     }
+    /**@deprecated Internal method */
     *displayDisposePackets() {
         for (const { action } of this._actions.values())
             yield* action.displayDisposePackets();
@@ -1320,19 +1373,19 @@ class Action extends UniquePostable {
 class ControlBindedAction extends Action {
     control;
     constructor(control) {
-        super(Definitions_ActionType.NoArgsAction);
+        super(ActionType.NoArgsAction);
         this.control = control;
     }
     *displayInitPackets() {
         yield* super.displayInitPackets();
-        yield Packets_PacketBuilder.BindActionToControl(this, this.control);
+        yield PacketBuilder.BindActionToControl(this, this.control);
     }
     *displayDisposePackets() {
-        yield Packets_PacketBuilder.UnbindActionToControl(this, this.control);
+        yield PacketBuilder.UnbindActionToControl(this, this.control);
         yield* super.displayDisposePackets();
     }
 }
-class EditorActions_KeyInputAction extends (/* unused pure expression or super */ null && (Action)) {
+class KeyInputAction extends Action {
     context;
     button;
     inputModifier;
@@ -1355,16 +1408,16 @@ class MouseInputAction extends Action {
     context;
     mouseAction;
     constructor(context, mouseAction) {
-        super(Definitions_ActionType.MouseRayCastAction);
+        super(ActionType.MouseRayCastAction);
         this.context = context;
         this.mouseAction = mouseAction;
     }
     *displayInitPackets() {
         yield* super.displayInitPackets();
-        yield Packets_PacketBuilder.BindMouseInputActionToContext(this, this.context, this.mouseAction);
+        yield PacketBuilder.BindMouseInputActionToContext(this, this.context, this.mouseAction);
     }
     *displayDisposePackets() {
-        yield Packets_PacketBuilder.UnbindInputActionToContext(this, this.context);
+        yield PacketBuilder.UnbindInputActionToContext(this, this.context);
         yield* super.displayDisposePackets();
     }
 }
@@ -1407,14 +1460,14 @@ class MouseRayCastPayload extends PayloadLoader {
     }
 }
 const PayloadLoaders = new Map();
-PayloadLoaders.set(Definitions_ActionType.NoArgsAction, NoArgsPayload);
-PayloadLoaders.set(Definitions_ActionType.MouseRayCastAction, MouseRayCastPayload);
+PayloadLoaders.set(ActionType.NoArgsAction, NoArgsPayload);
+PayloadLoaders.set(ActionType.MouseRayCastAction, MouseRayCastPayload);
 
 ;// CONCATENATED MODULE: ./src/dynamic-editor/native/Controls/Actions.ts
 
 
 
-class KeyInputActionsEvent extends (/* unused pure expression or super */ null && (ActionBasedEvent)) {
+class KeyInputActionsEvent extends ActionBasedEvent {
     constructor(conextId) { super(conextId); }
     subscribe(m, keyButton, inputModifier = InputModifier.Any) {
         if (this._actions.has(m))
@@ -1437,7 +1490,7 @@ class KeyInputActionsEvent extends (/* unused pure expression or super */ null &
         return m;
     }
 }
-class MouseInputActionsEvent extends General_ActionBasedEvent {
+class MouseInputActionsEvent extends ActionBasedEvent {
     constructor(conextId) { super(conextId); }
     subscribe(m, mouseAction) {
         if (this._actions.has(m))
@@ -1458,6 +1511,21 @@ class MouseInputActionsEvent extends General_ActionBasedEvent {
         this._actions.delete(m);
         super._unsubUpdate(action);
         return m;
+    }
+}
+class MouseClickEvent extends MouseInputActionsEvent {
+    subscribe(m) {
+        return super.subscribe(m, MouseAction.ButtonClick);
+    }
+}
+class MouseDragEvent extends MouseInputActionsEvent {
+    subscribe(m) {
+        return super.subscribe(m, MouseAction.Drag);
+    }
+}
+class MouseWheelEvent extends MouseInputActionsEvent {
+    subscribe(m) {
+        return super.subscribe(m, MouseAction.Wheel);
     }
 }
 
@@ -1524,6 +1592,7 @@ class MenuItem extends ModedElement {
         this.setPropertyValue("name", displayText);
         return this;
     }
+    /**@deprecated Internal method */
     getMainPacketData(flags, packets) {
         const object = super.getMainPacketData(flags, packets);
         if (typeof this._parent === "object")
@@ -1563,13 +1632,13 @@ class MenuActionItem extends MenuItem {
         this.onActionExecute.subscribe(handler);
         return this;
     }
-    addKeyboardTrigger(keyButton, modifier = Definitions_InputModifier.Any) {
+    addKeyboardTrigger(keyButton, modifier = InputModifier.Any) {
         this._triggers.add({ keyButton, modifier });
-        TriggerEvent(this.onUpdate, new FakeUpdatable(Packets_PacketBuilder.BindKeyInputActionToContext(this._action, EditorInputContext.GlobalToolMode, keyButton, modifier)), INIT_FLAG);
+        TriggerEvent(this.onUpdate, new FakeUpdatable(PacketBuilder.BindKeyInputActionToContext(this._action, EditorInputContext.GlobalToolMode, keyButton, modifier)), INIT_FLAG);
         return this;
     }
     clearKeyboardTriggers() {
-        TriggerEvent(this.onUpdate, new FakeUpdatable(Packets_PacketBuilder.UnbindInputActionToContext(this._action, EditorInputContext.GlobalToolMode)), REMOVE_FLAG);
+        TriggerEvent(this.onUpdate, new FakeUpdatable(PacketBuilder.UnbindInputActionToContext(this._action, EditorInputContext.GlobalToolMode)), REMOVE_FLAG);
         this._triggers.clear();
         return this;
     }
@@ -1577,7 +1646,7 @@ class MenuActionItem extends MenuItem {
         yield* super.displayInitPackets();
         yield* this._action.displayInitPackets();
         for (const { keyButton, modifier } of this._triggers)
-            yield Packets_PacketBuilder.BindKeyInputActionToContext(this._action, EditorInputContext.GlobalToolMode, keyButton, modifier);
+            yield PacketBuilder.BindKeyInputActionToContext(this._action, EditorInputContext.GlobalToolMode, keyButton, modifier);
     }
     *displayDisposePackets() {
         yield* this._action.displayDisposePackets();
@@ -1612,11 +1681,13 @@ class MenuOptionsItem extends MenuItem {
     *getMenuItems() { for (const e of this._handlers.keys())
         yield e; }
     hasMenuItem(item) { return this._handlers.has(item); }
+    /**@deprecated Internal method */
     *displayInitPackets() {
         yield* super.displayInitPackets();
         for (const a of this._handlers.keys())
             yield* a.displayInitPackets();
     }
+    /**@deprecated Internal method */
     *displayDisposePackets() {
         yield* super.displayDisposePackets();
         for (const a of this._handlers.keys())
@@ -1627,6 +1698,7 @@ const TOOL_OBJECT_TYPE = Symbol("Tool");
 class Tool extends ModedElement {
     packetConstructor = ServerUXEventPacket;
     _propertyBindings = new WeakMap();
+    _isActive = false;
     PACKET_TYPES = {
         [INIT_FLAG]: ServerUXEventType.CreateTool,
         [UPDATE_FLAG]: ServerUXEventType.CreateTool,
@@ -1635,7 +1707,10 @@ class Tool extends ModedElement {
     [UNIQUE_SYMBOL](d) { return d.addReverses(this, "tool-"); }
     [OBJECT_TYPE] = TOOL_OBJECT_TYPE;
     onActivationStateChange = new PublicEvent;
-    onMouseInteract = new MouseInputActionsEvent(this);
+    onMouseDrag = new MouseDragEvent(this);
+    onMouseClick = new MouseClickEvent(this);
+    onMouseWheel = new MouseWheelEvent(this);
+    onKeyboardKeyPress = new KeyInputActionsEvent(this);
     isActivePropertyGetter = new BooleanProperty(false);
     constructor(icon, title, description) {
         const tSP = new StringProperty(title ?? "");
@@ -1648,9 +1723,13 @@ class Tool extends ModedElement {
             titleStringLocId: { property: tSP, isFake: true },
         });
         this.onActivationStateChange.subscribe(e => {
+            this._isActive = e.isSelected;
             (e.isSelected != this.isActivePropertyGetter.getValue()) ? this.isActivePropertyGetter.setValue(e.isSelected) : null;
         });
-        this.onMouseInteract.onUpdate.subscribe((...p) => TriggerEvent(this.onUpdate, ...p));
+        this.onMouseClick.onUpdate.subscribe((...p) => TriggerEvent(this.onUpdate, ...p));
+        this.onMouseDrag.onUpdate.subscribe((...p) => TriggerEvent(this.onUpdate, ...p));
+        this.onMouseWheel.onUpdate.subscribe((...p) => TriggerEvent(this.onUpdate, ...p));
+        this.onKeyboardKeyPress.onUpdate.subscribe((...p) => TriggerEvent(this.onUpdate, ...p));
     }
     get icon() { return this.getPropertyValue("icon") ?? ""; }
     set icon(v) { this.setPropertyValue("icon", v); }
@@ -1658,6 +1737,7 @@ class Tool extends ModedElement {
     set title(v) { this.setPropertyValue("titleString", v); }
     get description() { return this.getPropertyValue("descriptionString") ?? ""; }
     set description(v) { this.setPropertyValue("descriptionString", v); }
+    get isActivated() { return this._isActive; }
     setIcon(icon) {
         this.setPropertyValue("icon", icon);
         return this;
@@ -1679,19 +1759,20 @@ class Tool extends ModedElement {
         this.setPropertyValue("descriptionString", text);
         return this;
     }
-    bindPropertyPanes(...panes) {
-        for (const pane of panes) {
+    bindVisibleElements(...elements) {
+        for (const pane of elements) {
             if (this._propertyBindings.has(pane))
                 continue;
             const method = this.isActivePropertyGetter.onValueChange.subscribe(e => {
                 pane.setPropertyValue("visible", e.newValue);
             });
+            pane.setPropertyValue("visible", this.isActivated);
             this._propertyBindings.set(pane, method);
         }
         return this;
     }
-    unbindPropertyPanes(...panes) {
-        for (const pane of panes) {
+    unbindVisibleElements(...elements) {
+        for (const pane of elements) {
             if (!this._propertyBindings.has(pane))
                 continue;
             const method = this._propertyBindings.get(pane);
@@ -1700,6 +1781,7 @@ class Tool extends ModedElement {
         }
         return this;
     }
+    /**@deprecated Internal method */
     getMainPacketData(flags, packets) {
         const data = super.getMainPacketData(flags, packets);
         data.tooltipData = {
@@ -1710,12 +1792,20 @@ class Tool extends ModedElement {
         };
         return data;
     }
+    /**@deprecated Internal method */
     *displayInitPackets() {
         yield* super.displayInitPackets();
-        yield* this.onMouseInteract.displayInitPackets();
+        yield* this.onMouseClick.displayInitPackets();
+        yield* this.onMouseDrag.displayInitPackets();
+        yield* this.onMouseWheel.displayInitPackets();
+        yield* this.onKeyboardKeyPress.displayInitPackets();
     }
+    /**@deprecated Internal method */
     *displayDisposePackets() {
-        yield* this.onMouseInteract.displayDisposePackets();
+        yield* this.onKeyboardKeyPress.displayDisposePackets();
+        yield* this.onMouseWheel.displayInitPackets();
+        yield* this.onMouseDrag.displayInitPackets();
+        yield* this.onMouseClick.displayInitPackets();
         yield* super.displayDisposePackets();
     }
 }
@@ -1753,6 +1843,7 @@ class PaneElement extends ModingElement {
     getMainPacketDataItemOptions(flags, packets) {
         return {};
     }
+    /**@deprecated Internal method */
     getMainPacketData(flags, packets) {
         const data = super.getMainPacketData(flags, packets);
         data.paneId = flags === REMOVE_FLAG ? this.lastPaneId : this.paneId;
@@ -2014,7 +2105,7 @@ class NumberPaneElement extends ValuePaneElement {
     }
 }
 class ButtonPaneElement extends ContentPaneElement {
-    _action = new Action(Definitions_ActionType.NoArgsAction);
+    _action = new Action(ActionType.NoArgsAction);
     onButtonClick = this._action.onActionExecute;
     constructor(label) {
         super({
@@ -2027,13 +2118,14 @@ class ButtonPaneElement extends ContentPaneElement {
         data.variant = this.propertyBag["variant"].property.value;
         return data;
     }
+    /**@deprecated Internal method */
     getMainPacketData(flags, packets) {
         if (flags === INIT_FLAG) {
             packets.push(...this._action.displayInitPackets());
-            packets.push(Packets_PacketBuilder.BindActionToControl(this._action, this));
+            packets.push(PacketBuilder.BindActionToControl(this._action, this));
         }
         else if (flags === REMOVE_FLAG) {
-            packets.push(Packets_PacketBuilder.UnbindActionToControl(this._action, this));
+            packets.push(PacketBuilder.UnbindActionToControl(this._action, this));
             packets.push(...this._action.displayDisposePackets());
         }
         return super.getMainPacketData(flags, packets);
@@ -2093,6 +2185,11 @@ class DropdownPaneElement extends ValuePaneElement {
     }
     get selectedValue() { return this._options[this.value]; }
     get selectedValuePropertyGetter() { return this._propertyGetter; }
+    /**
+     * You should use this method just once, this pane element is not fully dynamic as other ones
+     * @param array The array of elements
+     * @returns
+     */
     setDropdownItems(array) {
         const { dropdownItems, options } = DropdownPaneElement.MapDropDownItems(array);
         this.setPropertyValue("dropdownItems", dropdownItems);
@@ -2354,6 +2451,7 @@ class ToolView extends Displayable {
         this._EditorPaneEvenHandler.clear();
         yield* super.displayDisposePackets();
     }
+    /**@deprecated Internal method */
     getMainPacketData(flags) {
         const data = { visible: this._visible, enabled: this._enabled };
         if (this._activeTool === null)
@@ -2502,7 +2600,9 @@ class EditorControlManager {
 
 const DISPLAY_MANAGERS = new WeakMap();
 class PlayerDisplayManager {
+    //internal
     static hasDisplayManager(player) { return DISPLAY_MANAGERS.has(player); }
+    //internal
     static getDisplayManager(player) { return DISPLAY_MANAGERS.get(player); }
     //@ts-ignore
     activeTool;
@@ -2628,7 +2728,7 @@ class EditorContextManager {
         }));
     }
 }
-EditorExtension.registry = function (extensionName) {
+EditorExtension.Registry = function (extensionName) {
     if (typeof this !== 'function')
         throw new TypeError("Bound to 'this' is not a function.");
     //@ts-ignore
@@ -2760,6 +2860,8 @@ var __webpack_exports__CursorTargetMode = __webpack_exports__.zI;
 var __webpack_exports__DividerPaneElement = __webpack_exports__.Jh;
 var __webpack_exports__DropdownItemsMapingProperty = __webpack_exports__.ct;
 var __webpack_exports__DropdownPaneElement = __webpack_exports__.Aw;
+var __webpack_exports__Editor = __webpack_exports__.ML;
+var __webpack_exports__EditorEvents = __webpack_exports__.Wi;
 var __webpack_exports__EditorExtension = __webpack_exports__.MC;
 var __webpack_exports__EditorMode = __webpack_exports__.je;
 var __webpack_exports__EditorPane = __webpack_exports__.J4;
@@ -2770,18 +2872,28 @@ var __webpack_exports__ExtensionReadyEvent = __webpack_exports__.hV;
 var __webpack_exports__ExtensionReadyEventData = __webpack_exports__.CS;
 var __webpack_exports__ExtensionShutdownEvent = __webpack_exports__.CG;
 var __webpack_exports__ExtensionShutdownEventData = __webpack_exports__._4;
+var __webpack_exports__GraphicsSettings = __webpack_exports__.kZ;
+var __webpack_exports__GraphicsSettingsProperty = __webpack_exports__.fT;
+var __webpack_exports__InputModifier = __webpack_exports__.P3;
 var __webpack_exports__KeyboardKey = __webpack_exports__.u8;
+var __webpack_exports__Logger = __webpack_exports__.Yd;
 var __webpack_exports__MenuActionItem = __webpack_exports__.MK;
 var __webpack_exports__MenuOptionsItem = __webpack_exports__.hd;
 var __webpack_exports__MouseAction = __webpack_exports__.oX;
+var __webpack_exports__MouseInteractionType = __webpack_exports__.V1;
+var __webpack_exports__MouseInteractions = __webpack_exports__.Y2;
 var __webpack_exports__NumberPaneElement = __webpack_exports__.VW;
 var __webpack_exports__NumberProperty = __webpack_exports__.Y6;
 var __webpack_exports__PermutationPickerPane = __webpack_exports__.SY;
 var __webpack_exports__PlayerModeChangeEvent = __webpack_exports__.$W;
 var __webpack_exports__PlayerModeChangeEventData = __webpack_exports__.uY;
+var __webpack_exports__PlaytestManager = __webpack_exports__.uG;
+var __webpack_exports__PlaytestSessionResult = __webpack_exports__.YY;
 var __webpack_exports__RedirectDestination = __webpack_exports__.Pw;
 var __webpack_exports__Selection = __webpack_exports__.Y1;
 var __webpack_exports__SelectionManager = __webpack_exports__.ZE;
+var __webpack_exports__SettingsManager = __webpack_exports__.pz;
+var __webpack_exports__SimulationState = __webpack_exports__.BH;
 var __webpack_exports__StatusBarAlignmentProperty = __webpack_exports__.V7;
 var __webpack_exports__StatusBarItem = __webpack_exports__.wl;
 var __webpack_exports__StatusBarItemAlignment = __webpack_exports__.se;
@@ -2794,4 +2906,5 @@ var __webpack_exports__ValueChangeEvent = __webpack_exports__.My;
 var __webpack_exports__ValueChangeEventData = __webpack_exports__.xC;
 var __webpack_exports__Vector3Property = __webpack_exports__.G7;
 var __webpack_exports__VectorPaneElement = __webpack_exports__.Bk;
-export { __webpack_exports__AutoSizeStatusBarItem as AutoSizeStatusBarItem, __webpack_exports__BindedSource as BindedSource, __webpack_exports__BlockPickerPaneElement as BlockPickerPaneElement, __webpack_exports__BlockTypePickerPaneElement as BlockTypePickerPaneElement, __webpack_exports__BooleanPaneElement as BooleanPaneElement, __webpack_exports__BooleanProperty as BooleanProperty, __webpack_exports__BuildInPane as BuildInPane, __webpack_exports__ButtonPaneElement as ButtonPaneElement, __webpack_exports__ButtonVariant as ButtonVariant, __webpack_exports__ButtonVariantProperty as ButtonVariantProperty, __webpack_exports__ClipboardItem as ClipboardItem, __webpack_exports__ClipboardManager as ClipboardManager, __webpack_exports__ClipboardMirrorAxis as ClipboardMirrorAxis, __webpack_exports__ClipboardRotation as ClipboardRotation, __webpack_exports__Cursor as Cursor, __webpack_exports__CursorControlMode as CursorControlMode, __webpack_exports__CursorTargetMode as CursorTargetMode, __webpack_exports__DividerPaneElement as DividerPaneElement, __webpack_exports__DropdownItemsMapingProperty as DropdownItemsMapingProperty, __webpack_exports__DropdownPaneElement as DropdownPaneElement, __webpack_exports__EditorExtension as EditorExtension, __webpack_exports__EditorMode as EditorMode, __webpack_exports__EditorPane as EditorPane, __webpack_exports__Element as Element, __webpack_exports__ExtensionInitializeEvent as ExtensionInitializeEvent, __webpack_exports__ExtensionInitializeEventData as ExtensionInitializeEventData, __webpack_exports__ExtensionReadyEvent as ExtensionReadyEvent, __webpack_exports__ExtensionReadyEventData as ExtensionReadyEventData, __webpack_exports__ExtensionShutdownEvent as ExtensionShutdownEvent, __webpack_exports__ExtensionShutdownEventData as ExtensionShutdownEventData, __webpack_exports__KeyboardKey as KeyboardKey, __webpack_exports__MenuActionItem as MenuActionItem, __webpack_exports__MenuOptionsItem as MenuOptionsItem, __webpack_exports__MouseAction as MouseAction, __webpack_exports__NumberPaneElement as NumberPaneElement, __webpack_exports__NumberProperty as NumberProperty, __webpack_exports__PermutationPickerPane as PermutationPickerPane, __webpack_exports__PlayerModeChangeEvent as PlayerModeChangeEvent, __webpack_exports__PlayerModeChangeEventData as PlayerModeChangeEventData, __webpack_exports__RedirectDestination as RedirectDestination, __webpack_exports__Selection as Selection, __webpack_exports__SelectionManager as SelectionManager, __webpack_exports__StatusBarAlignmentProperty as StatusBarAlignmentProperty, __webpack_exports__StatusBarItem as StatusBarItem, __webpack_exports__StatusBarItemAlignment as StatusBarItemAlignment, __webpack_exports__StringPaneElement as StringPaneElement, __webpack_exports__StringProperty as StringProperty, __webpack_exports__Tool as Tool, __webpack_exports__ToolView as ToolView, __webpack_exports__TransactionManager as TransactionManager, __webpack_exports__ValueChangeEvent as ValueChangeEvent, __webpack_exports__ValueChangeEventData as ValueChangeEventData, __webpack_exports__Vector3Property as Vector3Property, __webpack_exports__VectorPaneElement as VectorPaneElement };
+var __webpack_exports__editor = __webpack_exports__.j6;
+export { __webpack_exports__AutoSizeStatusBarItem as AutoSizeStatusBarItem, __webpack_exports__BindedSource as BindedSource, __webpack_exports__BlockPickerPaneElement as BlockPickerPaneElement, __webpack_exports__BlockTypePickerPaneElement as BlockTypePickerPaneElement, __webpack_exports__BooleanPaneElement as BooleanPaneElement, __webpack_exports__BooleanProperty as BooleanProperty, __webpack_exports__BuildInPane as BuildInPane, __webpack_exports__ButtonPaneElement as ButtonPaneElement, __webpack_exports__ButtonVariant as ButtonVariant, __webpack_exports__ButtonVariantProperty as ButtonVariantProperty, __webpack_exports__ClipboardItem as ClipboardItem, __webpack_exports__ClipboardManager as ClipboardManager, __webpack_exports__ClipboardMirrorAxis as ClipboardMirrorAxis, __webpack_exports__ClipboardRotation as ClipboardRotation, __webpack_exports__Cursor as Cursor, __webpack_exports__CursorControlMode as CursorControlMode, __webpack_exports__CursorTargetMode as CursorTargetMode, __webpack_exports__DividerPaneElement as DividerPaneElement, __webpack_exports__DropdownItemsMapingProperty as DropdownItemsMapingProperty, __webpack_exports__DropdownPaneElement as DropdownPaneElement, __webpack_exports__Editor as Editor, __webpack_exports__EditorEvents as EditorEvents, __webpack_exports__EditorExtension as EditorExtension, __webpack_exports__EditorMode as EditorMode, __webpack_exports__EditorPane as EditorPane, __webpack_exports__Element as Element, __webpack_exports__ExtensionInitializeEvent as ExtensionInitializeEvent, __webpack_exports__ExtensionInitializeEventData as ExtensionInitializeEventData, __webpack_exports__ExtensionReadyEvent as ExtensionReadyEvent, __webpack_exports__ExtensionReadyEventData as ExtensionReadyEventData, __webpack_exports__ExtensionShutdownEvent as ExtensionShutdownEvent, __webpack_exports__ExtensionShutdownEventData as ExtensionShutdownEventData, __webpack_exports__GraphicsSettings as GraphicsSettings, __webpack_exports__GraphicsSettingsProperty as GraphicsSettingsProperty, __webpack_exports__InputModifier as InputModifier, __webpack_exports__KeyboardKey as KeyboardKey, __webpack_exports__Logger as Logger, __webpack_exports__MenuActionItem as MenuActionItem, __webpack_exports__MenuOptionsItem as MenuOptionsItem, __webpack_exports__MouseAction as MouseAction, __webpack_exports__MouseInteractionType as MouseInteractionType, __webpack_exports__MouseInteractions as MouseInteractions, __webpack_exports__NumberPaneElement as NumberPaneElement, __webpack_exports__NumberProperty as NumberProperty, __webpack_exports__PermutationPickerPane as PermutationPickerPane, __webpack_exports__PlayerModeChangeEvent as PlayerModeChangeEvent, __webpack_exports__PlayerModeChangeEventData as PlayerModeChangeEventData, __webpack_exports__PlaytestManager as PlaytestManager, __webpack_exports__PlaytestSessionResult as PlaytestSessionResult, __webpack_exports__RedirectDestination as RedirectDestination, __webpack_exports__Selection as Selection, __webpack_exports__SelectionManager as SelectionManager, __webpack_exports__SettingsManager as SettingsManager, __webpack_exports__SimulationState as SimulationState, __webpack_exports__StatusBarAlignmentProperty as StatusBarAlignmentProperty, __webpack_exports__StatusBarItem as StatusBarItem, __webpack_exports__StatusBarItemAlignment as StatusBarItemAlignment, __webpack_exports__StringPaneElement as StringPaneElement, __webpack_exports__StringProperty as StringProperty, __webpack_exports__Tool as Tool, __webpack_exports__ToolView as ToolView, __webpack_exports__TransactionManager as TransactionManager, __webpack_exports__ValueChangeEvent as ValueChangeEvent, __webpack_exports__ValueChangeEventData as ValueChangeEventData, __webpack_exports__Vector3Property as Vector3Property, __webpack_exports__VectorPaneElement as VectorPaneElement, __webpack_exports__editor as editor };

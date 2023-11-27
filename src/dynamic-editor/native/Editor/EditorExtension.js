@@ -29,22 +29,23 @@ export class EditorExtension{
         this.clipboardManager = context.clipboardManager;
         this.transactionManager = context.transactionManager;
         this.selectionManager = context.selectionManager;
+        this.playtestManager = context.context.playtest;
         this.mainSelection = context.selectionManager.selection;
         this.mainClipboard = context.clipboardManager.clipboard;
         this.cursor = context.context.cursor;
         this.settings = context.context.settings;
         context.context.cursor
         context.onInitializeEvent.subscribe(()=>{
-            (async ()=>this.Initialize?.(this))().catch(er=>console.warn(er,er?.stack));
+            (async ()=>this.Initialize?.(this))().catch(er=>console.error(er,er?.stack));
             TriggerEvent(onInitializeEvent,new ExtensionInitializeEventData(this));
         });
         context.onReadyEvent.subscribe(()=>{
-            (async ()=>this.Ready?.(this))().catch(er=>console.warn(er,er?.stack));
+            (async ()=>this.Ready?.(this))().catch(er=>console.error(er,er?.stack));
             TriggerEvent(this.onReady,new ExtensionReadyEventData(this));
         });
         context.onShutdownEvent.subscribe(()=>{
             TriggerEvent(this.onShutdown,new ExtensionShutdownEventData(this));
-            (async ()=>this.Shutdown?.(this))().catch(er=>console.warn(er,er?.stack));
+            (async ()=>this.Shutdown?.(this))().catch(er=>console.error(er,er?.stack));
         });
         context.context.afterEvents.modeChange.subscribe(e=>TriggerEvent(onPlayerModeChangeEvent,new PlayerModeChangeEventData(this,e.mode)));
         this.player = context.player;

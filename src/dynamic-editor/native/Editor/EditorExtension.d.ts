@@ -1,4 +1,4 @@
-import { ClipboardItem, ClipboardManager, Cursor, CursorProperties, ExtensionOptionalParameters, Selection, SelectionManager, SettingsManager, TransactionManager } from "@minecraft/server-editor-bindings";
+import { ClipboardItem, ClipboardManager, Cursor, CursorProperties, ExtensionOptionalParameters, PlaytestManager, Selection, SelectionManager, SettingsManager, TransactionManager } from "@minecraft/server-editor-bindings";
 import { ExtensionInitializeEvent, ExtensionReadyEvent, ExtensionShutdownEvent, PlayerModeChangeEvent } from "../Events";
 import { MenuBarControl, StatusBarControl, ToolBar, ToolView } from "../Controls";
 import { BuildInPane, RedirectDestination } from "dynamic-editor/core";
@@ -38,6 +38,8 @@ export abstract class EditorExtension{
     readonly transactionManager: TransactionManager;
     /**SelectionManager known from native editor APIs.*/
     readonly selectionManager: SelectionManager;
+    /**SelectionManager known from native editor APIs.*/
+    readonly playtestManager: PlaytestManager;
     /**Selection known from native editor APIs.*/
     readonly mainSelection: Selection;
     /**ClipboardItem known from native editor APIs.*/
@@ -54,7 +56,7 @@ export abstract class EditorExtension{
     /**The registration metadata*/
     static readonly metadata?: ExtensionOptionalParameters;
     /**The registration, making a extension alive!*/
-    static registry(extensionName?: string): void;
+    static Registry(extensionName?: string): void;
     /**Redirection to hardcoded destinations*/
     redirectTo(destination: RedirectDestination): this;
     /**Changing visibility of hardcoded client Panes*/

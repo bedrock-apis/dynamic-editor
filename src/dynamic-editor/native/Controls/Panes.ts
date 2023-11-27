@@ -32,6 +32,7 @@ export class PaneElement<T extends InternalPaneElementTypes,PropertyRecord exten
     protected getMainPacketDataItemOptions(flags: number, packets: IPacket[]){
         return {} as any;
     }
+    /**@deprecated Internal method */
     getMainPacketData(flags: number, packets: IPacket[]) {
         const data = super.getMainPacketData(flags,packets);
         data.paneId = flags === REMOVE_FLAG?this.lastPaneId:this.paneId;
@@ -296,6 +297,7 @@ export class ButtonPaneElement extends ContentPaneElement<InternalPaneElementTyp
         data.variant = this.propertyBag["variant"].property.value;
         return data;
     }
+    /**@deprecated Internal method */
     getMainPacketData(flags: number, packets: IPacket[]) {
         if(flags === INIT_FLAG) {
             packets.push(...this._action.displayInitPackets());
@@ -360,6 +362,11 @@ export class DropdownPaneElement<T extends any[]> extends ValuePaneElement<Inter
     }
     get selectedValue(): T[number]{return this._options[this.value];}
     get selectedValuePropertyGetter(){return this._propertyGetter;}
+    /**
+     * You should use this method just once, this pane element is not fully dynamic as other ones
+     * @param array The array of elements
+     * @returns 
+     */
     setDropdownItems(array: T){
         const {dropdownItems,options} = DropdownPaneElement.MapDropDownItems(array);
         this.setPropertyValue("dropdownItems",dropdownItems);

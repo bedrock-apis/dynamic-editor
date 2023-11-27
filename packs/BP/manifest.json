@@ -1,0 +1,36 @@
+{
+    "format_version": 2,
+    "header": {
+        "uuid": "035a5505-e2b9-4852-923e-cade246a419f",
+        "name": "Dynamic Editor - Dev",
+        "version": [
+            1,
+            0,
+            0
+        ],
+        "min_engine_version": [
+            1,
+            20,
+            40
+        ],
+        "description": "Dynamic Editor Module description"
+    },
+    "modules": [
+        {
+            "type": "script",
+            "entry": "scripts/index.js",
+            "uuid": "1b5b6d54-a1d2-4b89-aae8-cffdd0e1a1af",
+            "version": [
+                1,
+                0,
+                0
+            ]
+        }
+    ],
+    "dependencies": [
+        {"module_name": "@minecraft/server","version": "1.9.0-beta"},
+        {"module_name": "@minecraft/server-editor-bindings","version": "0.1.0-beta"},
+        {"module_name": "@minecraft/server-editor","version": "0.1.0-beta"}
+    ],
+    "capabilities":["editorExtension","script_eval"]
+}

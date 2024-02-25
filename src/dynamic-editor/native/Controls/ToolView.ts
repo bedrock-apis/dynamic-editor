@@ -4,7 +4,6 @@ import { Displayable, INIT_FLAG, REMOVE_FLAG, ServerUXEventPacket, UPDATE_FLAG }
 import { IUnkownTool, MenuItem, StatusBarItem, TOOL_OBJECT_TYPE, Tool } from "./Elements";
 import { OBJECT_TYPE } from "./Base";
 import { EditorPane } from "./Panes";
-
 const VALID_ITEM: unique symbol = Symbol("VALID_ITEM");
 const VALID_MENU_ITEM: unique symbol = Symbol("VALID_MENU_ITEM");
 const VALID_STATUS_ITEM: unique symbol = Symbol("VALID_STATUS_ITEM");

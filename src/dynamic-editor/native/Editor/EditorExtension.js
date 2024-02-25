@@ -36,16 +36,16 @@ export class EditorExtension{
         this.settings = context.context.settings;
         context.context.cursor
         context.onInitializeEvent.subscribe(()=>{
-            (async ()=>this.Initialize?.(this))().catch(er=>console.error(er,er?.stack));
+            (async ()=>await this.Initialize?.(this))().catch(er=>console.error(er,er?.stack));
             TriggerEvent(onInitializeEvent,new ExtensionInitializeEventData(this));
         });
         context.onReadyEvent.subscribe(()=>{
-            (async ()=>this.Ready?.(this))().catch(er=>console.error(er,er?.stack));
+            (async ()=>await this.Ready?.(this))().catch(er=>console.error(er,er?.stack));
             TriggerEvent(this.onReady,new ExtensionReadyEventData(this));
         });
         context.onShutdownEvent.subscribe(()=>{
             TriggerEvent(this.onShutdown,new ExtensionShutdownEventData(this));
-            (async ()=>this.Shutdown?.(this))().catch(er=>console.error(er,er?.stack));
+            (async ()=>await this.Shutdown?.(this))().catch(er=>console.error(er,er?.stack));
         });
         context.context.afterEvents.modeChange.subscribe(e=>TriggerEvent(onPlayerModeChangeEvent,new PlayerModeChangeEventData(this,e.mode)));
         this.player = context.player;

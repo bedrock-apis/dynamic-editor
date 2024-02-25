@@ -76,7 +76,7 @@ export declare enum ButtonVariant {
 	"destructive" = "destructive",
 	"hero" = "hero"
 }
-declare enum ActionType {
+export declare enum ActionType {
 	NoArgsAction = "NoArgsAction",
 	MouseRayCastAction = "MouseRayCastAction"
 }
@@ -299,13 +299,17 @@ declare class Action<AType extends ActionType = ActionType.NoArgsAction> extends
 	get [ACTION_RETURNER](): this;
 	protected getMainPacketData(flags: number, packets: IPacket[]): any;
 	execute(payload: AType extends ActionType.MouseRayCastAction ? MouseRayCastPayload : NoArgsPayload): void;
+	/**@inheritdoc */
 	displayInitPackets(): Generator<IPacket, any, any>;
+	/**@inheritdoc */
 	displayDisposePackets(): Generator<IPacket>;
+	/**@inheritdoc */
 	displayUpdatePackets(): Generator<IPacket>;
 }
 declare class ControlBindedAction extends Action<ActionType.NoArgsAction> {
 	readonly control: IUniqueObject;
 	constructor(control: IUniqueObject);
+	/**@inheritdoc */
 	displayInitPackets(): Generator<IPacket, void, any>;
 	displayDisposePackets(): Generator<IPacket, void, unknown>;
 }
@@ -330,9 +334,9 @@ declare class PayloadLoader {
 	readonly dimension: import("@minecraft/server").Dimension;
 	constructor(player: Player, data: any);
 }
-declare class NoArgsPayload extends PayloadLoader {
+export declare class NoArgsPayload extends PayloadLoader {
 }
-declare class MouseRayCastPayload extends PayloadLoader {
+export declare class MouseRayCastPayload extends PayloadLoader {
 	readonly location: Vector3;
 	readonly direction: Vector3;
 	readonly blockLocation: Vector3;
@@ -345,13 +349,13 @@ declare class MouseRayCastPayload extends PayloadLoader {
 	get block(): import("@minecraft/server").Block | undefined;
 	constructor(player: Player, data: any);
 }
-export enum ClipboardMirrorAxis {
+declare enum ClipboardMirrorAxis {
 	None = "None",
 	X = "X",
 	XZ = "XZ",
 	Z = "Z"
 }
-export enum ClipboardRotation {
+declare enum ClipboardRotation {
 	None = "None",
 	Rotate180 = "Rotate180",
 	Rotate270 = "Rotate270",
@@ -416,12 +420,28 @@ export class Cursor {
 	setProperties(properties: CursorProperties): void;
 	show(): void;
 }
+declare class CursorPropertiesChangeAfterEvent {
+	private constructor();
+	readonly properties: CursorProperties;
+}
+declare class CursorPropertyChangeAfterEventSignal {
+	private constructor();
+	subscribe(callback: (arg0: CursorPropertiesChangeAfterEvent) => void): (arg0: CursorPropertiesChangeAfterEvent) => void;
+	unsubscribe(callback: (arg0: CursorPropertiesChangeAfterEvent) => void): void;
+}
+declare class Extension {
+	private constructor();
+	readonly defaultToolGroupId: string;
+	readonly description: string;
+	readonly name: string;
+	readonly notes: string;
+}
 declare class ExtensionContext {
 	private constructor();
 	readonly afterEvents: ExtensionContextAfterEvents;
 	readonly clipboardManager: ClipboardManager;
 	readonly cursor: Cursor;
-	readonly extensionName: string;
+	readonly extensionInfo: Extension;
 	readonly player: _10.Player;
 	readonly playtest: PlaytestManager;
 	readonly selectionManager: SelectionManager;
@@ -430,6 +450,7 @@ declare class ExtensionContext {
 }
 declare class ExtensionContextAfterEvents {
 	private constructor();
+	readonly cursorPropertyChange: CursorPropertyChangeAfterEventSignal;
 	readonly modeChange: ModeChangeAfterEventSignal;
 }
 export class GraphicsSettings {
@@ -495,8 +516,10 @@ export class SimulationState {
 }
 export class TransactionManager {
 	private constructor();
+	addUserDefinedOperation(transactionHandlerId: UserDefinedTransactionHandlerId, operationData: string, operationName?: string): void;
 	commitOpenTransaction(): boolean;
 	commitTrackedChanges(): number;
+	createUserDefinedTransactionHandler(undoClosure: (arg0: string) => void, redoClosure: (arg0: string) => void): UserDefinedTransactionHandlerId;
 	discardOpenTransaction(): boolean;
 	discardTrackedChanges(): number;
 	openTransaction(name: string): boolean;
@@ -509,6 +532,9 @@ export class TransactionManager {
 	undo(): void;
 	undoSize(): number;
 }
+declare class UserDefinedTransactionHandlerId {
+	private constructor();
+}
 export interface ClipboardWriteOptions {
 	anchor?: _10.Vector3;
 	mirror?: ClipboardMirrorAxis;
@@ -519,12 +545,14 @@ export interface CursorProperties {
 	controlMode?: CursorControlMode;
 	fixedModeDistance?: number;
 	outlineColor?: _10.RGBA;
+	projectThroughLiquid?: boolean;
 	targetMode?: CursorTargetMode;
 	visible?: boolean;
 }
 export interface ExtensionOptionalParameters {
 	description?: string;
 	notes?: string;
+	toolGroupId?: string;
 }
 export interface LogProperties {
 	player?: _10.Player;
@@ -538,6 +566,7 @@ export interface PlaytestGameOptions {
 	showCoordinates?: boolean;
 	spawnPosition?: _10.Vector3;
 	timeOfDay?: number;
+	weather?: number;
 }
 declare class EditorControlManager {
 	readonly context: EditorContextManager;
@@ -752,6 +781,11 @@ declare class Property<T> {
 	 * @returns this
 	 */
 	removeOnValueChangeHandler(a: Parameters<ValueChangeEvent<T>["subscribe"]>[0]): this;
+	/**
+	 *
+	 */
+	valueOf(): T;
+	toJSON(): T;
 }
 declare class ElementProperty<T> extends Property<T> {
 	/**
@@ -815,6 +849,8 @@ export declare class Element<PropertyRecord extends ElementExtendable = {}> exte
 		[K in keyof PropertyRecord]?: PropertyRecord[K];
 	};
 	setPropertyValue<T extends keyof PropertyRecord>(propertyName: T, value: ElementPropertyType<PropertyRecord[T]>): this;
+	getOriginalPropertyConstructor<T extends keyof PropertyRecord>(propertyName: T): typeof Property & (new (...any: any[]) => PropertyRecord[T]);
+	canAssignToProperty<T extends keyof PropertyRecord>(propertyName: T, value: ElementProperty<any>): boolean;
 	protected getMainPacketData(flags: number, packets: IPacket[]): any;
 	protected _TriggerPropertyChange<T extends keyof PropertyRecord>(el: Element<PropertyRecord>, nV: ElementPropertyType<PropertyRecord[T]>, pN: T, oV: ElementPropertyType<PropertyRecord[T]>, p: PropertyRecord[T]): void;
 	protected _setPropertyRealness<T extends keyof PropertyRecord>(key: T, isReal: boolean): this;
@@ -1001,6 +1037,7 @@ export declare class Tool extends ModedElement<{
 	titleStringLocId: StringProperty;
 	descriptionString: StringProperty;
 	descriptionStringLocId: StringProperty;
+	toolGroupId: StringProperty;
 }> implements IObjectType {
 	protected packetConstructor: new (data: any) => ServerUXEventPacket;
 	protected _propertyBindings: WeakMap<WeakKey, any>;
@@ -1028,8 +1065,11 @@ export declare class Tool extends ModedElement<{
 	set title(v: string);
 	get description(): string;
 	set description(v: string);
+	get toolGroupId(): string;
+	set toolGroupId(v: string);
 	get isActivated(): boolean;
 	setIcon(icon: string): this;
+	setToolGroupId(groupId: string): this;
 	/**@author ConMaster2112 */
 	setTitle(text: string): this;
 	/**@deprecated This state of tool doesn't really do anything, but maybe in future its going to do.*/
@@ -1046,10 +1086,15 @@ export declare class Tool extends ModedElement<{
 	/**@deprecated Internal method */
 	displayDisposePackets(): Generator<IPacket, void, any>;
 }
-export interface IPaneElement<T extends PaneElement<any, any>> extends Displayable<any> {
+export interface IPaneElement<T extends ValuePaneElement<any, any, any>> extends Displayable<any> {
 	getSelfElement(): T;
 }
-declare class PaneElement<T extends InternalPaneElementTypes, PropertyRecord extends ElementExtendable = {}> extends ModingElement<PropertyRecord> implements IPaneElement<PaneElement<T, PropertyRecord>> {
+export interface IGetPaneElement<T extends ElementProperty<any>, K extends ValuePaneElement<any, any, any> = any> extends IPaneElement<K> {
+	getPaneProperty(): T;
+	setPaneProperty(p: T): this;
+	canAssignPaneProperty(p: any): boolean;
+}
+declare class PaneElement<T extends InternalPaneElementTypes, PropertyRecord extends ElementExtendable = {}> extends ModingElement<PropertyRecord> implements IPaneElement<ValuePaneElement<T, PropertyRecord, any>> {
 	protected PACKET_TYPES: {
 		0: ServerUXEventType;
 		1: ServerUXEventType;
@@ -1067,7 +1112,7 @@ declare class PaneElement<T extends InternalPaneElementTypes, PropertyRecord ext
 	protected getMainPacketDataItemOptions(flags: number, packets: IPacket[]): any;
 	/**@deprecated Internal method */
 	getMainPacketData(flags: number, packets: IPacket[]): any;
-	getSelfElement(): PaneElement<T, PropertyRecord>;
+	getSelfElement(): ValuePaneElement<T, PropertyRecord, any>;
 }
 declare class ContentPaneElement<T extends InternalPaneElementTypes, PropertyRecord extends ElementExtendable> extends PaneElement<T, {
 	titleAltText: StringProperty;
@@ -1081,31 +1126,29 @@ declare class ContentPaneElement<T extends InternalPaneElementTypes, PropertyRec
 }
 declare class ValuePaneElement<T extends InternalPaneElementTypes, PropertyRecord extends ElementExtendable, P extends ElementProperty<any>> extends ContentPaneElement<T, {
 	value: P;
-} & PropertyRecord> {
+} & PropertyRecord> implements IGetPaneElement<P> {
 	protected constructor(properties: ElementConstruction<PropertyRecord & {
 		value: P;
 	}>, typeName: T);
+	getPaneProperty(): P;
+	setPaneProperty(p: P): this;
+	canAssignPaneProperty(p: any): boolean;
 	protected readonly _propertyKey: string;
 	readonly onUserInputValue: ValueChangeEvent<ElementPropertyType<P>>;
 	get value(): ElementPropertyType<P>;
 	set value(v: ElementPropertyType<P>);
 	setValue(value: ElementPropertyType<P>): this;
+	getValue(): ElementPropertyType<P>;
 	getValueProperty(): P;
 	getMainPacketData(flags: number, packets: IPacket[]): any;
 	protected _setValue(newValue: any): void;
 }
-declare class SubPaneElement extends PaneElement<InternalPaneElementTypes.SubPane, {}> {
-	protected readonly pane: EditorPane;
-	protected constructor(pane: EditorPane);
-	protected get paneId(): any;
-	protected set paneId(v: any);
-	protected get lastPaneId(): any;
-	protected set lastPaneId(v: any);
-	protected getMainPacketDataItemOptions(flags: number, packets: IPacket[]): any;
-}
-export declare class EditorPane extends RenderingElement<{
+export declare class EditorPane<T extends {
+	[key: string]: any;
+} = {}> extends RenderingElement<{
 	collapsed: BooleanProperty;
 	titleAltText: StringProperty;
+	titleStringId: StringProperty;
 	width: NumberProperty;
 }> implements IPaneElement<any> {
 	protected PACKET_TYPES: {
@@ -1116,13 +1159,24 @@ export declare class EditorPane extends RenderingElement<{
 	[UNIQUE_SYMBOL](d: PlayerDisplayManager): string;
 	protected _parentPane: any;
 	protected readonly _paneElementHandler: Map<IPaneElement<any>, {
-		element: IPaneElement<any>;
+		element: PaneElement<any, any>;
+		propertyName?: string | undefined;
 		method: any;
 		prop: any;
 	}>;
+	protected readonly _paneElementPropertiesMap: Map<string, ElementProperty<any>>;
 	protected readonly _properties: Map<string, ValuePaneElement<any, any, any>>;
 	protected readonly _currentElement: SubPaneElement;
-	get elementCount(): number;
+	protected readonly _propertyDictionary: {
+		[key: string]: any;
+	};
+	get elementsCount(): number;
+	get propertyDictionary(): {
+		[key: string]: any;
+	};
+	get propertyDictionaryProperties(): {
+		[key: string]: ElementProperty<any>;
+	};
 	constructor(title?: string);
 	get width(): number;
 	set width(v: number);
@@ -1134,18 +1188,100 @@ export declare class EditorPane extends RenderingElement<{
 	set isCollapsed(v: boolean);
 	setCollapsed(isCollapsed: boolean): this;
 	getElements(): IterableIterator<IPaneElement<any>>;
-	addElement(e: IPaneElement<any>): this;
-	addElements(...elements: IPaneElement<any>[]): this;
+	/**
+	 *
+	 * @param e Element to add
+	 * @param key if specified than elements value is wrapped to propertyDictionary of this pane
+	 * @returns this
+	 */
+	addElement<K extends string, L extends ValuePaneElement<any, any, S>, S extends ElementProperty<J>, J extends any>(e: IPaneElement<L>, key?: K): this & EditorPane<T & {
+		[N in K]: J;
+	}>;
 	removeElement(e: IPaneElement<any>): boolean;
 	protected getMainPacketData(flags: number, packets: IPacket[]): any;
 	protected _getPropertyItems(flag: number, packets: IPacket[]): any[];
 	getSelfElement(): any;
 }
-export declare class DividerPaneElement extends PaneElement<InternalPaneElementTypes.Divider> {
+declare class SubPaneElement extends PaneElement<InternalPaneElementTypes.SubPane, {}> {
+	protected readonly pane: EditorPane<{}>;
+	protected constructor(pane: EditorPane);
+	protected get paneId(): any;
+	protected set paneId(v: any);
+	protected get lastPaneId(): any;
+	protected set lastPaneId(v: any);
+	protected getMainPacketDataItemOptions(flags: number, packets: IPacket[]): any;
+}
+export declare class ToolView extends Displayable<IPacket> {
+	protected readonly PACKET_TYPES: {
+		2: ServerUXEventType;
+		0: ServerUXEventType;
+		1: ServerUXEventType;
+	};
+	protected readonly _MenuItemEvenHandler: Map<MenuItem<any>, any>;
+	protected readonly _StatusItemEvenHandler: Map<StatusBarItem, any>;
+	protected readonly _ToolEvenHandler: Map<Tool, any>;
+	protected readonly _EditorPaneEvenHandler: Map<EditorPane<{}>, any>;
+	protected readonly _manager: EditorControlManager;
+	protected _visible: boolean;
+	protected _enabled: boolean;
+	protected _activeTool: any;
+	get registeredTools(): number;
+	get registeredMenuItems(): number;
+	get registeredStatusBarItems(): number;
+	get registeredEditorPanes(): number;
+	protected constructor(manager: EditorControlManager);
+	protected _registry(item: EditorPane | MenuItem | StatusBarItem | Tool, map: Map<any, any>): boolean;
+	protected _unregistry(item: EditorPane | MenuItem | StatusBarItem | Tool, map: Map<any, any>): boolean;
+	addEditorPanes(...panes: EditorPane[]): this;
+	addTools(...tools: Tool[]): this;
+	addMenuItems(...items: MenuItem<any>[]): this;
+	addStatusBarItems(...items: StatusBarItem[]): this;
+	setActiveTool(item: Tool | null): void;
+	getActiveTool(): Tool | IUnkownTool | null;
+	addMenuItem(item: MenuItem<any>): boolean;
+	addStatusBarItem(item: StatusBarItem): boolean;
+	addTool(item: Tool): boolean;
+	addEditorPane(item: EditorPane): boolean;
+	removeItem(item: MenuItem<any> | StatusBarItem | Tool | EditorPane): boolean;
+	clearAll(): void;
+	hasTool(item: any): boolean;
+	hasMenuItem(item: any): boolean;
+	hasEditorPane(item: any): boolean;
+	hasStatusBarItem(item: any): boolean;
+	getMenuItems(): IterableIterator<MenuItem<any>>;
+	getStatusBarItems(): IterableIterator<StatusBarItem>;
+	getTools(): IterableIterator<Tool>;
+	getEditorPanes(): IterableIterator<EditorPane<{}>>;
+	/**@deprecated This is feature is incomplete, it can be set but could be desynced by other addons */
+	setToolBarVisibility(visibility: boolean): this;
+	/**@deprecated This is feature is incomplete, it can be set but could be desynced by other addons */
+	setToolBarMode(enabled: boolean): this;
+	/**@deprecated Internal function */
+	displayInitPackets(): Generator<IPacket, void, any>;
+	/**@deprecated Internal function */
+	displayDisposePackets(): Generator<IPacket, void, any>;
+	/**@deprecated Internal method */
+	protected getMainPacketData(flags?: number | undefined): any;
+}
+export declare class Editor {
+	readonly events: EditorEvents;
+	get isSimulationPaused(): boolean;
+	set isSimulationPaused(v: boolean);
+	readonly get logger(): Logger;
 	constructor();
 }
-export declare class BooleanPaneElement extends ValuePaneElement<InternalPaneElementTypes.Boolean, {}, BooleanProperty> {
+export declare class EditorEvents {
+	constructor();
+}
+export declare const editor: Editor;
+export declare class DividerPaneElement extends ValuePaneElement<InternalPaneElementTypes.Divider, {}, BooleanProperty> {
+	constructor();
+}
+export declare class BooleanPaneElement extends ValuePaneElement<InternalPaneElementTypes.Boolean, {
+	displayAsToggleSwitch: BooleanProperty;
+}, BooleanProperty> {
 	constructor(title: string);
+	protected getMainPacketDataItemOptions(flags: number, packets: IPacket[]): any;
 }
 export declare class StringPaneElement extends ValuePaneElement<InternalPaneElementTypes.String, {}, StringProperty> {
 	constructor(title: string);
@@ -1173,14 +1309,15 @@ export declare class ButtonPaneElement extends ContentPaneElement<InternalPaneEl
 }> {
 	protected _action: Action<ActionType.NoArgsAction>;
 	readonly onButtonClick: PublicEvent<[
-		NoArgsPayload
+		this
 	]>;
-	constructor(label: string);
+	constructor(label: string, callback?: (sender: ButtonPaneElement) => void);
+	setVariant(variant: ButtonVariant): this;
 	protected getMainPacketDataItemOptions(flags: number, packets: IPacket[]): any;
 	/**@deprecated Internal method */
 	getMainPacketData(flags: number, packets: IPacket[]): any;
-	addClickHandler(method: () => void): this;
-	removeClickHandler(method: () => void): this;
+	addClickHandler(method: (e: this) => void): this;
+	removeClickHandler(method: (e: this) => void): this;
 }
 export declare class VectorPaneElement extends ValuePaneElement<InternalPaneElementTypes.Vector3, {
 	min: Vector3Property;
@@ -1224,60 +1361,8 @@ export declare class BlockPickerPaneElement extends ValuePaneElement<InternalPan
 	constructor(title: string);
 	protected getMainPacketDataItemOptions(flags: number, packets: IPacket[]): any;
 }
-export declare class ToolView extends Displayable<IPacket> {
-	protected readonly PACKET_TYPES: {
-		2: ServerUXEventType;
-		0: ServerUXEventType;
-		1: ServerUXEventType;
-	};
-	protected readonly _MenuItemEvenHandler: Map<MenuItem<any>, any>;
-	protected readonly _StatusItemEvenHandler: Map<StatusBarItem, any>;
-	protected readonly _ToolEvenHandler: Map<Tool, any>;
-	protected readonly _EditorPaneEvenHandler: Map<EditorPane, any>;
-	protected readonly _manager: EditorControlManager;
-	protected _visible: boolean;
-	protected _enabled: boolean;
-	protected _activeTool: any;
-	get registeredTools(): number;
-	get registeredMenuItems(): number;
-	get registeredStatusBarItems(): number;
-	get registeredEditorPanes(): number;
-	protected constructor(manager: EditorControlManager);
-	protected _registry(item: EditorPane | MenuItem | StatusBarItem | Tool, map: Map<any, any>): boolean;
-	protected _unregistry(item: EditorPane | MenuItem | StatusBarItem | Tool, map: Map<any, any>): boolean;
-	addEditorPanes(...panes: EditorPane[]): this;
-	addTools(...tools: Tool[]): this;
-	addMenuItems(...items: MenuItem<any>[]): this;
-	addStatusBarItems(...items: StatusBarItem[]): this;
-	setActiveTool(item: Tool | null): void;
-	getActiveTool(): Tool | IUnkownTool | null;
-	addMenuItem(item: MenuItem<any>): boolean;
-	addStatusBarItem(item: StatusBarItem): boolean;
-	addTool(item: Tool): boolean;
-	addEditorPane(item: EditorPane): boolean;
-	removeItem(item: MenuItem<any> | StatusBarItem | Tool | EditorPane): boolean;
-	clearAll(): void;
-	hasTool(item: any): boolean;
-	hasMenuItem(item: any): boolean;
-	hasEditorPane(item: any): boolean;
-	hasStatusBarItem(item: any): boolean;
-	getMenuItems(): IterableIterator<MenuItem<any>>;
-	getStatusBarItems(): IterableIterator<StatusBarItem>;
-	getTools(): IterableIterator<Tool>;
-	getEditorPanes(): IterableIterator<EditorPane>;
-	/**@deprecated This is feature is incomplete, it can be set but could be desynced by other addons */
-	setToolBarVisibility(visibility: boolean): this;
-	/**@deprecated This is feature is incomplete, it can be set but could be desynced by other addons */
-	setToolBarMode(enabled: boolean): this;
-	/**@deprecated Internal function */
-	displayInitPackets(): Generator<IPacket, void, any>;
-	/**@deprecated Internal function */
-	displayDisposePackets(): Generator<IPacket, void, any>;
-	/**@deprecated Internal method */
-	protected getMainPacketData(flags?: number | undefined): any;
-}
 export declare class AutoSizeStatusBarItem extends StatusBarItem {
-	constructor(content?: string);
+	constructor(content?: string, textSizeMultiplier?: number);
 }
 export declare class BlockTypePickerPaneElement extends BlockPickerPaneElement {
 	constructor(title: string);
@@ -1286,7 +1371,7 @@ export declare class BlockTypePickerPaneElement extends BlockPickerPaneElement {
 }
 export declare class PermutationPickerPane extends EditorPane {
 	readonly blockTypePicker: BlockTypePickerPaneElement;
-	protected readonly pane: EditorPane;
+	protected readonly pane: EditorPane<{}>;
 	protected permutation: BlockPermutation;
 	get blockPermutation(): BlockPermutation;
 	constructor(title: string);
@@ -1324,24 +1409,13 @@ declare class PlayerDisplayManager {
 	getUnique(obj: any): string | undefined;
 	openCreateUnique(obj: any, as?: string): string | undefined;
 }
-export declare class Editor {
-	readonly events: EditorEvents;
-	get isSimulationPaused(): boolean;
-	set isSimulationPaused(v: boolean);
-	readonly get logger(): Logger;
-	constructor();
-}
-export declare class EditorEvents {
-	constructor();
-}
-export declare const editor: Editor;
 declare const UNIQUE_SYMBOL: unique symbol;
 export interface IPacket {
 	readonly id: string;
 	readonly data: any;
 }
 export interface IUniqueObject {
-	[UNIQUE_SYMBOL](display: PlayerDisplayManager, context: EditorContextManager): any;
+	[UNIQUE_SYMBOL](display: PlayerDisplayManager): any;
 }
 export interface IPacketCommand extends IPacket {
 	readonly commandId: symbol;

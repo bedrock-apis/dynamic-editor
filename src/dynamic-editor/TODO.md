@@ -1,6 +1,9 @@
 # TO DO
+ - Add MenuCheckmarkItem
+ - Add [object Object].propertyOf(): Property;
+
 ### Improve Bindings
-  - Add Lazy bingin, should have change value only when changed, one way binding
+  - Add Lazy binding, should have change value only when changed, one way binding
   - Improve Converting Property to accept two ways modification
   - Improve Element to Element binding to support two ways binding
 
@@ -17,5 +20,7 @@
   - ClipboardManager
   - Cursor APIs
   - Selection APIs
-  - Graphical Settings APIs (no hurry request)
-### Add Panes APIs
+  - Graphical Settings APIs (low priority request)
+
+## Problems
+ - EditorPane building packet is not effecient, onChange

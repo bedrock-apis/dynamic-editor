@@ -80,7 +80,7 @@ export class Property<T>{
     setValue(value: T){
         if(!this.isValidType(value)) throw new TypeError("Invalid value type: '" + value + "'");
         const a = new ValueChangeEventData(this.value,value);
-        TriggerEvent(this.onValueChange,a);
+        TriggerEvent(this.onValueChange, a);
         if(value !== a.newValue && !this.isValidType(a.newValue)) throw new TypeError("Invalid value type: '" + value + "'");
         this.value = a.newValue;
         TriggerEvent(this._onValueChange,a);
@@ -102,6 +102,11 @@ export class Property<T>{
         this.onValueChange.unsubscribe(a);
         return this;
     }
+    /**
+     * 
+     */
+    valueOf(){ return this.value; }
+    toJSON(){return this.value; }
 }
 export class ElementProperty<T> extends Property<T>{
     /**
@@ -212,6 +217,10 @@ export class Element<PropertyRecord extends ElementExtendable = {}> extends Disp
         this.propertyBag[propertyName].property.setValue(value);
         return this;
     }
+    getOriginalPropertyConstructor<T extends keyof PropertyRecord>(propertyName: T){return this.propertyBag[propertyName].construct;}
+    canAssignToProperty<T extends keyof PropertyRecord>(propertyName: T, value: ElementProperty<any>): boolean{
+        return this.getOriginalPropertyConstructor(propertyName)?.CanAssign?.(value)??false;
+    };
     protected getMainPacketData(flags: number, packets: IPacket[]) {
         const data = super.getMainPacketData(flags, packets);
         for (const key of this.getPropertyNames()) if(!this._isFakes.get(key as string)) data[key] = this.propertyBag[key].property.getValue();
@@ -234,4 +243,5 @@ export class Element<PropertyRecord extends ElementExtendable = {}> extends Disp
     protected _isPropertyReal<T extends keyof PropertyRecord>(key: T){
         return this._isFakes.get(key) !== true;
     }
+    ///UI handlers
 }

@@ -73,7 +73,7 @@ export class EditorContextManager{
 
 }
 
-EditorExtension.Registry = function (extensionName: string){
+EditorExtension.Registry = function(extensionName: string){
     if(typeof this !== 'function') throw new TypeError("Bound to 'this' is not a function.");
     //@ts-ignore
     this.extensionName = (extensionName??this.extensionName)??this.name;

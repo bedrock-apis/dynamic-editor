@@ -1,6 +1,5 @@
 import { Player } from "@minecraft/server";
 import { NativeEvent, TriggerEvent, UUID } from "dynamic-editor/core/index";
-import { Action } from "./EditorActions";
 import { IUnkownTool, OBJECT_TYPE, TOOL_OBJECT_TYPE, Tool } from "../Controls/index";
 
 const DISPLAY_MANAGERS = new WeakMap();

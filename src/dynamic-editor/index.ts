@@ -2,11 +2,13 @@ export {
     BuildInPane, StatusBarItemAlignment, 
     KeyboardKey, RedirectDestination,
     MouseAction, ButtonVariant, 
-    InputModifier, MouseInteractions, MouseInteractionType
+    InputModifier, MouseInteractions, MouseInteractionType, ActionType
 } from "./core/index";
 export { 
     EditorExtension, 
-    editor, Editor, EditorEvents
+    editor, Editor, EditorEvents,
+    MouseRayCastPayload,
+    NoArgsPayload
 } from "./native/Editor/index";
 export { 
     ExtensionInitializeEvent, ExtensionInitializeEventData,
@@ -58,8 +60,6 @@ export {
     TransactionManager,
     ClipboardItem,
     ClipboardManager,
-    ClipboardMirrorAxis,
-    ClipboardRotation,
     ClipboardWriteOptions,
     CursorControlMode,
     CursorTargetMode,

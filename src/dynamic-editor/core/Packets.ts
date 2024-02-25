@@ -1,6 +1,5 @@
 import { PlayerDisplayManager } from "dynamic-editor/native/Editor/EditorDisplayManager";
 import { PostEventId, ReceiveEventId } from "./Definitions";
-import { EditorContextManager } from "dynamic-editor/native/Editor";
 
 export const UNIQUE_SYMBOL: unique symbol = Symbol("UNIQUE");
 export const IDENTITY_SYMBOL: unique symbol = Symbol("IDENTITY_SYMBOL");
@@ -12,7 +11,7 @@ export interface IPacket{
     readonly data: any;
 }
 export interface IUniqueObject{
-    [UNIQUE_SYMBOL](display: PlayerDisplayManager,context: EditorContextManager): any
+    [UNIQUE_SYMBOL](display: PlayerDisplayManager): any
 }
 export interface IPacketCommand extends IPacket{
     readonly commandId: symbol;

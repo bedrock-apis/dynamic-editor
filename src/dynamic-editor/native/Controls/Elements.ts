@@ -3,8 +3,8 @@ import { BooleanProperty, NumberProperty, StringProperty, ModedElement, Renderin
 import { StatusBarAlignmentProperty } from "./Properties";
 import { ControlBindedAction, NoArgsPayload } from "../Editor/EditorActions";
 import { FakeUpdatable, INIT_FLAG, PacketBuilder, REMOVE_FLAG, ServerUXEventPacket, UPDATE_FLAG } from "../Packets";
-import { ACTION_RETURNER, Element, ElementConstruction, ElementExtendable, ElementProperty, IActionLike, IContentElement, IObjectType, OBJECT_TYPE } from "./Base";
-import { KeyInputActionsEvent, MouseClickEvent, MouseDragEvent, MouseInputActionsEvent, MouseWheelEvent } from "./Actions";
+import { ACTION_RETURNER, ElementConstruction, ElementExtendable, IActionLike, IContentElement, IObjectType, OBJECT_TYPE } from "./Base";
+import { KeyInputActionsEvent, MouseClickEvent, MouseDragEvent, MouseWheelEvent } from "./Actions";
 import { PlayerDisplayManager } from "../Editor/EditorDisplayManager";
 
 export class StatusBarItem extends ModedElement<{size:NumberProperty,text:StringProperty,alignment:StatusBarAlignmentProperty}> implements IContentElement{
@@ -158,7 +158,7 @@ export interface IUnkownTool{
     readonly id: string
 } 
 export const TOOL_OBJECT_TYPE = Symbol("Tool");
-export class Tool extends ModedElement<{icon:StringProperty,titleString:StringProperty,titleStringLocId:StringProperty,descriptionString:StringProperty,descriptionStringLocId:StringProperty}> implements IObjectType{
+export class Tool extends ModedElement<{icon:StringProperty,titleString:StringProperty,titleStringLocId:StringProperty,descriptionString:StringProperty,descriptionStringLocId:StringProperty,toolGroupId:StringProperty}> implements IObjectType{
     protected packetConstructor: new (data: any) => ServerUXEventPacket = ServerUXEventPacket;
     protected _propertyBindings = new WeakMap();
     protected _isActive = false;
@@ -184,6 +184,7 @@ export class Tool extends ModedElement<{icon:StringProperty,titleString:StringPr
             descriptionStringLocId:{property:dSP,isFake:true},
             titleString:{property:tSP,isFake:true},
             titleStringLocId:{property:tSP,isFake:true},
+            toolGroupId:{property:new StringProperty("")}
         });
         this.onActivationStateChange.subscribe(e=>{
             this._isActive = e.isSelected;
@@ -200,9 +201,15 @@ export class Tool extends ModedElement<{icon:StringProperty,titleString:StringPr
     set title(v:string){this.setPropertyValue("titleString",v);}
     get description():string{return this.getPropertyValue("descriptionString")??"";}
     set description(v:string){this.setPropertyValue("descriptionString",v);}
+    get toolGroupId():string{return this.getPropertyValue("toolGroupId")??"";}
+    set toolGroupId(v:string){this.setPropertyValue("toolGroupId",v);}
     get isActivated(): boolean{return this._isActive;}
     setIcon(icon: string){
         this.setPropertyValue("icon",icon);
+        return this;
+    }
+    setToolGroupId(groupId: string){
+        this.setPropertyValue("toolGroupId",groupId);
         return this;
     }
     /**@author ConMaster2112 */
@@ -225,8 +232,8 @@ export class Tool extends ModedElement<{icon:StringProperty,titleString:StringPr
     bindVisibleElements(...elements: RenderingElement<any>[]){
         for (const pane of elements) {
             if(this._propertyBindings.has(pane)) continue;
-            const method = this.isActivePropertyGetter.onValueChange.subscribe(e=>{
-                pane.setPropertyValue("visible", e.newValue);
+            const method = this.onActivationStateChange.subscribe(e=>{
+                pane.setPropertyValue("visible", e.isSelected);
             });
             pane.setPropertyValue("visible",this.isActivated);
             this._propertyBindings.set(pane,method);
@@ -237,7 +244,7 @@ export class Tool extends ModedElement<{icon:StringProperty,titleString:StringPr
         for (const pane of elements) {
             if(!this._propertyBindings.has(pane)) continue;
             const method = this._propertyBindings.get(pane);
-            this.isActivePropertyGetter.onValueChange.unsubscribe(method);
+            this.onActivationStateChange.unsubscribe(method);
             this._propertyBindings.delete(pane);
         }
         return this;
@@ -246,10 +253,10 @@ export class Tool extends ModedElement<{icon:StringProperty,titleString:StringPr
     getMainPacketData(flags: number, packets: IPacket[]) {
         const data = super.getMainPacketData(flags, packets);
         data.tooltipData = {
-            descriptionString:this.propertyBag["descriptionString"],
-            descriptionStringLocId:this.propertyBag["descriptionStringLocId"],
-            titleString:this.propertyBag["titleString"],
-            titleStringLocId:this.propertyBag["titleStringLocId"]
+            descriptionString:this.propertyBag["descriptionString"].property,
+            descriptionStringLocId:this.propertyBag["descriptionStringLocId"].property,
+            titleString:this.propertyBag["titleString"].property,
+            titleStringLocId:this.propertyBag["titleStringLocId"].property
         };
         return data;
     }

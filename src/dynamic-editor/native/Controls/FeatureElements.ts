@@ -1,12 +1,13 @@
 import { BlockPermutation, BlockStates, BlockType, BlockTypes } from "@minecraft/server";
 import { StatusBarItem } from "./Elements";
-import { BlockPickerPaneElement, DropdownPaneElement, EditorPane } from "./Panes";
+import { EditorPane } from "./Panes";
+import { BlockPickerPaneElement, DropdownPaneElement } from "./PaneElements";
 
 export class AutoSizeStatusBarItem extends StatusBarItem{
-    constructor(content?: string){
+    constructor(content?: string, textSizeMultiplier: number = 1.2){
         super(content);
         //bind size property depending on current text property and its length
-        StatusBarItem.BindProperty(this,"text",this,"size",n=>(n?.length??0)*1.25);
+        StatusBarItem.BindProperty(this,"text",this,"size",n=>(n?.length??0)*textSizeMultiplier);
         this.setPropertyValue("text",content??"");
     }
 }
@@ -25,7 +26,7 @@ export class PermutationPickerPane extends EditorPane{
     get blockPermutation(){return this.permutation;};
     constructor(title: string){
         super(title??"Permutation Picker");
-        this.blockTypePicker.setValue("air");
+        this.blockTypePicker.setValue("grass");
         this.blockTypePicker.onPropertyValueChange.subscribe(({newValue,propertyName})=>{
             if(propertyName === "value"){
                 this.permutation = BlockPermutation.resolve(newValue as string);
@@ -41,6 +42,7 @@ export class PermutationPickerPane extends EditorPane{
                 }
             }
         });
-        this.addElements(this.blockTypePicker,this.pane);
+        console.warn("Permutation picker");
+        this.addElement(this.blockTypePicker).addElement(this.pane);
     }
 }

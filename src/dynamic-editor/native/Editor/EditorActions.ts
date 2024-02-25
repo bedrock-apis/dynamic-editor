@@ -34,8 +34,11 @@ export class Action<AType extends ActionType = ActionType.NoArgsAction> extends 
     execute(payload: AType extends ActionType.MouseRayCastAction?MouseRayCastPayload:NoArgsPayload){
         TriggerEvent(this.onActionExecute,payload);
     }
+    /**@inheritdoc */
     *displayInitPackets(): Generator<IPacket,any,any>{ yield * super.getPackets(INIT_FLAG); }
+    /**@inheritdoc */
     *displayDisposePackets(): Generator<IPacket>{ yield * super.getPackets(REMOVE_FLAG);}
+    /**@inheritdoc */
     *displayUpdatePackets(): Generator<IPacket>{yield * super.getPackets(UPDATE_FLAG);}
 }
 export class ControlBindedAction extends Action<ActionType.NoArgsAction>{
@@ -44,6 +47,7 @@ export class ControlBindedAction extends Action<ActionType.NoArgsAction>{
         super(ActionType.NoArgsAction);
         this.control = control;
     }
+    /**@inheritdoc */
     *displayInitPackets(){
         yield* super.displayInitPackets();
         yield PacketBuilder.BindActionToControl(this,this.control);

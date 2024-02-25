@@ -6,3 +6,4 @@ export * from "./ToolView";
 export * from "./Actions";
 export * from "./Panes";
 export * from "./FeatureElements";
+export * from "./PaneElements";

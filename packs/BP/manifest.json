@@ -28,7 +28,7 @@
         }
     ],
     "dependencies": [
-        {"module_name": "@minecraft/server","version": "1.9.0-beta"},
+        {"module_name": "@minecraft/server","version": "1.10.0-beta"},
         {"module_name": "@minecraft/server-editor-bindings","version": "0.1.0-beta"},
         {"module_name": "@minecraft/server-editor","version": "0.1.0-beta"}
     ],

@@ -8,15 +8,15 @@ Minecraft Editor internal design wen't different way, so this project lost its p
 
 Creating Double click confirm button
 
-![](./media/confirm-button.mp4)
+<video src="./media/confirm-button.mp4" controls width="100%"></video>
 
 Full control about pane sizes
 
-![](./media/dynamic-editor-pane-animation.mp4)
+<video src="./media/dynamic-editor-pane-animation.mp4" autoplay loop muted playsinline width="100%"></video>
 
 Binding UI element together with just few lines of code, concept of shared property values
 
-![](./media/editor-cross-binded-panes.mp4)
+<video src="./media/editor-cross-binded-panes.mp4" autoplay loop muted playsinline width="100%"></video>
 
 # Dynamic Editor Mode APIs
 

@@ -1,3 +1,5 @@
+
+
 ### Archivation and Showcase
 
 Minecraft Editor internal design wen't different way, so this project lost its purpose and is no longer possible to keep with changes and maintenance
@@ -8,15 +10,15 @@ Minecraft Editor internal design wen't different way, so this project lost its p
 
 Creating Double click confirm button
 
-<video src="./media/confirm-button.mp4" controls width="100%"></video>
+<video src="./media/confirm-button.mp4"></video>
 
 Full control about pane sizes
 
-<video src="./media/dynamic-editor-pane-animation.mp4" autoplay loop muted playsinline width="100%"></video>
+<video src="./media/dynamic-editor-pane-animation.mp4"></video>
 
 Binding UI element together with just few lines of code, concept of shared property values
 
-<video src="./media/editor-cross-binded-panes.mp4" autoplay loop muted playsinline width="100%"></video>
+<video src="./media/editor-cross-binded-panes.mp4"></video>
 
 # Dynamic Editor Mode APIs
 
